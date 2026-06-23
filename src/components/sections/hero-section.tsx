@@ -147,7 +147,7 @@ export function HeroSection({
 
         <motion.p
           variants={fadeUp}
-          className="mb-10 max-w-2xl text-lg leading-relaxed text-slate-500 sm:text-xl"
+          className="mb-10 max-w-2xl md:max-w-none text-lg leading-relaxed text-slate-500 sm:text-xl md:whitespace-nowrap"
         >
           {displaySubtitle}
         </motion.p>
