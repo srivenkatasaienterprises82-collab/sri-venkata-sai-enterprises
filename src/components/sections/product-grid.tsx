@@ -5,17 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { Section } from "@/components/layout/section";
 
-import { getAllProducts, getStartingPrice, formatPrice, isPriceOnEnquiry } from "@/lib/data/products";
+import { getStartingPrice, formatPrice, isPriceOnEnquiry } from "@/lib/data/products";
+import type { Product } from "@/lib/data/products";
 
-// Number of cards shown in the homepage "Latest Devices" grid.
 const GRID_SIZE = 6;
 
-export function ProductGrid() {
-  // Prefer featured products; fall back to the tail of the catalog so the
-  // grid is never silently empty if there are fewer featured items than slots.
-  const all = getAllProducts();
-  const featured = all.filter((p) => p.featured);
-  const products = (featured.length >= GRID_SIZE ? featured : all).slice(0, GRID_SIZE);
+export function ProductGrid({ products }: { products: Product[] }) {
+  const featured = products.filter((p) => p.featured);
+  const shown = (featured.length >= GRID_SIZE ? featured : products).slice(0, GRID_SIZE);
   return (
     <Section className="bg-white" container="sm" id="products">
       <div className="w-full">
@@ -29,7 +26,7 @@ export function ProductGrid() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((product, i) => {
+          {shown.map((product, i) => {
             const enquiry = isPriceOnEnquiry(product);
             const startingPrice = getStartingPrice(product);
             // Show the cheapest variant's RAM/storage alongside the starting price.

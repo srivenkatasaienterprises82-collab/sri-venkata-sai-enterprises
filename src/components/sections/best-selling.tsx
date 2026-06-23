@@ -5,10 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { Section } from "@/components/layout/section";
 
-import { getAllProducts, getStartingPrice, formatPrice } from "@/lib/data/products";
+import { getStartingPrice, formatPrice } from "@/lib/data/products";
+import type { Product } from "@/lib/data/products";
 
-export function BestSelling() {
-  const bestSellers = getAllProducts().slice(0, 8);
+export function BestSelling({ products }: { products: Product[] }) {
+  const bestSellers = products.slice(0, 8);
   return (
     <Section className="bg-slate-50" container="sm">
       <div className="w-full">

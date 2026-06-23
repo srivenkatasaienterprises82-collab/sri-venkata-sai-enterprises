@@ -4,7 +4,8 @@ import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getAllProducts, formatPrice } from "@/lib/data/products";
+import { formatPrice } from "@/lib/data/products";
+import type { Product } from "@/lib/data/products";
 import { Button } from "@/components/ui/button";
 import { BadgeCheck, ChevronLeft, ChevronRight, ShieldCheck, ShoppingBag, Star } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
@@ -27,7 +28,7 @@ const fadeUp: Variants = {
   },
 };
 
-export function HeroSection() {
+export function HeroSection({ products }: { products: Product[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [itemsPerView, setItemsPerView] = useState(3);
@@ -35,7 +36,7 @@ export function HeroSection() {
   const [startX, setStartX] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  const carouselProducts = getAllProducts().filter((p) => p.featured).slice(0, 6);
+  const carouselProducts = products.filter((p) => p.featured).slice(0, 6);
 
   useEffect(() => {
     const handleResize = () => {

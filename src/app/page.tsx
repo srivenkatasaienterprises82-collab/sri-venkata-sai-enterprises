@@ -11,10 +11,28 @@ import { FAQ } from "@/components/sections/faq";
 import { ContactSection } from "@/components/sections/contact-section";
 import { Footer } from "@/components/sections/footer";
 import { faqs } from "@/lib/data/faq";
+import { sanityFetch } from "@/sanity/lib/live";
+import {
+  PRODUCTS_QUERY,
+  CATEGORIES_QUERY,
+  TESTIMONIALS_QUERY,
+} from "@/sanity/queries";
+import { toProducts, toBrands, toTestimonials } from "@/sanity/transform";
 
+export const dynamic = "force-dynamic";
 
+export default async function Home() {
+  const [{ data: sanityProducts }, { data: categories }, { data: testimonialsData }] =
+    await Promise.all([
+      sanityFetch({ query: PRODUCTS_QUERY }) as Promise<{ data: any[] }>,
+      sanityFetch({ query: CATEGORIES_QUERY }) as Promise<{ data: any[] }>,
+      sanityFetch({ query: TESTIMONIALS_QUERY }) as Promise<{ data: any[] }>,
+    ]);
 
-export default function Home() {
+  const products = toProducts(sanityProducts);
+  const brands = toBrands(categories);
+  const testimonials = toTestimonials(testimonialsData);
+
   return (
     <>
       {/* FAQ structured data for Google rich results */}
@@ -36,15 +54,15 @@ export default function Home() {
         }}
       />
       <main>
-        <HeroSection />
-        <BestSelling />
+        <HeroSection products={products} />
+        <BestSelling products={products} />
         <PromoBanners />
         <TrustStrip />
-        <BrandStrip />
+        <BrandStrip brands={brands} />
         <TopRatedPerformance />
         <BentoDeals />
-        <ProductGrid />
-        <Testimonials />
+        <ProductGrid products={products} />
+        <Testimonials testimonials={testimonials} />
         <FAQ />
         <ContactSection />
       </main>

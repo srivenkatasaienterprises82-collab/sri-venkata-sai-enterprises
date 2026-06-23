@@ -4,11 +4,9 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Section } from "@/components/layout/section";
-import { getFeaturedBrands } from "@/lib/data/brands";
+import type { Brand } from "@/lib/data/brands";
 
-const brands = getFeaturedBrands();
-
-export function BrandStrip() {
+export function BrandStrip({ brands }: { brands: Brand[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {

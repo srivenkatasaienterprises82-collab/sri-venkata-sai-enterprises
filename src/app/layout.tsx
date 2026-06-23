@@ -4,6 +4,7 @@ import { Nav } from "@/components/layout/nav";
 import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { CartProvider } from "@/context/CartContext";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { SanityLive } from "@/sanity/lib/live";
 import "./globals.css";
 
 function SkipLink() {
@@ -66,6 +67,7 @@ export default function RootLayout({
         {children}
       </div>
       <WhatsAppFloat />
+          <SanityLive />
           <Toaster position="top-right" theme="dark" />
         </CartProvider>
       </body>

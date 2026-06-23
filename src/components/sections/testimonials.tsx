@@ -2,12 +2,12 @@
 
 import { Section } from "@/components/layout/section";
 import { GradientText } from "@/components/ui/gradient-text";
-import { getAllTestimonials } from "@/lib/data/testimonials";
+import type { Testimonial } from "@/lib/data/testimonials";
 import { Quote, Star } from "lucide-react";
 import { motion } from "framer-motion";
 
-export function Testimonials() {
-  const testimonials = getAllTestimonials();
+export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
+  const items = testimonials.slice(0, 6);
 
   return (
     <Section className="bg-slate-50">
@@ -24,7 +24,7 @@ export function Testimonials() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {testimonials.slice(0, 6).map((testimonial, index) => (
+          {items.map((testimonial, index) => (
           <motion.div
             key={`${testimonial.name}-${testimonial.location}`}
             initial={{ opacity: 0, y: 20 }}
