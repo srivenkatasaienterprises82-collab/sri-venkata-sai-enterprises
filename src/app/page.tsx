@@ -101,10 +101,10 @@ export default async function Home() {
           secondaryCtaText={secondaryCtaText}
           secondaryCtaLink={secondaryCtaLink}
         />
+        <BrandStrip brands={brands} />
         <BestSelling products={products} />
         <PromoBanners />
         <TrustStrip />
-        <BrandStrip brands={brands} />
         <TopRatedPerformance products={topRatedProducts} />
         <BentoDeals offers={bentoDeals} />
         <ProductGrid products={products} />

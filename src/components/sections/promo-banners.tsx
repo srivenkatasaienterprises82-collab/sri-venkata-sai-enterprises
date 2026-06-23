@@ -24,7 +24,21 @@ function isDark(hex: string) {
 }
 
 export default async function PromoBanners() {
-  const { data: banners } = await safeSanityFetch({ query: BANNERS_QUERY }) as { data: Banner[] | null };
+  const { data: sanityBanners } = await safeSanityFetch({ query: BANNERS_QUERY }) as { data: Banner[] | null };
+
+  // Combine Sanity banners with a hardcoded third banner
+  const banners = [
+    ...(sanityBanners || []),
+    {
+      _id: "hardcoded-3rd-banner",
+      title: "[Insert Brand/Phone Name]",
+      subtitle: "Special Offer",
+      badge: "NEW",
+      cta: "Shop Now",
+      link: "[Insert Link/URL]",
+      backgroundColor: "#1e293b", // Slate 800
+    }
+  ];
 
   if (!banners?.length) return null;
 

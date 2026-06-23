@@ -67,7 +67,7 @@ export function Nav({ settings }: { settings?: SanitySiteSettings }) {
           {/* Logo */}
           <Link
             href="/"
-            className="flex flex-1 items-center gap-3 shrink-0"
+            className="flex items-center gap-3 shrink-0"
             aria-label={`${storeName} — home`}
           >
             <Image

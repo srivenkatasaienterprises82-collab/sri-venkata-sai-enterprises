@@ -177,24 +177,7 @@ export function HeroSection({
           </Button>
         </motion.div>
 
-        <motion.div
-          variants={fadeUp}
-          className="flex w-full max-w-2xl flex-wrap items-center justify-center gap-x-8 gap-y-3"
-        >
-          {[
-            { icon: Star, label: `${siteConfig.rating} rating` },
-            { icon: ShieldCheck, label: "Genuine products" },
-            { icon: BadgeCheck, label: "Brand warranty" },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className="flex items-center gap-2.5 rounded-xl border border-slate-200/60 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur-sm"
-            >
-              <item.icon className="h-4 w-4 shrink-0 text-blue-600" />
-              <span>{item.label}</span>
-            </div>
-          ))}
-        </motion.div>
+
       </motion.div>
 
       {/* ── 2. Phone Showcase Carousel ── */}
@@ -211,7 +194,7 @@ export function HeroSection({
           {/* Navigation Arrows (Outside overflow-hidden container for more breathing room) */}
           <button
             onClick={handlePrev}
-            className="absolute left-0 sm:left-2 xl:-left-6 top-[316px] z-30 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/95 text-slate-600 shadow-lg shadow-slate-900/5 backdrop-blur-md transition-all hover:bg-white hover:text-blue-600 hover:shadow-xl"
+            className="absolute -left-2 sm:-left-6 lg:-left-8 top-1/2 z-30 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/95 text-slate-600 shadow-lg shadow-slate-900/5 backdrop-blur-md transition-all hover:bg-white hover:text-blue-600 hover:shadow-xl"
             aria-label="Previous slide"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -219,7 +202,7 @@ export function HeroSection({
 
           <button
             onClick={handleNext}
-            className="absolute right-0 sm:right-2 xl:-right-6 top-[316px] z-30 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/95 text-slate-600 shadow-lg shadow-slate-900/5 backdrop-blur-md transition-all hover:bg-white hover:text-blue-600 hover:shadow-xl"
+            className="absolute -right-2 sm:-right-6 lg:-right-8 top-1/2 z-30 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 bg-white/95 text-slate-600 shadow-lg shadow-slate-900/5 backdrop-blur-md transition-all hover:bg-white hover:text-blue-600 hover:shadow-xl"
             aria-label="Next slide"
           >
             <ChevronRight className="h-5 w-5" />
@@ -228,7 +211,7 @@ export function HeroSection({
           <div className="relative overflow-hidden rounded-3xl bg-slate-50/50 px-4 py-10 sm:px-10 lg:px-14">
             {/* Track */}
             <div
-              className="flex transition-transform duration-700 ease-in-out"
+              className="flex items-center transition-transform duration-700 ease-in-out"
               style={{
                 transform: `translateX(-${translatePercent}%)`,
               }}
@@ -251,8 +234,8 @@ export function HeroSection({
                 return (
                   <div
                     key={product.id}
-                    className="flex w-full flex-shrink-0 items-end justify-center px-3 sm:w-[33.333333%] sm:px-4"
-                    style={{ height: "460px" }}
+                    className="flex w-full flex-shrink-0 items-center justify-center px-3 sm:w-[33.333333%] sm:px-4 py-6"
+                    style={{ minHeight: "460px" }}
                   >
                     <Link
                       href={`/products/${product.slug}`}
