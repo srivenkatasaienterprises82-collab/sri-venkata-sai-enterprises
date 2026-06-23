@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     `best mobile shop ${siteConfig.address.city}`,
   ],
   icons: {
-    icon: [{ url: "/logo.jpg", type: "image/jpeg" }],
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/logo.jpg" }],
   },
   openGraph: {
