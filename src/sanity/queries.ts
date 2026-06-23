@@ -40,7 +40,8 @@ export const CATEGORIES_QUERY = defineQuery(`*[_type == "category"] | order(name
 }`);
 
 export const BANNERS_QUERY = defineQuery(`*[_type == "banner" && active == true] | order(order asc){
-  _id, title, subtitle, "image": image.asset->url, link
+  _id, title, subtitle, badge, cta, backgroundColor,
+  "image": image.asset->url, link
 }`);
 
 export const TESTIMONIALS_QUERY = defineQuery(`*[_type == "testimonial"]{
