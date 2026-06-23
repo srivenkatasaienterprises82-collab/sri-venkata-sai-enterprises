@@ -11,7 +11,7 @@ export async function getSiteSettings(): Promise<SanitySiteSettings> {
     }
     return settings;
   } catch (err) {
-    console.warn("⚠️ Failed to load site settings from Sanity, falling back to static config:", err);
+    console.warn(`⚠️ Failed to load site settings from Sanity, falling back to static config: ${err instanceof Error ? err.message : String(err)}`);
     return {
       companyName: siteConfig.storeName,
       companyShortName: siteConfig.storeShortName,

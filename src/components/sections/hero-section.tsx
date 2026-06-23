@@ -140,14 +140,14 @@ export function HeroSection({
 
         <motion.h1
           variants={fadeUp}
-          className="mb-6 text-2xl font-extrabold leading-[1.1] tracking-tight text-slate-900 xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
+          className="mb-6 text-lg xs:text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.1] tracking-tight text-slate-900 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
         >
           {displayTitle}
         </motion.h1>
 
         <motion.p
           variants={fadeUp}
-          className="mb-10 text-[10px] xs:text-xs sm:text-base md:text-xl leading-relaxed text-slate-500 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
+          className="mb-10 text-[9px] xxs:text-[10px] xs:text-xs sm:text-sm md:text-lg lg:text-xl leading-relaxed text-slate-500 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
         >
           {displaySubtitle}
         </motion.p>

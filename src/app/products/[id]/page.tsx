@@ -44,7 +44,7 @@ async function fetchProduct(slug: string): Promise<{ product: Product; isSanity:
       return { product: toProduct(sanityProduct), isSanity: true };
     }
   } catch (err) {
-    console.warn(`⚠️ Failed to fetch product slug ${slug} from Sanity:`, err);
+    console.warn(`⚠️ Failed to fetch product slug ${slug} from Sanity: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   // Fallback to static data

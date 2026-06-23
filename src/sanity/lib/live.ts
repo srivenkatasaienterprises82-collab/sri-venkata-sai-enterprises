@@ -20,7 +20,7 @@ export async function safeSanityFetch<T>({
     const res = await sanityFetch({ query, params });
     return res as { data: T };
   } catch (err) {
-    console.warn("⚠️ Sanity fetch error for query:", query, err);
+    console.warn(`⚠️ Sanity fetch error for query ${query}: ${err instanceof Error ? err.message : String(err)}`);
     return { data: null };
   }
 }
