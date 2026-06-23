@@ -21,8 +21,8 @@ interface SideBanner {
 const leftBanners: SideBanner[] = [
   {
     src: "/images/banners/Gemini_Generated_Image_1gagrs1gagrs1gag.png",
-    alt: "Premium smartphones sale",
-    href: "/products",
+    alt: "iQOO 15R Premium 5G",
+    href: "/products/iqoo-15r",
   },
   {
     src: "/images/banners/Gemini_Generated_Image_abvgiuabvgiuabvg.png",
@@ -34,8 +34,8 @@ const leftBanners: SideBanner[] = [
 const rightBanners: SideBanner[] = [
   {
     src: "/images/banners/Gemini_Generated_Image_zerbi9zerbi9zerb.png",
-    alt: "New arrivals 5G",
-    href: "/products",
+    alt: "iQOO Neo 10 Gaming Flagship",
+    href: "/products/iqoo-neo-10",
   },
   {
     src: "/images/banners/vivo-t4-pro-in-nitro-blue-lg-x2.jpg.jpeg",
