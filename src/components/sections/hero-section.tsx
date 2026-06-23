@@ -140,14 +140,14 @@ export function HeroSection({
 
         <motion.h1
           variants={fadeUp}
-          className="mb-6 text-4xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl xl:text-7xl md:whitespace-nowrap"
+          className="mb-6 text-2xl font-extrabold leading-[1.1] tracking-tight text-slate-900 xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
         >
           {displayTitle}
         </motion.h1>
 
         <motion.p
           variants={fadeUp}
-          className="mb-10 max-w-2xl md:max-w-none text-lg leading-relaxed text-slate-500 sm:text-xl md:whitespace-nowrap"
+          className="mb-10 text-[10px] xs:text-xs sm:text-base md:text-xl leading-relaxed text-slate-500 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
         >
           {displaySubtitle}
         </motion.p>
@@ -205,6 +205,14 @@ export function HeroSection({
           onMouseLeave={() => setIsHovered(false)}
         >
         <div className="relative overflow-hidden rounded-3xl bg-slate-50/50 px-4 py-10 sm:px-10 lg:px-14">
+          {/* Locked Featured Badge in the absolute center */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 z-30 flex justify-center pb-10 pt-10">
+            <div className="relative flex w-[280px] items-end justify-center" style={{ height: "460px" }}>
+              <div className="absolute bottom-[372px] left-1/2 -translate-x-1/2 rounded-full bg-amber-500 px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
+                Featured
+              </div>
+            </div>
+          </div>
           {/* Navigation Arrows */}
           <button
             onClick={handlePrev}
@@ -242,7 +250,7 @@ export function HeroSection({
             }}
           >
             {carouselProducts.map((product, i) => {
-              const isCenter = i === currentIndex + 1;
+              const isCenter = itemsPerView === 3 ? i === currentIndex + 1 : i === currentIndex;
 
               return (
                 <div
@@ -259,11 +267,6 @@ export function HeroSection({
                         : "z-10 w-[220px] translate-y-6 scale-[0.92] rounded-xl p-5 opacity-70 hover:opacity-100"
                     }`}
                   >
-                    {isCenter && product.featured && (
-                      <div className="absolute -top-3 rounded-full bg-amber-500 px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
-                        Featured
-                      </div>
-                    )}
                     <div
                       className={`relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-slate-50 ${
                         isCenter ? "mb-5 h-[260px]" : "mb-4 h-[220px]"

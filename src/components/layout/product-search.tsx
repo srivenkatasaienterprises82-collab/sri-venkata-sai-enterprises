@@ -87,12 +87,12 @@ export function ProductSearch({ onSelect }: ProductSearchProps) {
       : undefined;
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-sm">
+    <div ref={containerRef} className="relative w-full max-w-md">
       <span id={labelId} className="sr-only">
         Search products and brands
       </span>
       <div className="relative flex items-center">
-        <Search className="absolute left-3 h-4 w-4 text-slate-400" aria-hidden="true" />
+        <Search className="absolute left-3.5 h-4 w-4 text-slate-400" aria-hidden="true" />
         <input
           type="text"
           role="combobox"
@@ -111,7 +111,7 @@ export function ProductSearch({ onSelect }: ProductSearchProps) {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search products, brands..."
-          className="h-10 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-10 text-sm outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+          className="h-10 w-full rounded-full border border-slate-100 bg-slate-100/60 pl-11 pr-10 text-sm outline-none transition-all focus:border-blue-500/80 focus:bg-white focus:ring-2 focus:ring-blue-100/50"
         />
         {query && (
           <button

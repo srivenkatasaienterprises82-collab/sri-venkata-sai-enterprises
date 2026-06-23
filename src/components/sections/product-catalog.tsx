@@ -84,7 +84,7 @@ export function ProductCatalog({ products }: ProductCatalogProps) {
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search brand, model, feature (e.g. AMOLED, flagship)"
             aria-label="Search mobiles"
-            className="min-h-14 w-full rounded-xl border border-slate-300 bg-slate-50 pl-12 pr-11 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+            className="min-h-14 w-full rounded-full border border-slate-300 bg-slate-50 pl-14 pr-13 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
           />
           {query && (
             <button
