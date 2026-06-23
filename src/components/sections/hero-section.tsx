@@ -222,83 +222,77 @@ export function HeroSection({
           </button>
 
           <div className="relative overflow-hidden rounded-3xl bg-slate-50/50 px-4 py-10 sm:px-10 lg:px-14">
-            {/* Locked Featured Badge in the absolute center (aligned to 300px card width) */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 z-30 flex justify-center pb-10 pt-10">
-              <div className="relative flex w-[300px] items-end justify-center" style={{ height: "460px" }}>
-                <div className="absolute bottom-[372px] left-1/2 -translate-x-1/2 rounded-full bg-amber-500 px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
-                  Featured
-                </div>
-              </div>
-            </div>
+            {/* Track */}
+            <div
+              className="flex transition-transform duration-700 ease-in-out"
+              style={{
+                transform: `translateX(-${translatePercent}%)`,
+              }}
+              onPointerDown={(e) => {
+                setIsDragging(false);
+                setStartX(e.clientX);
+              }}
+              onPointerMove={(e) => {
+                if (Math.abs(e.clientX - startX) > 5) {
+                  setIsDragging(true);
+                }
+              }}
+              onPointerUp={() => {
+                setTimeout(() => setIsDragging(false), 50);
+              }}
+            >
+              {carouselProducts.map((product, i) => {
+                const isCenter = itemsPerView === 3 ? i === currentIndex + 1 : i === currentIndex;
 
-          {/* Track */}
-          <div
-            className="flex transition-transform duration-700 ease-in-out"
-            style={{
-              transform: `translateX(-${translatePercent}%)`,
-            }}
-            onPointerDown={(e) => {
-              setIsDragging(false);
-              setStartX(e.clientX);
-            }}
-            onPointerMove={(e) => {
-              if (Math.abs(e.clientX - startX) > 5) {
-                setIsDragging(true);
-              }
-            }}
-            onPointerUp={() => {
-              setTimeout(() => setIsDragging(false), 50);
-            }}
-          >
-            {carouselProducts.map((product, i) => {
-              const isCenter = itemsPerView === 3 ? i === currentIndex + 1 : i === currentIndex;
-
-              return (
-                <div
-                  key={product.id}
-                  className="flex w-full flex-shrink-0 items-end justify-center px-3 sm:w-[33.333333%] sm:px-4"
-                  style={{ height: "460px" }}
-                >
-                  <Link
-                    href={`/products/${product.slug}`}
-                    onClick={(e) => isDragging && e.preventDefault()}
-                    className={`relative flex w-full max-w-[300px] mx-auto flex-col items-center rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5 transition-all duration-500 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/10 ${
-                      isCenter
-                        ? "z-20 translate-y-0 scale-100 p-6 opacity-100 shadow-xl shadow-slate-200/50"
-                        : "z-10 translate-y-6 scale-[0.88] rounded-xl p-5 opacity-70 hover:opacity-100"
-                    }`}
+                return (
+                  <div
+                    key={product.id}
+                    className="flex w-full flex-shrink-0 items-end justify-center px-3 sm:w-[33.333333%] sm:px-4"
+                    style={{ height: "460px" }}
                   >
-                    <div
-                      className={`relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-slate-50 ${
-                        isCenter ? "mb-5 h-[260px]" : "mb-4 h-[220px]"
+                    <Link
+                      href={`/products/${product.slug}`}
+                      onClick={(e) => isDragging && e.preventDefault()}
+                      className={`relative flex w-full max-w-[280px] mx-auto flex-col items-center rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5 transition-all duration-500 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/10 p-6 ${
+                        isCenter
+                          ? "z-20 translate-y-0 scale-100 opacity-100 shadow-xl shadow-slate-200/50"
+                          : "z-10 translate-y-6 scale-[0.88] opacity-75 hover:opacity-100"
                       }`}
                     >
-                      {product.image && (
-                        <Image
-                          src={product.image}
-                          alt={product.name}
-                          fill
-                          sizes="33vw"
-                          className={`object-contain p-4 mix-blend-multiply transition-transform duration-500 hover:scale-105 ${
-                            !isCenter ? "object-top" : ""
-                          }`}
-                        />
+                      {product.featured && (
+                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-500 px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md z-30">
+                          Featured
+                        </span>
                       )}
-                    </div>
-                    <span className="mb-1 text-[10px] font-bold uppercase tracking-wider text-blue-600">{product.brand}</span>
-                    <p className={`text-center font-bold text-slate-900 ${isCenter ? "text-base" : "text-sm"}`}>
-                      {product.name}
-                    </p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className={`font-extrabold text-slate-900 ${isCenter ? "text-base" : "text-sm"}`}>
-                        {formatPrice(product.variants[0]?.price || 0)}
-                      </span>
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
+
+                      <div className="relative flex w-full h-[240px] items-center justify-center overflow-hidden rounded-xl bg-slate-50 mb-5">
+                        {product.image && (
+                          <Image
+                            src={product.image}
+                            alt={product.name}
+                            fill
+                            sizes="33vw"
+                            className="object-contain p-4 mix-blend-multiply transition-transform duration-500 hover:scale-105"
+                          />
+                        )}
+                      </div>
+
+                      <div className="text-center w-full flex flex-col items-center mt-2">
+                        <span className="mb-1 text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                          {product.brand}
+                        </span>
+                        <h3 className="text-center font-bold text-slate-900 text-base leading-snug line-clamp-1">
+                          {product.name}
+                        </h3>
+                        <p className="mt-2 font-extrabold text-slate-900 text-base">
+                          {formatPrice(product.variants[0]?.price || 0)}
+                        </p>
+                      </div>
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
 
           {/* Dots */}
           <div className="mt-10 flex justify-center gap-3">
