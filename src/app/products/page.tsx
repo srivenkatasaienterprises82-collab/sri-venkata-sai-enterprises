@@ -7,7 +7,11 @@ import { BrandFilter } from "@/components/sections/brand-filter";
 import { ProductCatalog } from "@/components/sections/product-catalog";
 import { siteConfig } from "@/lib/data/siteConfig";
 import type { Metadata } from "next";
-
+import { safeSanityFetch } from "@/sanity/lib/live";
+import { PRODUCTS_QUERY, BRANDS_QUERY } from "@/sanity/queries";
+import { toProducts, toBrands } from "@/sanity/transform";
+import { getSiteSettings } from "@/sanity/lib/settings";
+import type { SanityProduct, SanityBrand } from "@/sanity/types";
 export const metadata: Metadata = {
   title: `Mobiles & Smartphones in ${siteConfig.address.city}`,
   description:
@@ -15,8 +19,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/products" },
 };
 
-// Dynamic: the page filters by ?brand= at request time, so it must not be
-// prerendered once with empty params (that would silently break the filter).
 export const dynamic = "force-dynamic";
 
 export default async function ProductsPage({
@@ -26,12 +28,25 @@ export default async function ProductsPage({
 }) {
   const params = await searchParams;
   const activeBrand = params.brand?.toLowerCase() || null;
-  const allProducts = getAllProducts();
-  const brands = getAllBrands();
+
+  const [
+    { data: sanityProducts },
+    { data: sanityBrands },
+    settings,
+  ] = await Promise.all([
+    safeSanityFetch({ query: PRODUCTS_QUERY }) as Promise<{ data: SanityProduct[] | null }>,
+    safeSanityFetch({ query: BRANDS_QUERY }) as Promise<{ data: SanityBrand[] | null }>,
+    getSiteSettings(),
+  ]);
+
+  const allProducts = sanityProducts?.length ? toProducts(sanityProducts) : getAllProducts();
+  const brands = sanityBrands?.length ? toBrands(sanityBrands) : getAllBrands();
 
   const filteredProducts = activeBrand
     ? allProducts.filter((p) => p.brandSlug === activeBrand)
     : allProducts;
+
+  const storeCity = settings?.city || siteConfig.address.city;
 
   return (
     <>
@@ -51,7 +66,7 @@ export default async function ProductsPage({
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
                 Browse genuine smartphones with personal buying help. Every
-                device includes warranty and local support in ${siteConfig.address.city}.
+                device includes warranty and local support in {storeCity}.
               </p>
             </div>
           </div>
@@ -71,7 +86,7 @@ export default async function ProductsPage({
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer settings={settings} brands={brands} />
     </>
   );
 }

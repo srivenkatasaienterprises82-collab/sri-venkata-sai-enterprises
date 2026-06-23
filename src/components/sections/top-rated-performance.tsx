@@ -1,4 +1,5 @@
 import { getProductBySlug, formatPrice, isPriceOnEnquiry } from "@/lib/data/products";
+import type { Product } from "@/lib/data/products";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -12,8 +13,12 @@ const TARGET_SLUGS = [
   "oppo-reno-15-pro-mini"
 ];
 
-export function TopRatedPerformance() {
-  const topRatedPhones = TARGET_SLUGS.map(slug => getProductBySlug(slug)).filter(Boolean);
+export function TopRatedPerformance({ products }: { products?: Product[] }) {
+  // Use products passed from Sanity, or resolve target slugs from static lists as fallback
+  const topRatedPhones = products?.length
+    ? products
+    : TARGET_SLUGS.map(slug => getProductBySlug(slug)).filter(Boolean) as Product[];
+
   return (
     <section className="bg-slate-50 py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -38,7 +43,7 @@ export function TopRatedPerformance() {
         {/* Single-row horizontal carousel — all viewports */}
         <div className="scrollbar-hide flex gap-5 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 pb-4 pt-2">
           {topRatedPhones.map((phone) => {
-            const variant = phone!.variants[0];
+            const variant = phone.variants[0];
             const startingPrice = variant?.price;
             const originalPrice = variant?.originalPrice;
             let discount = 0;
@@ -46,11 +51,11 @@ export function TopRatedPerformance() {
               discount = Math.round(((originalPrice - startingPrice) / originalPrice) * 100);
             }
             const specsStr = variant ? `${variant.ram}/${variant.storage}` : "";
-            const colorStr = phone!.colors[0]?.name || "Various colors";
+            const colorStr = phone.colors[0]?.name || "Various colors";
             
             return (
               <div
-                key={phone!.id}
+                key={phone.id}
                 className="group relative flex min-w-[240px] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl"
               >
                 {discount > 0 && (
@@ -59,8 +64,8 @@ export function TopRatedPerformance() {
                   </div>
                 )}
 
-                <Link href={`/products/${phone!.slug}`} className="relative h-40 w-full bg-slate-50 flex items-center justify-center cursor-pointer overflow-hidden transition-colors group-hover:bg-slate-100/50">
-                  {phone?.image ? (
+                <Link href={`/products/${phone.slug}`} className="relative h-40 w-full bg-slate-50 flex items-center justify-center cursor-pointer overflow-hidden transition-colors group-hover:bg-slate-100/50">
+                  {phone.image ? (
                     <Image
                       src={phone.image}
                       alt={phone.name}
@@ -85,17 +90,17 @@ export function TopRatedPerformance() {
                 </Link>
 
                 <div className="flex flex-col gap-1.5 p-5 pt-4">
-                  <Link href={`/products/${phone!.slug}`} className="text-base font-bold text-slate-900 leading-snug line-clamp-1 group-hover:text-blue-600 transition-colors">
-                    {phone!.name}
+                  <Link href={`/products/${phone.slug}`} className="text-base font-bold text-slate-900 leading-snug line-clamp-1 group-hover:text-blue-600 transition-colors">
+                    {phone.name}
                   </Link>
                   <p className="text-xs font-medium text-slate-500 leading-snug line-clamp-1">
                     {specsStr} · {colorStr}
                   </p>
                   <div className="mt-3 flex items-baseline gap-2 border-t border-slate-100 pt-3">
                     <span className="text-lg font-extrabold text-slate-900 tracking-tight">
-                      {isPriceOnEnquiry(phone!) ? "Price on Enquiry" : formatPrice(startingPrice || 0)}
+                      {isPriceOnEnquiry(phone) ? "Price on Enquiry" : formatPrice(startingPrice || 0)}
                     </span>
-                    {originalPrice && !isPriceOnEnquiry(phone!) && (
+                    {originalPrice && !isPriceOnEnquiry(phone) && (
                       <span className="text-[11px] font-semibold text-slate-400 line-through">
                         {formatPrice(originalPrice)}
                       </span>
@@ -120,3 +125,4 @@ export function TopRatedPerformance() {
     </section>
   );
 }
+export default TopRatedPerformance;

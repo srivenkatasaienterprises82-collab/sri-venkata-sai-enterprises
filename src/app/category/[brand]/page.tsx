@@ -7,6 +7,11 @@ import { getAllBrands, getBrandBySlug } from "@/lib/data/brands";
 import { notFound } from "next/navigation";
 import { siteConfig } from "@/lib/data/siteConfig";
 import type { Metadata } from "next";
+import { safeSanityFetch } from "@/sanity/lib/live";
+import { BRANDS_QUERY, PRODUCTS_BY_BRAND_QUERY } from "@/sanity/queries";
+import { toBrands, toProducts } from "@/sanity/transform";
+import { getSiteSettings } from "@/sanity/lib/settings";
+import type { SanityBrand, SanityProduct } from "@/sanity/types";
 
 interface CategoryPageProps {
   params: Promise<{ brand: string }>;
@@ -14,29 +19,79 @@ interface CategoryPageProps {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { brand } = await params;
-  const brandInfo = getBrandBySlug(brand);
-  if (!brandInfo) {
-    return { title: "Brand Not Found" };
+  const normalisedBrand = brand.toLowerCase();
+
+  // Try to lookup brand in Sanity first
+  let brandName = normalisedBrand;
+  let count = 0;
+
+  try {
+    const [{ data: sanityBrands }, { data: sanityProducts }] = await Promise.all([
+      safeSanityFetch({ query: BRANDS_QUERY }) as Promise<{ data: SanityBrand[] | null }>,
+      safeSanityFetch({
+        query: PRODUCTS_BY_BRAND_QUERY,
+        params: { brandSlug: normalisedBrand },
+      }) as Promise<{ data: SanityProduct[] | null }>,
+    ]);
+
+    const brands = sanityBrands?.length ? toBrands(sanityBrands) : getAllBrands();
+    const brandInfo = brands.find((b) => b.slug === normalisedBrand);
+    if (brandInfo) {
+      brandName = brandInfo.name;
+      count = sanityProducts?.length ? sanityProducts.length : getAllProducts().filter((p) => p.brandSlug === normalisedBrand).length;
+    } else {
+      const staticBrand = getBrandBySlug(normalisedBrand);
+      if (staticBrand) {
+        brandName = staticBrand.name;
+        count = getAllProducts().filter((p) => p.brandSlug === normalisedBrand).length;
+      } else {
+        return { title: "Brand Not Found" };
+      }
+    }
+  } catch {
+    const staticBrand = getBrandBySlug(normalisedBrand);
+    if (staticBrand) {
+      brandName = staticBrand.name;
+      count = getAllProducts().filter((p) => p.brandSlug === normalisedBrand).length;
+    }
   }
-  const productCount = getAllProducts().filter((p) => p.brandSlug === brand.toLowerCase()).length;
+
   return {
-    title: `${brandInfo.name} Mobiles in ${siteConfig.address.city} — ${productCount} Models`,
-    description: `Browse ${productCount}+ genuine ${brandInfo.name} smartphones in ${siteConfig.address.city}. Best prices, EMI, exchange offers, and official warranty at ${siteConfig.storeName}.`,
-    alternates: { canonical: `/category/${brand.toLowerCase()}` },
+    title: `${brandName} Mobiles in ${siteConfig.address.city} — ${count} Models`,
+    description: `Browse ${count}+ genuine ${brandName} smartphones in ${siteConfig.address.city}. Best prices, EMI, exchange offers, and official warranty at ${siteConfig.storeName}.`,
+    alternates: { canonical: `/category/${normalisedBrand}` },
   };
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { brand } = await params;
   const normalisedBrand = brand.toLowerCase();
-  const brandInfo = getBrandBySlug(normalisedBrand);
+
+  const [
+    { data: sanityBrands },
+    { data: sanityProducts },
+    settings,
+  ] = await Promise.all([
+    safeSanityFetch({ query: BRANDS_QUERY }) as Promise<{ data: SanityBrand[] | null }>,
+    safeSanityFetch({
+      query: PRODUCTS_BY_BRAND_QUERY,
+      params: { brandSlug: normalisedBrand },
+    }) as Promise<{ data: SanityProduct[] | null }>,
+    getSiteSettings(),
+  ]);
+
+  const brands = sanityBrands?.length ? toBrands(sanityBrands) : getAllBrands();
+  const brandInfo = brands.find((b) => b.slug === normalisedBrand) || getBrandBySlug(normalisedBrand);
+
   if (!brandInfo) {
     notFound();
   }
 
-  const allProducts = getAllProducts();
-  const brands = getAllBrands();
-  const filteredProducts = allProducts.filter((p) => p.brandSlug === normalisedBrand);
+  const filteredProducts = sanityProducts?.length
+    ? toProducts(sanityProducts)
+    : getAllProducts().filter((p) => p.brandSlug === normalisedBrand);
+
+  const storeCity = settings?.city || siteConfig.address.city;
 
   return (
     <>
@@ -48,7 +103,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               {brandInfo.name} <span className="text-blue-600">Mobiles</span>
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
-              {filteredProducts.length} {filteredProducts.length === 1 ? "model" : "models"} available — genuine {brandInfo.name} smartphones with EMI, exchange, and local warranty in ${siteConfig.address.city}.
+              {filteredProducts.length} {filteredProducts.length === 1 ? "model" : "models"} available — genuine {brandInfo.name} smartphones with EMI, exchange, and local warranty in {storeCity}.
             </p>
           </div>
         </section>
@@ -65,7 +120,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer settings={settings} brands={brands} />
     </>
   );
 }

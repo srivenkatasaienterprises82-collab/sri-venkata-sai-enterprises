@@ -6,6 +6,7 @@ import { MapPin, Phone, Clock, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { siteConfig } from "@/lib/data/siteConfig";
+import type { SanitySiteSettings } from "@/sanity/types";
 
 const subjectOptions = [
   "Phone availability",
@@ -16,7 +17,7 @@ const subjectOptions = [
   "Other",
 ];
 
-export function ContactSection() {
+export function ContactSection({ settings }: { settings?: SanitySiteSettings }) {
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -29,6 +30,23 @@ export function ContactSection() {
     phone: useId(),
     subject: useId(),
     message: useId(),
+  };
+
+  const storeName = settings?.companyName || siteConfig.storeName;
+  const phoneTel = settings?.phoneTel || siteConfig.phoneTel;
+  const phoneDisplay = settings?.phoneDisplay || siteConfig.phoneDisplay;
+  const hours = settings?.hours || siteConfig.hours;
+  const mapEmbedUrl = settings?.googleMapsEmbed || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3843.5!2d80.0486!3d15.5037!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b74db39b94b4b%3A0x8cce8e2a5e7d5a0!2sOngole%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1700000000000";
+  const whatsappUrl = settings?.whatsappNumber
+    ? `https://wa.me/${settings.whatsappNumber}`
+    : siteConfig.whatsappUrl;
+
+  const address = {
+    line1: settings?.addressLine1 || siteConfig.address.line1,
+    line2: settings?.addressLine2 || siteConfig.address.line2,
+    line3: settings?.addressLine3 || siteConfig.address.line3,
+    line4: settings?.addressLine4 || siteConfig.address.line4,
+    city: settings?.city || siteConfig.address.city,
   };
 
   function updateField(
@@ -47,7 +65,7 @@ export function ContactSection() {
     }
 
     const text = [
-      `Hi, I have a website enquiry for ${siteConfig.storeName}.`,
+      `Hi, I have a website enquiry for ${storeName}.`,
       "",
       `Name: ${form.name.trim()}`,
       `Phone: ${form.phone.trim()}`,
@@ -58,7 +76,7 @@ export function ContactSection() {
     ].join("\n");
 
     toast.success("Opening WhatsApp with your enquiry...");
-    window.location.href = `${siteConfig.whatsappUrl}?text=${encodeURIComponent(text)}`;
+    window.location.href = `${whatsappUrl}?text=${encodeURIComponent(text)}`;
   }
 
   return (
@@ -93,10 +111,10 @@ export function ContactSection() {
                 <div>
                   <p className="font-bold text-slate-900 mb-2">Store Address</p>
                   <address className="text-sm not-italic text-slate-600 leading-relaxed">
-                    {siteConfig.address.line1}<br />
-                    {siteConfig.address.line2}<br />
-                    {siteConfig.address.line3}<br />
-                    {siteConfig.address.line4}
+                    {address.line1}<br />
+                    {address.line2}<br />
+                    {address.line3}<br />
+                    {address.line4}
                   </address>
                 </div>
               </div>
@@ -109,10 +127,10 @@ export function ContactSection() {
                   <div>
                     <p className="font-bold text-slate-900 mb-2">Contact Us</p>
                     <a
-                      href={`tel:${siteConfig.phoneTel}`}
+                      href={`tel:${phoneTel}`}
                       className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors block"
                     >
-                      {siteConfig.phoneDisplay}
+                      {phoneDisplay}
                     </a>
                   </div>
                 </div>
@@ -124,7 +142,7 @@ export function ContactSection() {
                   <div>
                     <p className="font-bold text-slate-900 mb-2">Store Hours</p>
                     <p className="text-sm text-slate-600">
-                      {siteConfig.hours}
+                      {hours}
                     </p>
                   </div>
                 </div>
@@ -134,7 +152,7 @@ export function ContactSection() {
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <iframe
                 title="Sri Venkata Sai Enterprises location map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3843.5!2d80.0486!3d15.5037!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b74db39b94b4b%3A0x8cce8e2a5e7d5a0!2sOngole%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1700000000000"
+                src={mapEmbedUrl}
                 className="h-[280px] w-full"
                 style={{ border: 0 }}
                 allowFullScreen
@@ -247,3 +265,4 @@ export function ContactSection() {
     </section>
   );
 }
+export default ContactSection;

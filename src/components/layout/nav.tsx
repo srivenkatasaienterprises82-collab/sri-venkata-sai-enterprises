@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { ProductSearch } from "./product-search";
 import { siteConfig } from "@/lib/data/siteConfig";
+import type { SanitySiteSettings } from "@/sanity/types";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -19,17 +20,29 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function Nav() {
+export function Nav({ settings }: { settings?: SanitySiteSettings }) {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const { totalItems } = useCart();
 
+  const storeName = settings?.companyName || siteConfig.storeName;
+  const logoUrl = settings?.logo || "/logo.jpg";
+  const phoneTel = settings?.phoneTel || siteConfig.phoneTel;
+  const whatsappUrl = settings?.whatsappNumber
+    ? `https://wa.me/${settings.whatsappNumber}`
+    : siteConfig.whatsappUrl;
+
   function isActive(href: string) {
-  if (href === "/") return pathname === "/";
-  if (href === "/products") return pathname === "/products" || pathname === "/mobiles" || pathname.startsWith("/category/");
-  return pathname.startsWith(href.split("?")[0]);
+    if (href === "/") return pathname === "/";
+    if (href === "/products")
+      return (
+        pathname === "/products" ||
+        pathname === "/mobiles" ||
+        pathname.startsWith("/category/")
+      );
+    return pathname.startsWith(href.split("?")[0]);
   }
 
   useEffect(() => {
@@ -55,18 +68,18 @@ export function Nav() {
           <Link
             href="/"
             className="flex flex-1 items-center gap-3 shrink-0"
-            aria-label={`${siteConfig.storeName} — home`}
+            aria-label={`${storeName} — home`}
           >
             <Image
-              src="/logo.jpg"
-              alt={`${siteConfig.storeName} logo`}
+              src={logoUrl}
+              alt={`${storeName} logo`}
               width={40}
               height={40}
               className="h-8 w-8 md:h-10 md:w-10 shrink-0 rounded-lg object-cover"
               priority
             />
             <span className="text-base font-bold tracking-tight text-slate-900 sm:text-lg whitespace-nowrap">
-              {siteConfig.storeName}
+              {storeName}
             </span>
           </Link>
 
@@ -92,7 +105,7 @@ export function Nav() {
             <div className="min-w-[240px] max-w-md mr-2 shrink">
               <ProductSearch />
             </div>
-            <Button variant="secondary" size="sm" as="a" href={`tel:${siteConfig.phoneTel}`}>
+            <Button variant="secondary" size="sm" as="a" href={`tel:${phoneTel}`}>
               <Phone className="mr-1.5 h-3.5 w-3.5" />
               Call Now
             </Button>
@@ -100,7 +113,7 @@ export function Nav() {
               variant="whatsapp"
               size="sm"
               as="a"
-              href={siteConfig.whatsappUrl}
+              href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -199,7 +212,7 @@ export function Nav() {
                   variant="secondary"
                   size="sm"
                   as="a"
-                  href={`tel:${siteConfig.phoneTel}`}
+                  href={`tel:${phoneTel}`}
                   className="flex-1 justify-center"
                 >
                   <Phone className="mr-1.5 h-3.5 w-3.5" />
@@ -209,7 +222,7 @@ export function Nav() {
                   variant="whatsapp"
                   size="sm"
                   as="a"
-                  href={siteConfig.whatsappUrl}
+                  href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 justify-center"

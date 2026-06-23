@@ -1,24 +1,35 @@
-import type { Product, ProductVariant, ProductColor } from "@/lib/data/products";
+import type { Product, ProductVariant, ProductColor, ProductType, StockStatus, ProductCategory } from "@/lib/data/products";
 import type { Testimonial } from "@/lib/data/testimonials";
 import type { Brand } from "@/lib/data/brands";
-import type { SanityProduct, SanityCategory, SanityTestimonial } from "./types";
+import type { FAQItem } from "@/lib/data/faq";
+import type {
+  SanityProduct,
+  SanityBrand,
+  SanityTestimonial,
+  SanityFaq,
+} from "./types";
 
 export function toProduct(s: SanityProduct): Product {
+  // Map stock status value safely
+  let stockStatus: StockStatus = "inStock";
+  if (s.stock === "limited") stockStatus = "limited";
+  else if (s.stock === "outOfStock") stockStatus = "outOfStock";
+
   return {
     id: s._id,
     name: s.name,
     slug: s.slug?.current || "",
     brand: s.brand?.name || "",
     brandSlug: s.brandSlug || "",
-    imageFolder: "",
-    type: "smartphone",
-    category: "best-seller",
-    stock: s.stock > 0 ? "inStock" : "outOfStock",
+    imageFolder: "", // Deprecated for CMS-managed products
+    type: (s.type || "smartphone") as ProductType,
+    category: (s.categorySlug || "best-seller") as ProductCategory,
+    stock: stockStatus,
     image: s.coverImage || "",
     description: s.description || "",
     colors: (s.colors || []) as ProductColor[],
     variants: (s.variants || []) as ProductVariant[],
-    specifications: [],
+    specifications: s.specifications || [],
     featured: s.featured || false,
     tags: [],
     priceOnEnquiry: s.priceOnEnquiry || false,
@@ -32,7 +43,7 @@ export function toProducts(data: SanityProduct[]): Product[] {
 export function toTestimonial(s: SanityTestimonial): Testimonial {
   return {
     name: s.name,
-    location: "",
+    location: "Customer Review",
     rating: s.rating,
     text: s.quote,
     source: "manual",
@@ -43,15 +54,26 @@ export function toTestimonials(data: SanityTestimonial[]): Testimonial[] {
   return data.map(toTestimonial);
 }
 
-export function toBrand(s: SanityCategory): Brand {
+export function toBrand(s: SanityBrand): Brand {
   return {
     name: s.name,
     slug: s.slug?.current || "",
     logo: s.logo || "",
-    featured: true,
+    featured: s.featured || false,
   };
 }
 
-export function toBrands(data: SanityCategory[]): Brand[] {
+export function toBrands(data: SanityBrand[]): Brand[] {
   return data.map(toBrand);
+}
+
+export function toFaq(s: SanityFaq): FAQItem {
+  return {
+    question: s.question,
+    answer: s.answer,
+  };
+}
+
+export function toFaqs(data: SanityFaq[]): FAQItem[] {
+  return data.map(toFaq);
 }

@@ -3,7 +3,7 @@ import { Toaster } from "sonner";
 import { Nav } from "@/components/layout/nav";
 import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { CartProvider } from "@/context/CartContext";
-import { siteConfig } from "@/lib/data/siteConfig";
+import { getSiteSettings } from "@/sanity/lib/settings";
 import { SanityLive } from "@/sanity/lib/live";
 import "./globals.css";
 
@@ -15,43 +15,47 @@ function SkipLink() {
   );
 }
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
-  title: {
-    default: `${siteConfig.storeName} | Premium Mobile Store in ${siteConfig.address.city}`,
-    template: `%s | ${siteConfig.storeName}`,
-  },
-  description:
-    `Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo & Motorola. Best prices, EMI options, exchange offers, and fast local service in ${siteConfig.address.city}.`,
-  keywords: [
-    `mobiles ${siteConfig.address.city}`,
-    `smartphones ${siteConfig.address.city}`,
-    siteConfig.storeName,
-    `mobile store ${siteConfig.address.city}`,
-    `Vivo ${siteConfig.address.city}`,
-    `iQOO ${siteConfig.address.city}`,
-    `Samsung ${siteConfig.address.city}`,
-    `best mobile shop ${siteConfig.address.city}`,
-  ],
-  icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/logo.jpg" }],
-  },
-  openGraph: {
-    type: "website",
-    siteName: siteConfig.storeName,
-    title: `${siteConfig.storeName} | Premium Mobile Store in ${siteConfig.address.city}`,
-    description:
-      `Shop genuine smartphones with EMI options, exchange offers, and personal buying help in ${siteConfig.address.city}.`,
-    images: [{ url: "/logo.jpg", width: 320, height: 320, alt: siteConfig.storeName }],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const titleTemplate = settings.companyShortName
+    ? `%s | ${settings.companyShortName}`
+    : `%s | ${settings.companyName}`;
+  const keywords = settings.seoKeywords || [
+    `mobiles ${settings.city || "Ongole"}`,
+    `smartphones ${settings.city || "Ongole"}`,
+    settings.companyName,
+    `mobile store ${settings.city || "Ongole"}`,
+  ];
 
-export default function RootLayout({
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+    title: {
+      default: settings.seoTitleTemplate || `${settings.companyName} | Premium Mobile Store in ${settings.city || "Ongole"}`,
+      template: titleTemplate,
+    },
+    description: settings.seoDescription || `Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo & Motorola. Best prices, EMI options, exchange offers, and fast local service in ${settings.city || "Ongole"}.`,
+    keywords: keywords,
+    icons: {
+      icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+      apple: [{ url: settings.logo || "/logo.jpg" }],
+    },
+    openGraph: {
+      type: "website",
+      siteName: settings.companyName,
+      title: settings.seoTitleTemplate || `${settings.companyName} | Premium Mobile Store in ${settings.city || "Ongole"}`,
+      description: settings.seoDescription || `Shop genuine smartphones with EMI options, exchange offers, and personal buying help in ${settings.city || "Ongole"}.`,
+      images: [{ url: settings.openGraphImage || settings.logo || "/logo.jpg", width: 320, height: 320, alt: settings.companyName }],
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
   return (
     <html
       lang="en"
@@ -59,14 +63,12 @@ export default function RootLayout({
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >
-  <body suppressHydrationWarning className="min-h-screen bg-white text-slate-900 antialiased">
-    <SkipLink />
-    <CartProvider>
-      <Nav />
-      <div id="main">
-        {children}
-      </div>
-      <WhatsAppFloat />
+      <body suppressHydrationWarning className="min-h-screen bg-white text-slate-900 antialiased">
+        <SkipLink />
+        <CartProvider>
+          <Nav settings={settings} />
+          <div id="main">{children}</div>
+          <WhatsAppFloat settings={settings} />
           <SanityLive />
           <Toaster position="top-right" theme="dark" />
         </CartProvider>

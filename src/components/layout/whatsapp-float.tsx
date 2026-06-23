@@ -3,8 +3,13 @@
 import { MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { siteConfig } from "@/lib/data/siteConfig";
+import type { SanitySiteSettings } from "@/sanity/types";
 
-export function WhatsAppFloat() {
+export function WhatsAppFloat({ settings }: { settings?: SanitySiteSettings }) {
+  const whatsappUrl = settings?.whatsappNumber
+    ? `https://wa.me/${settings.whatsappNumber}`
+    : siteConfig.whatsappUrl;
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
@@ -13,7 +18,7 @@ export function WhatsAppFloat() {
       className="fixed bottom-6 right-6 z-50 md:bottom-8 md:right-8"
     >
       <a
-        href={siteConfig.whatsappUrl}
+        href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-whatsapp text-white shadow-xl transition-transform hover:scale-110 active:scale-95"

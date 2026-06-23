@@ -28,7 +28,33 @@ const fadeUp: Variants = {
   },
 };
 
-export function HeroSection({ products }: { products: Product[] }) {
+const DEFAULT_SLIDES = [
+  "/images/slides/slide1.jpg",
+  "/images/slides/slide2.webp",
+  "/images/slides/slide3.webp",
+  "/images/slides/slide4.webp",
+  "/images/slides/slide5.jpeg",
+];
+
+export function HeroSection({
+  products,
+  title,
+  subtitle,
+  slides,
+  primaryCtaText,
+  primaryCtaLink,
+  secondaryCtaText,
+  secondaryCtaLink,
+}: {
+  products: Product[];
+  title?: string;
+  subtitle?: string;
+  slides?: string[];
+  primaryCtaText?: string;
+  primaryCtaLink?: string;
+  secondaryCtaText?: string;
+  secondaryCtaLink?: string;
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [itemsPerView, setItemsPerView] = useState(3);
@@ -36,7 +62,12 @@ export function HeroSection({ products }: { products: Product[] }) {
   const [startX, setStartX] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  const carouselProducts = products.filter((p) => p.featured).slice(0, 6);
+  const featured = products.filter((p) => p.featured).slice(0, 6);
+  const carouselProducts = featured.length > 0 ? featured : products.slice(0, 6);
+  const displaySlides = slides?.length ? slides : DEFAULT_SLIDES;
+  const displayTitle = title || "Latest Mobiles at Best Prices";
+  const displaySubtitle = subtitle || "Shop genuine smartphones with EMI options, exchange offers, and personal buying help";
+  const translatePercent = carouselProducts.length > 0 ? (currentIndex / carouselProducts.length) * 100 : 0;
 
   useEffect(() => {
     const handleResize = () => {
@@ -60,7 +91,7 @@ export function HeroSection({ products }: { products: Product[] }) {
     };
   }, []);
 
-  const maxIndex = Math.max(0, carouselProducts.length - itemsPerView);
+  const maxIndex = carouselProducts.length > 0 ? Math.max(0, carouselProducts.length - itemsPerView) : 0;
 
   useEffect(() => {
     if (isHovered || reducedMotion) return;
@@ -107,26 +138,34 @@ export function HeroSection({ products }: { products: Product[] }) {
           variants={fadeUp}
           className="mb-6 text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-6xl md:text-7xl lg:text-8xl"
         >
-          Latest Mobiles{" "}
-          <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            at Best Prices
-          </span>
+          {displayTitle}
         </motion.h1>
 
         <motion.p
           variants={fadeUp}
           className="mb-10 max-w-2xl text-lg leading-relaxed text-slate-500 sm:text-xl"
         >
-          Shop genuine smartphones with EMI options, exchange offers, and personal buying help
+          {displaySubtitle}
         </motion.p>
 
         <motion.div variants={fadeUp} className="mb-10 flex flex-wrap items-center justify-center gap-4">
-          <Button size="lg" as={Link} href="/products" className="rounded-full shadow-lg shadow-blue-600/25">
+          <Button
+            size="lg"
+            as={Link}
+            href={primaryCtaLink || "/products"}
+            className="rounded-full shadow-lg shadow-blue-600/25"
+          >
             <ShoppingBag className="mr-2 h-5 w-5" />
-            Browse Mobiles
+            {primaryCtaText || "Browse Mobiles"}
           </Button>
-          <Button variant="secondary" size="lg" as={Link} href="/contact" className="rounded-full">
-            Get in Touch
+          <Button
+            variant="secondary"
+            size="lg"
+            as={Link}
+            href={secondaryCtaLink || "/contact"}
+            className="rounded-full"
+          >
+            {secondaryCtaText || "Get in Touch"}
           </Button>
         </motion.div>
 
@@ -151,15 +190,16 @@ export function HeroSection({ products }: { products: Product[] }) {
       </motion.div>
 
       {/* ── 2. Phone Showcase Carousel ── */}
-      <motion.div
-        className="relative z-10 mx-auto mb-20 w-full max-w-7xl"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        variants={fadeUp}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+      {carouselProducts.length > 0 && (
+        <motion.div
+          className="relative z-10 mx-auto mb-20 w-full max-w-7xl"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
         <div className="relative overflow-hidden rounded-3xl bg-slate-50/50 px-4 py-10 sm:px-10 lg:px-14">
           {/* Navigation Arrows */}
           <button
@@ -182,7 +222,7 @@ export function HeroSection({ products }: { products: Product[] }) {
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{
-              transform: `translateX(-${(currentIndex / carouselProducts.length) * 100}%)`,
+              transform: `translateX(-${translatePercent}%)`,
             }}
             onPointerDown={(e) => {
               setIsDragging(false);
@@ -267,6 +307,7 @@ export function HeroSection({ products }: { products: Product[] }) {
           </div>
         </div>
       </motion.div>
+      )}
 
       {/* ── 3. Image Carousel ── */}
       <motion.div
@@ -277,16 +318,11 @@ export function HeroSection({ products }: { products: Product[] }) {
         variants={fadeUp}
       >
         <HeroCarousel
-          images={[
-            "/images/slides/slide1.jpg",
-            "/images/slides/slide2.webp",
-            "/images/slides/slide3.webp",
-            "/images/slides/slide4.webp",
-            "/images/slides/slide5.jpeg",
-          ]}
+          images={displaySlides}
           className="h-[260px] rounded-2xl shadow-lg shadow-slate-900/5 ring-1 ring-slate-900/5 sm:h-[360px] md:h-[460px] lg:h-[560px]"
         />
       </motion.div>
     </section>
   );
 }
+export default HeroSection;

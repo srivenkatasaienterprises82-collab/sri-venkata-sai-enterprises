@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { sanityFetch } from "@/sanity/lib/live";
+import { safeSanityFetch } from "@/sanity/lib/live";
 import { BANNERS_QUERY } from "@/sanity/queries";
 
 type Banner = {
@@ -24,7 +24,7 @@ function isDark(hex: string) {
 }
 
 export default async function PromoBanners() {
-  const { data: banners } = await sanityFetch({ query: BANNERS_QUERY }) as { data: Banner[] };
+  const { data: banners } = await safeSanityFetch({ query: BANNERS_QUERY }) as { data: Banner[] | null };
 
   if (!banners?.length) return null;
 

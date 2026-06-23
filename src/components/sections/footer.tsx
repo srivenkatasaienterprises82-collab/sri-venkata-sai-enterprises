@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
 import { getFeaturedBrands } from "@/lib/data/brands";
+import type { Brand } from "@/lib/data/brands";
+import type { SanitySiteSettings } from "@/sanity/types";
 
 const quickLinks = [
   { href: "/", label: "Home" },
@@ -22,8 +24,34 @@ const quickLinks = [
   { href: "/privacy", label: "Privacy Policy" },
 ];
 
-export function Footer() {
-  const featuredBrands = getFeaturedBrands().slice(0, 8);
+export function Footer({
+  settings,
+  brands,
+}: {
+  settings?: SanitySiteSettings;
+  brands?: Brand[];
+}) {
+  const displayBrands = brands?.length ? brands.slice(0, 8) : getFeaturedBrands().slice(0, 8);
+  const storeName = settings?.companyName || siteConfig.storeName;
+  const logoUrl = settings?.logo || "/logo.jpg";
+  const phoneDisplay = settings?.phoneDisplay || siteConfig.phoneDisplay;
+  const phoneTel = settings?.phoneTel || siteConfig.phoneTel;
+  const whatsappUrl = settings?.whatsappNumber
+    ? `https://wa.me/${settings.whatsappNumber}`
+    : siteConfig.whatsappUrl;
+  const city = settings?.city || siteConfig.address.city;
+  const hours = settings?.hours || siteConfig.hours;
+  const copyright = settings?.copyrightText || `© ${new Date().getFullYear()} ${storeName}. All rights reserved.`;
+
+  const address = {
+    line1: settings?.addressLine1 || siteConfig.address.line1,
+    line2: settings?.addressLine2 || siteConfig.address.line2,
+    line3: settings?.addressLine3 || siteConfig.address.line3,
+    line4: settings?.addressLine4 || siteConfig.address.line4,
+  };
+
+  const footerText = settings?.footerText || `${city}'s trusted mobile store for genuine smartphones, personal buying help, EMI, exchange offers, and fast local service.`;
+
   return (
     <footer className="border-t border-slate-200 bg-white">
       <Section className="border-none pt-16 pb-10" spacing="none" container="default">
@@ -32,26 +60,25 @@ export function Footer() {
           <div>
             <Link href="/" className="flex items-center gap-3">
               <Image
-                src="/logo.jpg"
-                alt={`${siteConfig.storeName} logo`}
+                src={logoUrl}
+                alt={`${storeName} logo`}
                 width={44}
                 height={44}
                 className="h-11 w-11 rounded-xl object-cover border border-slate-200 shadow-sm"
               />
               <span className="text-xl font-extrabold tracking-tight text-slate-900">
-                {siteConfig.storeName}
+                {storeName}
               </span>
             </Link>
             <p className="mt-4 max-w-xs text-sm text-slate-500 leading-relaxed font-medium">
-              {siteConfig.address.city}&apos;s trusted mobile store for genuine smartphones, personal
-              buying help, EMI, exchange offers, and fast local service.
+              {footerText}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button
                 variant="whatsapp"
                 size="sm"
                 as="a"
-                href={siteConfig.whatsappUrl}
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -61,7 +88,7 @@ export function Footer() {
                 variant="secondary"
                 size="sm"
                 as="a"
-                href={`tel:${siteConfig.phoneTel}`}
+                href={`tel:${phoneTel}`}
               >
                 <Phone className="mr-2 h-4 w-4" /> Call Now
               </Button>
@@ -85,11 +112,11 @@ export function Footer() {
             </nav>
           </div>
 
-          {/* Top Brands — derived from data so dead brands are never listed */}
+          {/* Top Brands */}
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">Top Brands</h3>
             <nav className="mt-5 flex flex-col gap-3">
-              {featuredBrands.map((brand) => (
+              {displayBrands.map((brand) => (
                 <Link
                   key={brand.slug}
                   href={`/category/${brand.slug}`}
@@ -109,21 +136,21 @@ export function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
                 <address className="not-italic text-sm leading-relaxed">
-                  {siteConfig.address.line1}<br />
-                  {siteConfig.address.line2}<br />
-                  {siteConfig.address.line3}<br />
-                  {siteConfig.address.line4}
+                  {address.line1}<br />
+                  {address.line2}<br />
+                  {address.line3}<br />
+                  {address.line4}
                 </address>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-slate-400 shrink-0" />
-                <a href={`tel:${siteConfig.phoneTel}`} className="text-sm hover:text-blue-600 transition">
-                  {siteConfig.phoneDisplay}
+                <a href={`tel:${phoneTel}`} className="text-sm hover:text-blue-600 transition">
+                  {phoneDisplay}
                 </a>
               </div>
               <div className="flex items-center gap-3">
                 <Clock className="h-4 w-4 text-slate-400 shrink-0" />
-                <span className="text-sm">{siteConfig.hours}</span>
+                <span className="text-sm">{hours}</span>
               </div>
             </div>
           </div>
@@ -132,7 +159,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
           <p className="text-sm font-medium text-slate-500">
-            © {new Date().getFullYear()} {siteConfig.storeName}. All rights reserved.
+            {copyright}
           </p>
           <div className="flex items-center gap-6 text-sm font-medium text-slate-500">
             <Link href="/privacy" className="hover:text-blue-600 transition">
@@ -147,3 +174,4 @@ export function Footer() {
     </footer>
   );
 }
+export default Footer;
