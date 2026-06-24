@@ -103,11 +103,11 @@ export default async function Home() {
         />
         <BrandStrip brands={brands} />
         <BrandCarousel />
+        <ProductGrid products={products} />
         <BestSelling products={products} />
 
         <TopRatedPerformance products={topRatedProducts} />
         <BentoDeals offers={bentoDeals} />
-        <ProductGrid products={products} />
         <TrustStrip />
         <Testimonials testimonials={testimonials} />
         <FAQ items={faqs} />
