@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: settings.seoDescription || `Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo & Motorola. Best prices, EMI options, exchange offers, and fast local service in ${settings.city || "Ongole"}.`,
     keywords: keywords,
     icons: {
-      icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
+      icon: "/favicon.ico",
       apple: [{ url: settings.logo || "/logo.jpg" }],
     },
     openGraph: {
