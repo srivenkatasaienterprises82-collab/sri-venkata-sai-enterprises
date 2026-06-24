@@ -35,6 +35,7 @@ export function ProductCatalog({ products }: ProductCatalogProps) {
   const [query, setQuery] = useState("");
   const [priceBucket, setPriceBucket] = useState<string | null>(null);
   const [stockFilter, setStockFilter] = useState<"any" | "in-stock" | "featured">("any");
+  const [sortOrder, setSortOrder] = useState<"none" | "low-high" | "high-low">("none");
 
   const filtered = useMemo(() => {
     const normalisedQuery = query.trim().toLowerCase();
@@ -42,7 +43,7 @@ export function ProductCatalog({ products }: ProductCatalogProps) {
       ? PRICE_BUCKETS.find((candidate) => candidate.id === priceBucket) ?? null
       : null;
 
-    return products.filter((product) => {
+    const matched = products.filter((product) => {
       if (stockFilter === "in-stock" && product.stock === "outOfStock") return false;
       if (stockFilter === "featured" && !product.featured) return false;
 
@@ -65,7 +66,16 @@ export function ProductCatalog({ products }: ProductCatalogProps) {
         .toLowerCase();
       return haystack.includes(normalisedQuery);
     });
-  }, [products, query, priceBucket, stockFilter]);
+
+    if (sortOrder === "low-high") {
+      return [...matched].sort((a, b) => (getStartingPrice(a) ?? 0) - (getStartingPrice(b) ?? 0));
+    }
+    if (sortOrder === "high-low") {
+      return [...matched].sort((a, b) => (getStartingPrice(b) ?? 0) - (getStartingPrice(a) ?? 0));
+    }
+
+    return matched;
+  }, [products, query, priceBucket, stockFilter, sortOrder]);
 
   const hasActiveFilter = query.trim().length > 0 || priceBucket !== null || stockFilter !== "any";
 
@@ -132,23 +142,35 @@ export function ProductCatalog({ products }: ProductCatalogProps) {
         </div>
       </div>
 
-      <div className="mb-6 flex items-center justify-between px-2">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 px-2">
         <p className="text-sm font-medium text-slate-500">
           Showing <span className="font-bold text-slate-900">{filtered.length}</span> phone{filtered.length === 1 ? "" : "s"}
         </p>
-        {hasActiveFilter && (
-          <button
-            type="button"
-            onClick={() => {
-              setQuery("");
-              setPriceBucket(null);
-              setStockFilter("any");
-            }}
-            className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition"
+        <div className="flex items-center gap-3">
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
+            aria-label="Sort by price"
+            className="min-h-9 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
           >
-            Clear filters
-          </button>
-        )}
+            <option value="none">Sort by</option>
+            <option value="low-high">Price: Low to High</option>
+            <option value="high-low">Price: High to Low</option>
+          </select>
+          {hasActiveFilter && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setPriceBucket(null);
+                setStockFilter("any");
+              }}
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid min-h-[320px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -169,6 +191,7 @@ export function ProductCatalog({ products }: ProductCatalogProps) {
               setQuery("");
               setPriceBucket(null);
               setStockFilter("any");
+              setSortOrder("none");
             }}
           >
             Reset filters
@@ -274,7 +297,7 @@ function ProductCard({ product }: { product: Product }) {
         <div className="flex flex-wrap gap-1.5 mt-1">
           {product.variants.map((variant) => (
             <span
-              key={`${variant.ram}-${variant.storage}`}
+              key={`${variant.ram}-${variant.storage}-${variant.price}`}
               className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-semibold text-slate-600"
             >
               {variant.ram}/{variant.storage}
