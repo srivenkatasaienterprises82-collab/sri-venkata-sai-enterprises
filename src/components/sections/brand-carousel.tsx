@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 /**
  * Infinite scrolling brand logo carousel.
@@ -54,9 +55,9 @@ function LogoSlide({ logo }: { logo: BrandLogo }) {
   );
 
   return logo.href ? (
-    <a href={logo.href} aria-label={`Visit ${logo.name}`}>
+    <Link href={logo.href} aria-label={`Visit ${logo.name}`}>
       {inner}
-    </a>
+    </Link>
   ) : (
     inner
   );

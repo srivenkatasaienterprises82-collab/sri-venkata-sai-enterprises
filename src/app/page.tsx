@@ -55,7 +55,7 @@ export default async function Home() {
   // Resolve Home Page CMS configurations with fallbacks
   const heroTitle = sanityHomePage?.heroTitle || undefined;
   const heroSubtitle = sanityHomePage?.heroSubtitle || undefined;
-  const heroSlides = sanityHomePage?.heroSlides || undefined;
+  const heroSlides = sanityHomePage?.heroSlides;
   const primaryCtaText = sanityHomePage?.primaryCtaText || undefined;
   const primaryCtaLink = sanityHomePage?.primaryCtaLink || undefined;
   const secondaryCtaText = sanityHomePage?.secondaryCtaText || undefined;

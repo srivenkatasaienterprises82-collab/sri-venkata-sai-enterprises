@@ -81,7 +81,7 @@ export function Particles({
     window.addEventListener("resize", init);
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", init);
     };
   }, [count]);
 

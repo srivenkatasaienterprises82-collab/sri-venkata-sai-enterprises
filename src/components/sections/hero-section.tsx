@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { Particles } from "@/components/ui/particles";
-import { BadgeCheck, ChevronLeft, ChevronRight, ShieldCheck, ShoppingBag, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
 
 const containerVariants: Variants = {
