@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { ArrowRight, RefreshCw, CreditCard, Headphones } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, RefreshCw, CreditCard } from "lucide-react";
 import { Sparkles } from "@/components/ui/sparkles";
 import type { SanityOffer } from "@/sanity/types";
 
@@ -16,7 +17,7 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
       subtitle?: string;
       discountText?: string;
       image?: string;
-      link?: string;
+      link: string;
       cta?: string;
     }
   ) => {
@@ -70,53 +71,48 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
     cta: "Shop Now",
   });
 
-  const c5 = getOffer(4, {
-    title: "Free Accessories Combo",
-    subtitle: "With every Vivo & iQOO smartphone · Limited Period Offer",
-    cta: "Claim Offer",
-    link: "/contact",
-  });
-
   return (
     <section className="bg-slate-50 px-8 pb-12 pt-6">
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-4 md:grid-cols-3">
-        {/* 1. FLAGSHIP DEAL (Spans 2 columns) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="group relative flex h-[280px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md md:col-span-2"
-        >
-          <div className="z-10 flex flex-col items-start">
-            {c1.badge && (
-              <Sparkles className="mb-3">
-                <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-blue-600">
-                  {c1.badge}
-                </span>
-              </Sparkles>
-            )}
-            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">{c1.title}</h3>
-            {c1.subtitle && (
-              <p className="mt-2 max-w-[220px] text-sm leading-relaxed text-slate-500 font-medium">
-                {c1.subtitle}
-              </p>
-            )}
-            <div className="mt-auto pt-14">
-              <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{c1.discountText}</span>
+        {/* 1. FLAGSHIP DEAL — iQOO Z11x 5G (Spans 2 columns) */}
+        <Link href={c1.link} className="md:col-span-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="group relative flex h-[280px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md"
+          >
+            <div className="z-10 flex flex-col items-start">
+              {c1.badge && (
+                <Sparkles className="mb-3">
+                  <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-blue-600">
+                    {c1.badge}
+                  </span>
+                </Sparkles>
+              )}
+              <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">{c1.title}</h3>
+              {c1.subtitle && (
+                <p className="mt-2 max-w-[220px] text-sm leading-relaxed text-slate-500 font-medium">
+                  {c1.subtitle}
+                </p>
+              )}
+              <div className="mt-auto pt-14">
+                <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{c1.discountText}</span>
+              </div>
             </div>
-          </div>
-          {c1.image && (
-            <div className="absolute -bottom-[20%] -right-[5%] h-[320px] w-[280px]">
-              <Image
-                src={c1.image}
-                alt={c1.title}
-                fill
-                className="object-contain mix-blend-multiply opacity-90 transition-transform hover:scale-105 duration-500"
-              />
-            </div>
-          )}
-        </motion.div>
+            {c1.image && (
+              <div className="absolute -bottom-[20%] -right-[5%] h-[320px] w-[280px]">
+                <Image
+                  src={c1.image}
+                  alt={c1.title}
+                  fill
+                  className="object-contain mix-blend-multiply opacity-90 transition-transform hover:scale-105 duration-500"
+                />
+              </div>
+            )}
+          </motion.div>
+        </Link>
 
         {/* 2. EMI CARD */}
         <motion.div
@@ -174,70 +170,45 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
           </div>
         </motion.div>
 
-        {/* 4. VIVO CARD (Spans 2 columns) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="group relative flex h-[240px] flex-col justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md md:col-span-2"
-        >
-          <div className="z-10 flex flex-col items-start">
-            {c4.badge && (
-              <Sparkles className="mb-3">
-                <span className="rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-amber-600">
-                  {c4.badge}
-                </span>
-              </Sparkles>
-            )}
-            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">{c4.title}</h3>
-            {c4.subtitle && (
-              <p className="mt-2 max-w-[220px] text-sm leading-relaxed text-slate-500 font-medium">
-                {c4.subtitle}
-              </p>
-            )}
-            <span className="mt-5 text-3xl font-extrabold text-slate-900 tracking-tight">{c4.discountText}</span>
-          </div>
-          {c4.image && (
-            <div className="absolute -bottom-[30%] -right-[10%] h-[340px] w-[340px]">
-              <Image
-                src={c4.image}
-                alt={c4.title}
-                fill
-                className="object-contain mix-blend-multiply opacity-90 transition-transform hover:scale-105 duration-500"
-              />
-            </div>
-          )}
-        </motion.div>
-
-        {/* 5. ACCESSORIES BANNER */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="group flex flex-col items-center justify-between gap-5 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:flex-row md:col-span-3 transition-all hover:shadow-md"
-        >
-          <div className="flex items-center gap-5">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
-              <Headphones className="h-7 w-7" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-900 tracking-tight">{c5.title}</h3>
-              {c5.subtitle && (
-                <p className="text-sm text-slate-500 font-medium mt-1">
-                  {c5.subtitle}
+        {/* 4. VIVO CARD — Vivo T5x 5G (Spans 2 columns) */}
+        <Link href={c4.link} className="md:col-span-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="group relative flex h-[240px] flex-col justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md"
+          >
+            <div className="z-10 flex flex-col items-start">
+              {c4.badge && (
+                <Sparkles className="mb-3">
+                  <span className="rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-amber-600">
+                    {c4.badge}
+                  </span>
+                </Sparkles>
+              )}
+              <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">{c4.title}</h3>
+              {c4.subtitle && (
+                <p className="mt-2 max-w-[220px] text-sm leading-relaxed text-slate-500 font-medium">
+                  {c4.subtitle}
                 </p>
               )}
+              <span className="mt-5 text-3xl font-extrabold text-slate-900 tracking-tight">{c4.discountText}</span>
             </div>
-          </div>
-          <a
-            href={c5.link}
-            className="whitespace-nowrap rounded-xl bg-slate-900 px-6 py-3 text-center text-sm font-bold text-white transition-colors hover:bg-slate-800 shadow-sm"
-          >
-            {c5.cta}
-          </a>
-        </motion.div>
+            {c4.image && (
+              <div className="absolute -bottom-[30%] -right-[10%] h-[340px] w-[340px]">
+                <Image
+                  src={c4.image}
+                  alt={c4.title}
+                  fill
+                  className="object-contain mix-blend-multiply opacity-90 transition-transform hover:scale-105 duration-500"
+                />
+              </div>
+            )}
+          </motion.div>
+        </Link>
+
+
       </div>
     </section>
   );
