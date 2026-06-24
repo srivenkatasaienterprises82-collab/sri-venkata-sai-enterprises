@@ -49,12 +49,15 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import { draftMode } from "next/headers";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const settings = await getSiteSettings();
+  const { isEnabled: isDraftMode } = await draftMode();
 
   return (
     <html
@@ -76,7 +79,7 @@ export default async function RootLayout({
           <Nav settings={settings} />
           <div id="main">{children}</div>
           <WhatsAppFloat settings={settings} />
-          {process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && <SanityLive />}
+          {isDraftMode && process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && <SanityLive />}
           <Toaster position="top-right" theme="dark" />
         </CartProvider>
       </body>

@@ -247,7 +247,8 @@ export function HeroSection({
                             src={product.image}
                             alt={product.name}
                             fill
-                            sizes="33vw"
+                            priority={i < 3}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
                             className="object-contain p-4 mix-blend-multiply transition-transform duration-500 hover:scale-105"
                           />
                         )}

@@ -69,6 +69,7 @@ export function BestSelling({ products }: { products: Product[] }) {
                         src={product.image}
                         alt={product.name}
                         fill
+                        priority={i < 4}
                         className="object-contain p-4 mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
                         sizes="(max-width: 640px) 240px, 280px"
                       />
@@ -98,7 +99,7 @@ export function BestSelling({ products }: { products: Product[] }) {
                         {startingPrice ? formatPrice(startingPrice) : "Price on Enquiry"}
                       </span>
                       {originalPrice && (
-                        <span className="text-xs font-medium text-slate-400 line-through">
+                        <span className="text-xs font-medium text-slate-500 line-through">
                           {formatPrice(originalPrice)}
                         </span>
                       )}
