@@ -58,7 +58,7 @@ export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[_type == "product" && feat
   colors, variants, specifications
 }`);
 
-export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[_type == "product" && slug.current == $slug && enabled != false][0]{
+export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[_type == "product" && (slug.current == $slug || _id == $id) && enabled != false][0]{
   _id, name, slug, type, stock, price, originalPrice, priceOnEnquiry,
   "brand": brand->{name, slug},
   "brandSlug": brand->slug.current,

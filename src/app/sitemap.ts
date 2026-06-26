@@ -13,6 +13,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: "/shipping-policy", changeFrequency: "yearly", priority: 0.3 },
   { url: "/terms", changeFrequency: "yearly", priority: 0.3 },
   { url: "/privacy", changeFrequency: "yearly", priority: 0.3 },
+  { url: "/best-mobile-store-in-ongole", changeFrequency: "monthly", priority: 0.8 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

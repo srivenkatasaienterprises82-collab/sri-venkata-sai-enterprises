@@ -20,7 +20,7 @@ export function toProduct(s: SanityProduct): Product {
     name: s.name,
     slug: s.slug?.current || "",
     brand: s.brand?.name || "",
-    brandSlug: s.brandSlug || "",
+    brandSlug: s.brand?.slug?.current || s.brandSlug || "",
     imageFolder: "", // Deprecated for CMS-managed products
     type: (s.type || "smartphone") as ProductType,
     category: (s.categorySlug || "best-seller") as ProductCategory,

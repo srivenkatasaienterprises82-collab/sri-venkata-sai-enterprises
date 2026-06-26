@@ -1,10 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, RefreshCw, CreditCard } from "lucide-react";
-import { Sparkles } from "@/components/ui/sparkles";
 import type { SanityOffer } from "@/sanity/types";
 
 export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
@@ -76,20 +74,12 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-4 md:grid-cols-3">
         {/* 1. FLAGSHIP DEAL — iQOO Z11x 5G (Spans 2 columns) */}
         <Link href={c1.link} className="md:col-span-2">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="group relative flex h-[280px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md"
-          >
+          <div className="group relative flex h-[280px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md">
             <div className="z-10 flex flex-col items-start">
               {c1.badge && (
-                <Sparkles className="mb-3">
-                  <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-blue-600">
-                    {c1.badge}
-                  </span>
-                </Sparkles>
+                <span className="mb-3 rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-blue-600">
+                  {c1.badge}
+                </span>
               )}
               <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">{c1.title}</h3>
               {c1.subtitle && (
@@ -111,17 +101,11 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
                 />
               </div>
             )}
-          </motion.div>
+          </div>
         </Link>
 
         {/* 2. EMI CARD */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="group flex h-[280px] flex-col justify-between rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md"
-        >
+        <div className="group flex h-[280px] flex-col justify-between rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md">
           <div>
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
               <CreditCard className="h-6 w-6" />
@@ -144,16 +128,10 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
           >
             {c2.cta} <ArrowRight className="h-4 w-4" />
           </a>
-        </motion.div>
+        </div>
 
         {/* 3. EXCHANGE CARD */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="group flex h-[240px] flex-col justify-between rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md"
-        >
+        <div className="group flex h-[240px] flex-col justify-between rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md">
           <div>
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
               <RefreshCw className="h-6 w-6" />
@@ -168,24 +146,16 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
               </p>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* 4. VIVO CARD — Vivo T5x 5G (Spans 2 columns) */}
         <Link href={c4.link} className="md:col-span-2">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="group relative flex h-[240px] flex-col justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md"
-          >
+          <div className="group relative flex h-[240px] flex-col justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md">
             <div className="z-10 flex flex-col items-start">
               {c4.badge && (
-                <Sparkles className="mb-3">
-                  <span className="rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-amber-600">
-                    {c4.badge}
-                  </span>
-                </Sparkles>
+                <span className="mb-3 rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-amber-600">
+                  {c4.badge}
+                </span>
               )}
               <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">{c4.title}</h3>
               {c4.subtitle && (
@@ -205,10 +175,8 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
                 />
               </div>
             )}
-          </motion.div>
+          </div>
         </Link>
-
-
       </div>
     </section>
   );

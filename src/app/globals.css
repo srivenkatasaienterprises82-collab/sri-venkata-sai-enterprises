@@ -132,6 +132,34 @@ body {
 .animate-marquee { animation: marquee 30s linear infinite; }
 .animate-scroll-indicator { animation: scroll-indicator 2s ease-in-out infinite; }
 
+/* ── Framer Motion Replacements ── */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+  opacity: 0; /* Starts hidden */
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+/* Delay classes for staggered animations */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
 /* ── Text gradient utility ── */
 .text-gradient {
   background: linear-gradient(135deg, var(--color-primary-dim) 0%, var(--color-primary) 50%, var(--color-primary-dim) 100%);
@@ -202,4 +230,14 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Fade-in utility (replaces Framer Motion entrance) ── */
+@keyframes fade-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out 1s both;
 }

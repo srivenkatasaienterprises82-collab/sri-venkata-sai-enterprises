@@ -23,7 +23,7 @@ export function HeroCarousel({ images, className = "", autoPlayInterval = 4500 }
     <Swiper
       modules={[Autoplay]}
       autoplay={{ delay: autoPlayInterval, disableOnInteraction: false, pauseOnMouseEnter: true }}
-      loop
+      rewind={true}
       className={className}
     >
       {images.map((item, i) => {

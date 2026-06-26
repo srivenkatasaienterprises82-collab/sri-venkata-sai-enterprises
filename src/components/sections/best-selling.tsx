@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Section } from "@/components/layout/section";
@@ -35,7 +34,7 @@ export function BestSelling({ products }: { products: Product[] }) {
         {/* ── Scrollable on mobile, grid on desktop ── */}
         <div className="relative -mx-6 px-6 sm:mx-0 sm:px-0">
           <div className="flex gap-4 overflow-x-auto pb-6 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 hide-scrollbar">
-            {bestSellers.map((product, i) => {
+            {bestSellers.map((product) => {
               const startingPrice = getStartingPrice(product);
               const originalPrice = product.variants[0]?.originalPrice;
               let discount = 0;
@@ -47,12 +46,8 @@ export function BestSelling({ products }: { products: Product[] }) {
               const displayInfo = [displayVariant, colorNames].filter(Boolean).join(" · ");
 
               return (
-                <motion.div
+                <div
                   key={product.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.04 }}
                   className="group flex w-[240px] flex-shrink-0 flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/10 sm:w-auto"
                 >
                   <Link
@@ -69,7 +64,6 @@ export function BestSelling({ products }: { products: Product[] }) {
                         src={product.image}
                         alt={product.name}
                         fill
-                        priority={i < 4}
                         className="object-contain p-4 mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
                         sizes="(max-width: 640px) 240px, 280px"
                       />
@@ -105,7 +99,7 @@ export function BestSelling({ products }: { products: Product[] }) {
                       )}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>

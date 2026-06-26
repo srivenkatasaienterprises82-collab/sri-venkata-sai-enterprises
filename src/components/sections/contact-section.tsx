@@ -3,7 +3,6 @@
 import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Clock, Send } from "lucide-react";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { siteConfig } from "@/lib/data/siteConfig";
 import type { SanitySiteSettings } from "@/sanity/types";
@@ -96,11 +95,7 @@ export function ContactSection({ settings }: { settings?: SanitySiteSettings }) 
 
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-start">
           {/* Left: Info & Map */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+          <div
             className="flex flex-col gap-8"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -167,14 +162,10 @@ export function ContactSection({ settings }: { settings?: SanitySiteSettings }) 
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Right: Lead form */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+          <div
           >
             <form
               onSubmit={handleSubmit}
@@ -266,7 +257,7 @@ export function ContactSection({ settings }: { settings?: SanitySiteSettings }) 
                 </div>
               </div>
             </form>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

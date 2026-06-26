@@ -1,16 +1,12 @@
+import dynamic from "next/dynamic";
 import { HeroSection } from "@/components/sections/hero-section";
 import { TrustStrip } from "@/components/sections/trust-strip";
 import { BrandStrip } from "@/components/sections/brand-strip";
 import { BrandCarousel } from "@/components/sections/brand-carousel";
 import { PromoBannerGrid } from "@/components/sections/promo-banner-grid";
-import { BentoDeals } from "@/components/sections/bento-deals";
 import { BestSelling } from "@/components/sections/best-selling";
-
 import { TopRatedPerformance } from "@/components/sections/top-rated-performance";
 import { ProductGrid } from "@/components/sections/product-grid";
-import { Testimonials } from "@/components/sections/testimonials";
-import { FAQ } from "@/components/sections/faq";
-import { ContactSection } from "@/components/sections/contact-section";
 import { Footer } from "@/components/sections/footer";
 import { faqs as defaultFaqs } from "@/lib/data/faq";
 import { safeSanityFetch } from "@/sanity/lib/live";
@@ -26,10 +22,22 @@ import { getAllProducts } from "@/lib/data/products";
 import { getAllTestimonials } from "@/lib/data/testimonials";
 import { getFeaturedBrands } from "@/lib/data/brands";
 import { getSiteSettings } from "@/sanity/lib/settings";
+import { siteConfig } from "@/lib/data/siteConfig";
 import type { SanityHomePage, SanityBrand, SanityProduct, SanityTestimonial, SanityFaq } from "@/sanity/types";
- 
-export const dynamic = "force-dynamic";
- 
+import type { Metadata } from "next";
+
+// ── Lazy-loaded below-the-fold sections (code-split via dynamic import) ──
+const BentoDeals = dynamic(() => import("@/components/sections/bento-deals"));
+const Testimonials = dynamic(() => import("@/components/sections/testimonials").then(m => ({ default: m.Testimonials })));
+const FAQ = dynamic(() => import("@/components/sections/faq").then(m => ({ default: m.FAQ })));
+const ContactSection = dynamic(() => import("@/components/sections/contact-section"));
+
+
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
 export default async function Home() {
   const [
     { data: sanityHomePage },
@@ -56,7 +64,6 @@ export default async function Home() {
   // Resolve Home Page CMS configurations with fallbacks
   const heroTitle = sanityHomePage?.heroTitle || undefined;
   const heroSubtitle = sanityHomePage?.heroSubtitle || undefined;
-  const heroSlides = sanityHomePage?.heroSlides;
   const primaryCtaText = sanityHomePage?.primaryCtaText || undefined;
   const primaryCtaLink = sanityHomePage?.primaryCtaLink || undefined;
   const secondaryCtaText = sanityHomePage?.secondaryCtaText || undefined;
@@ -71,6 +78,8 @@ export default async function Home() {
     : undefined;
 
   const bentoDeals = sanityHomePage?.bentoDeals || undefined;
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://srivenkatasaienterprises.com";
 
   return (
     <>
@@ -92,7 +101,114 @@ export default async function Home() {
           }),
         }}
       />
-      <main>
+
+      {/* LocalBusiness / ElectronicsStore structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": ["ElectronicsStore", "LocalBusiness"],
+            "@id": `${baseUrl}/#business`,
+            name: siteConfig.storeName,
+            image: `${baseUrl}/logo.jpg`,
+            url: baseUrl,
+            telephone: siteConfig.phoneTel,
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: `${siteConfig.address.line2}, ${siteConfig.address.line3}`,
+              addressLocality: siteConfig.address.city,
+              addressRegion: "Andhra Pradesh",
+              postalCode: siteConfig.address.pincode,
+              addressCountry: "IN",
+            },
+            geo: {
+              "@type": "GeoCoordinates",
+              latitude: 15.5127,
+              longitude: 80.0389,
+            },
+            openingHoursSpecification: {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: [
+                "Monday", "Tuesday", "Wednesday", "Thursday",
+                "Friday", "Saturday", "Sunday",
+              ],
+              opens: "10:00",
+              closes: "21:00",
+            },
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: siteConfig.ratingValue,
+              reviewCount: siteConfig.reviewCount,
+              bestRating: 5,
+            },
+            priceRange: "₹₹",
+          }),
+        }}
+      />
+
+      {/* Organization structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "@id": `${baseUrl}/#org`,
+            name: siteConfig.storeName,
+            url: baseUrl,
+            logo: `${baseUrl}/logo.jpg`,
+            sameAs: [
+              "https://www.instagram.com/sri_venkata_sai_enterprises/",
+              siteConfig.address.googleMapsUrl,
+              siteConfig.ratingSourceUrl,
+            ],
+          }),
+        }}
+      />
+
+      {/* WebSite structured data (enables sitelinks search box) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": `${baseUrl}/#website`,
+            name: siteConfig.storeName,
+            url: baseUrl,
+            potentialAction: {
+              "@type": "SearchAction",
+              target: {
+                "@type": "EntryPoint",
+                urlTemplate: `${baseUrl}/products?q={search_term_string}`,
+              },
+              "query-input": "required name=search_term_string",
+            },
+          }),
+        }}
+      />
+
+      {/* BreadcrumbList for homepage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: baseUrl,
+              },
+            ],
+          }),
+        }}
+      />
+
+      <>
         <HeroSection
           products={heroProducts}
           title={heroTitle}
@@ -114,7 +230,7 @@ export default async function Home() {
         <Testimonials testimonials={testimonials} />
         <FAQ items={faqs} />
         <ContactSection settings={settings} />
-      </main>
+      </>
       <Footer settings={settings} brands={brands} />
     </>
   );

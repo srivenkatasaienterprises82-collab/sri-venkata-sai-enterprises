@@ -33,22 +33,22 @@ async function getGalleryImages(imageFolder: string, fallbackImage: string): Pro
   }
 }
 
-async function fetchProduct(slug: string): Promise<{ product: Product; isSanity: boolean } | null> {
+async function fetchProduct(param: string): Promise<{ product: Product; isSanity: boolean } | null> {
   try {
     const { data: sanityProduct } = await sanityFetch({
       query: PRODUCT_BY_SLUG_QUERY,
-      params: { slug },
+      params: { slug: param, id: param },
     }) as { data: SanityProduct | null };
 
     if (sanityProduct) {
       return { product: toProduct(sanityProduct), isSanity: true };
     }
   } catch (err) {
-    console.warn(`⚠️ Failed to fetch product slug ${slug} from Sanity: ${err instanceof Error ? err.message : String(err)}`);
+    console.warn(`⚠️ Failed to fetch product slug ${param} from Sanity: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   // Fallback to static data
-  const staticProduct = getProductBySlug(slug);
+  const staticProduct = getProductBySlug(param);
   if (staticProduct) {
     return { product: staticProduct, isSanity: false };
   }
@@ -105,7 +105,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     try {
       const { data: rawSanityProduct } = await sanityFetch({
         query: PRODUCT_BY_SLUG_QUERY,
-        params: { slug: resolvedParams.id },
+        params: { slug: resolvedParams.id, id: resolvedParams.id },
       }) as { data: SanityProduct | null };
       if (rawSanityProduct?.images?.length) {
         galleryImages = rawSanityProduct.images;

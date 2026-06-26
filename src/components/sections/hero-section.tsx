@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -9,26 +8,8 @@ import type { Product } from "@/lib/data/products";
 import { Button } from "@/components/ui/button";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
-import { Particles } from "@/components/ui/particles";
 import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
-};
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
-  },
-};
 
 
 export function HeroSection({
@@ -57,6 +38,7 @@ export function HeroSection({
 
   const featured = products.filter((p) => p.featured).slice(0, 6);
   const carouselProducts = featured.length > 0 ? featured : products.slice(0, 6);
+  const safeCarouselProducts = carouselProducts.filter((p) => p.slug);
   const displayTitle = title || (
     <>
       Latest Mobiles{" "}
@@ -66,7 +48,12 @@ export function HeroSection({
     </>
   );
   const displaySubtitle = subtitle || "Shop genuine smartphones with EMI options, exchange offers, and personal buying help";
-  const translatePercent = carouselProducts.length > 0 ? (currentIndex / carouselProducts.length) * 100 : 0;
+  const hasValidSlug = (product: Product) => product.slug && product.slug.trim().length > 0;
+  const handleProductClick = (e: React.MouseEvent, product: Product) => {
+    if (isDragging || !hasValidSlug(product)) e.preventDefault();
+  };
+
+  const translatePercent = safeCarouselProducts.length > 0 ? (currentIndex / safeCarouselProducts.length) * 100 : 0;
 
   useEffect(() => {
     const handleResize = () => {
@@ -90,15 +77,7 @@ export function HeroSection({
     };
   }, []);
 
-  const maxIndex = carouselProducts.length > 0 ? Math.max(0, carouselProducts.length - itemsPerView) : 0;
-
-  useEffect(() => {
-    if (isHovered || reducedMotion) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [isHovered, reducedMotion, maxIndex]);
+  const maxIndex = safeCarouselProducts.length > 0 ? Math.max(0, safeCarouselProducts.length - itemsPerView) : 0;
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
@@ -108,47 +87,48 @@ export function HeroSection({
     setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
   };
 
+  useEffect(() => {
+    if (isHovered || reducedMotion) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [isHovered, reducedMotion, maxIndex]);
+
   return (
     <section className="relative overflow-hidden bg-white px-4 pb-16 pt-28 sm:px-8 lg:px-16 xl:px-20">
-      {/* Background */}
+      {/* Background — CSS only, no canvas particles */}
       <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-blue-50/80 via-white to-white" />
       <div className="pointer-events-none absolute -top-[10%] left-1/2 z-0 h-[700px] w-[900px] -translate-x-1/2 rounded-full bg-blue-400/10 blur-[120px]" />
       <div className="pointer-events-none absolute -bottom-[10%] right-0 z-0 h-[500px] w-[500px] rounded-full bg-indigo-400/10 blur-[100px]" />
-      <Particles count={30} className="z-0 opacity-60" />
 
       {/* ── 1. Hero Typography & CTAs ── */}
-      <motion.div
-        className="relative z-10 mx-auto mb-20 flex w-full max-w-4xl flex-col items-center text-center"
-        initial="hidden"
-        animate="show"
-        variants={containerVariants}
+      <div
+        className="relative z-10 mx-auto mb-20 flex w-full max-w-4xl flex-col items-center text-center animate-fade-in"
       >
-        <motion.div
-          variants={fadeUp}
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-blue-200/60 bg-blue-50/80 px-5 py-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-700 shadow-sm backdrop-blur-sm"
+        <div
+          className="animate-fade-in-up delay-100 mb-8 inline-flex items-center gap-2 rounded-full border border-blue-200/60 bg-blue-50/80 px-5 py-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-700 shadow-sm backdrop-blur-sm"
         >
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
           </span>
           {siteConfig.address.city}&apos;s trusted mobile store
-        </motion.div>
+        </div>
 
-        <motion.h1
-          variants={fadeUp}
-          className="mb-6 text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
+        <h1
+          className="animate-fade-in-up delay-200 mb-6 text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
         >
           {displayTitle}
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          variants={fadeUp}
-          className="mb-10 text-[9px] xxs:text-[10px] xs:text-xs sm:text-sm md:text-lg lg:text-xl leading-relaxed text-slate-500 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
+        <p
+          className="animate-fade-in-up delay-300 mb-10 text-[9px] xxs:text-[10px] xs:text-xs sm:text-sm md:text-lg lg:text-xl leading-relaxed text-slate-500 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
         >
           {displaySubtitle}
-        </motion.p>
+        </p>
 
-        <motion.div variants={fadeUp} className="mb-10 flex flex-wrap items-center justify-center gap-4">
+        <div className="animate-fade-in-up delay-400 mb-10 flex flex-wrap items-center justify-center gap-4">
           <Link href={primaryCtaLink || "/products"}>
             <ShimmerButton>
               <ShoppingBag className="mr-2 h-5 w-5 inline-block" />
@@ -164,19 +144,13 @@ export function HeroSection({
           >
             {secondaryCtaText || "Get in Touch"}
           </Button>
-        </motion.div>
-
-
-      </motion.div>
+        </div>
+      </div>
 
       {/* ── 2. Phone Showcase Carousel ── */}
-      {carouselProducts.length > 0 && (
-        <motion.div
-          className="relative z-10 mx-auto mb-20 w-full max-w-7xl px-4 sm:px-6 lg:px-8"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          variants={fadeUp}
+      {safeCarouselProducts.length > 0 && (
+        <div
+          className="animate-fade-in-up delay-500 relative z-10 mx-auto mb-20 w-full max-w-7xl px-4 sm:px-6 lg:px-8"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -217,7 +191,7 @@ export function HeroSection({
                 setTimeout(() => setIsDragging(false), 50);
               }}
             >
-              {carouselProducts.map((product, i) => {
+              {safeCarouselProducts.map((product, i) => {
                 const isCenter = itemsPerView === 3 ? i === currentIndex + 1 : i === currentIndex;
 
                 return (
@@ -227,8 +201,8 @@ export function HeroSection({
                     style={{ minHeight: "460px" }}
                   >
                     <Link
-                      href={`/products/${product.slug}`}
-                      onClick={(e) => isDragging && e.preventDefault()}
+                      href={hasValidSlug(product) ? `/products/${product.slug}` : "#"}
+                      onClick={(e) => handleProductClick(e, product)}
                       className={`relative flex w-full max-w-[280px] mx-auto flex-col items-center rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5 transition-all duration-500 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/10 p-6 ${
                         isCenter
                           ? "z-20 translate-y-0 scale-100 opacity-100 shadow-xl shadow-slate-200/50"
@@ -271,24 +245,22 @@ export function HeroSection({
               })}
             </div>
 
-          {/* Dots */}
-          <div className="mt-10 flex justify-center gap-3">
-            {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className={`h-2.5 rounded-full transition-all duration-300 ${
-                  currentIndex === idx ? "w-10 bg-blue-600" : "w-2.5 bg-slate-300 hover:bg-slate-400"
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
-            ))}
+            {/* Dots */}
+            <div className="mt-10 flex justify-center gap-3">
+              {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentIndex(idx)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${
+                    currentIndex === idx ? "w-10 bg-blue-600" : "w-2.5 bg-slate-300 hover:bg-slate-400"
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </motion.div>
       )}
-
-
     </section>
   );
 }

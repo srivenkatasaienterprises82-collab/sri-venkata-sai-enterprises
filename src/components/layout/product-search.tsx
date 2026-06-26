@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { products, getStartingPrice, isPriceOnEnquiry, formatPrice } from "@/lib/data/products";
 
 interface ProductSearchProps {
@@ -128,14 +127,9 @@ export function ProductSearch({ onSelect }: ProductSearchProps) {
         )}
       </div>
 
-      <AnimatePresence>
         {isOpen && query.trim() && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
-            transition={{ duration: 0.15 }}
-            className="absolute top-full mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl max-h-[360px] overflow-y-auto"
+          <div
+            className="animate-fade-in absolute top-full mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl max-h-[360px] overflow-y-auto"
             role="listbox"
             id={listboxId}
             aria-label="Product search results"
@@ -182,9 +176,8 @@ export function ProductSearch({ onSelect }: ProductSearchProps) {
                 No products found for &quot;{query}&quot;
               </div>
             )}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </div>
   );
 }

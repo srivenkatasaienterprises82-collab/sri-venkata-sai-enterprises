@@ -4,7 +4,6 @@ import { Section } from "@/components/layout/section";
 import { GradientText } from "@/components/ui/gradient-text";
 import type { Testimonial } from "@/lib/data/testimonials";
 import { Quote, Star } from "lucide-react";
-import { motion } from "framer-motion";
 
 export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
   const items = testimonials.slice(0, 6);
@@ -24,25 +23,12 @@ export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) 
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((testimonial, index) => (
-          <motion.div
+          {items.map((testimonial) => (
+          <div
             key={`${testimonial.name}-${testimonial.location}`}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.08, duration: 0.5 }}
+            className="flex h-full flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-900/5"
           >
-            <motion.div
-              animate={{ y: [0, -6, 0] }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: index * 0.3,
-              }}
-              className="flex h-full flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-900/5"
-            >
-              <div className="flex gap-3">
+            <div className="flex gap-3">
               <Quote className="mt-0.5 h-5 w-5 shrink-0 text-blue-500/50" aria-hidden="true" />
               <p className="text-sm leading-relaxed text-slate-600">{testimonial.text}</p>
             </div>
@@ -74,8 +60,7 @@ export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) 
                 <p className="text-xs text-slate-500">{testimonial.location}</p>
               </div>
             </div>
-            </motion.div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </Section>

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 /**
@@ -36,25 +35,17 @@ export function Sparkles({
   return (
     <span className={`relative inline-block ${className}`}>
       {sparkles.map((s) => (
-        <motion.span
+        <span
           key={s.id}
-          className="pointer-events-none absolute rounded-full bg-amber-400"
+          className="pointer-events-none absolute rounded-full bg-amber-400 animate-[pulse_var(--tw-animate-duration)_var(--tw-animate-delay)_infinite_ease-in-out]"
           style={{
             left: `${s.x}%`,
             top: `${s.y}%`,
             width: s.size,
             height: s.size,
-          }}
-          animate={{
-            opacity: [0, 1, 0],
-            scale: [0, 1, 0],
-          }}
-          transition={{
-            duration: s.duration,
-            repeat: Infinity,
-            delay: s.delay,
-            ease: "easeInOut",
-          }}
+            "--tw-animate-duration": `${s.duration}s`,
+            "--tw-animate-delay": `${s.delay}s`,
+          } as React.CSSProperties}
         />
       ))}
       {children}

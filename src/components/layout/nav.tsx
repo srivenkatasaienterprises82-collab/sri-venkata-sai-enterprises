@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Phone, MessageCircle, ShoppingBag, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { ProductSearch } from "./product-search";
 import { siteConfig } from "@/lib/data/siteConfig";
@@ -201,31 +200,20 @@ export function Nav({ settings }: { settings?: SanitySiteSettings }) {
       </div>
 
       {/* Mobile search overlay */}
-      <AnimatePresence>
         {searchOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: [0.25, 0.4, 0.25, 1] as const }}
-            className="overflow-hidden border-t border-slate-200 bg-white/95 backdrop-blur-md lg:hidden shadow-lg"
+          <div
+            className="animate-fade-in overflow-hidden border-t border-slate-200 bg-white/95 backdrop-blur-md lg:hidden shadow-lg"
           >
             <div className="p-4">
               <ProductSearch onSelect={() => setSearchOpen(false)} />
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
 
       {/* Mobile nav */}
-      <AnimatePresence>
         {open && (
-          <motion.nav
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: [0.25, 0.4, 0.25, 1] as const }}
-            className="overflow-hidden border-t border-slate-200 bg-white/95 backdrop-blur-md lg:hidden shadow-lg"
+          <nav
+            className="animate-fade-in overflow-hidden border-t border-slate-200 bg-white/95 backdrop-blur-md lg:hidden shadow-lg"
           >
             <div className="flex flex-col gap-2 px-5 py-4">
               {navLinks.map((link) => (
@@ -291,9 +279,8 @@ export function Nav({ settings }: { settings?: SanitySiteSettings }) {
                 )}
               </Link>
             </div>
-          </motion.nav>
+          </nav>
         )}
-      </AnimatePresence>
     </header>
   );
 }

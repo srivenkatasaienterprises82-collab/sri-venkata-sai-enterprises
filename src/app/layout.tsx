@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
       default: settings.seoTitleTemplate || `${settings.companyName} | Premium Mobile Store in ${settings.city || "Ongole"}`,
       template: titleTemplate,
     },
-    description: settings.seoDescription || `Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo & Motorola. Best prices, EMI options, exchange offers, and fast local service in ${settings.city || "Ongole"}.`,
+    description: settings.seoDescription || `Sri Venkata Sai Enterprises is the leading mobile phone store in Ongole. Buy iPhone, Samsung, Vivo, Oppo, Realme, OnePlus, Redmi and accessories at the best prices.`,
     keywords: keywords,
     icons: {
       icon: "/favicon.ico",
@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       siteName: settings.companyName,
       title: settings.seoTitleTemplate || `${settings.companyName} | Premium Mobile Store in ${settings.city || "Ongole"}`,
-      description: settings.seoDescription || `Shop genuine smartphones with EMI options, exchange offers, and personal buying help in ${settings.city || "Ongole"}.`,
+      description: settings.seoDescription || `Sri Venkata Sai Enterprises is the leading mobile phone store in Ongole. Buy iPhone, Samsung, Vivo, Oppo, Realme, OnePlus, Redmi and accessories at the best prices.`,
       images: [{ url: settings.openGraphImage || settings.logo || "/logo.jpg", width: 320, height: 320, alt: settings.companyName }],
     },
   };
@@ -77,7 +77,7 @@ export default async function RootLayout({
         <SkipLink />
         <CartProvider>
           <Nav settings={settings} />
-          <div id="main">{children}</div>
+          <main id="main">{children}</main>
           <WhatsAppFloat settings={settings} />
           {isDraftMode && process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && <SanityLive />}
           <Toaster position="top-right" theme="dark" />

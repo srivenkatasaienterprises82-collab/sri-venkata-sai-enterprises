@@ -1,8 +1,5 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import { type VariantProps, cva } from "class-variance-authority";
-import { motion, type MotionProps } from "framer-motion";
 import * as React from "react";
 
 const sectionVariants = cva("relative w-full", {
@@ -26,41 +23,35 @@ const sectionVariants = cva("relative w-full", {
   },
 });
 
-type SectionOwnProps = VariantProps<typeof sectionVariants> & MotionProps & {
-  as?: React.ElementType;
-};
-
-type SectionProps = Omit<React.HTMLAttributes<HTMLElement>, "as"> & SectionOwnProps;
+type SectionProps = React.HTMLAttributes<HTMLElement> &
+  VariantProps<typeof sectionVariants> & {
+    as?: React.ElementType;
+    /** @deprecated No longer used — kept for API compat so callers don't break */
+    initial?: unknown;
+    /** @deprecated */
+    whileInView?: unknown;
+    /** @deprecated */
+    viewport?: unknown;
+    /** @deprecated */
+    transition?: unknown;
+  };
 
 function Section({
   className,
   spacing,
   container,
-  as = "section",
+  as: Component = "section",
   children,
-  initial,
-  whileInView,
-  viewport,
-  transition,
+  // Consume (and discard) legacy motion props so callers don't break
+  initial: _initial,
+  whileInView: _whileInView,
+  viewport: _viewport,
+  transition: _transition,
   ...props
 }: SectionProps) {
-  const classNameValue = cn(sectionVariants({ spacing, container, className }));
-  const initialValue = initial ?? { opacity: 0, y: 28 };
-  const whileInViewValue = whileInView ?? { opacity: 1, y: 0 };
-  const viewportValue = viewport ?? { once: true, amount: 0.18, margin: "-60px" };
-  const transitionValue = transition ?? { duration: 0.55, ease: "easeOut" };
-
-  const Component = motion[as as keyof typeof motion] as React.ComponentType<
-    MotionProps & React.HTMLAttributes<HTMLElement>
-  >;
-
   return (
     <Component
-      className={classNameValue}
-      initial={initialValue}
-      whileInView={whileInViewValue}
-      viewport={viewportValue}
-      transition={transitionValue}
+      className={cn(sectionVariants({ spacing, container, className }))}
       {...props}
     >
       {children}

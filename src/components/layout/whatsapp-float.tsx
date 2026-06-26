@@ -1,7 +1,6 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
-import { motion } from "framer-motion";
 import { siteConfig } from "@/lib/data/siteConfig";
 import type { SanitySiteSettings } from "@/sanity/types";
 
@@ -11,12 +10,7 @@ export function WhatsAppFloat({ settings }: { settings?: SanitySiteSettings }) {
     : siteConfig.whatsappUrl;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 1, duration: 0.5 }}
-      className="fixed bottom-6 right-6 z-50 md:bottom-8 md:right-8"
-    >
+    <div className="fixed bottom-6 right-6 z-50 md:bottom-8 md:right-8 animate-fade-in">
       <a
         href={whatsappUrl}
         target="_blank"
@@ -34,6 +28,6 @@ export function WhatsAppFloat({ settings }: { settings?: SanitySiteSettings }) {
           Chat with us
         </span>
       </a>
-    </motion.div>
+    </div>
   );
 }

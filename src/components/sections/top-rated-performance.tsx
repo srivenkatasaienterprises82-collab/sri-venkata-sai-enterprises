@@ -76,10 +76,11 @@ export function TopRatedPerformance({ products }: { products?: Product[] }) {
           <Swiper
             modules={[Autoplay, Navigation]}
             onSwiper={(swiper) => { swiperRef.current = swiper; }}
-            autoplay={{ delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+            autoplay={{ delay: 2000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+            speed={600}
             breakpoints={swiperBreakpoints}
             grabCursor
-            loop
+            rewind={true}
           >
             {topRatedPhones.map((phone) => {
               const variant = phone.variants[0];

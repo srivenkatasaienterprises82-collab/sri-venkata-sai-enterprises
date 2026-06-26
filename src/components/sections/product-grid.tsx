@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Section } from "@/components/layout/section";
@@ -25,7 +24,7 @@ const swiperBreakpoints = {
 export function ProductGrid({ products }: { products: Product[] }) {
   const swiperRef = useRef<SwiperClass | null>(null);
   return (
-    <Section className="bg-white" container="sm" id="products" initial={{ opacity: 1, y: 0 }}>
+    <Section className="bg-white" container="sm" id="products">
       <div className="w-full">
         <div className="mb-10 flex items-end justify-between">
           <div>
@@ -63,10 +62,11 @@ export function ProductGrid({ products }: { products: Product[] }) {
           <Swiper
             modules={[Autoplay, Navigation]}
             onSwiper={(swiper) => { swiperRef.current = swiper; }}
-            autoplay={{ delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+            autoplay={{ delay: 2000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+            speed={600}
             breakpoints={swiperBreakpoints}
             grabCursor
-            loop
+            rewind={true}
           >
             {products.map((product) => {
               const enquiry = isPriceOnEnquiry(product);
@@ -79,12 +79,8 @@ export function ProductGrid({ products }: { products: Product[] }) {
 
               return (
                 <SwiperSlide key={product.id}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                    className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/10"
+                  <div
+                    className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/10 animate-fade-in-up"
                   >
                     <Link href={`/products/${product.slug}`} className="relative mb-4 flex h-[200px] w-full items-center justify-center overflow-hidden rounded-xl bg-slate-50 transition-colors group-hover:bg-slate-100/50">
                       <div className={`absolute left-3 top-3 z-10 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm
@@ -152,7 +148,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
                         </Link>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 </SwiperSlide>
               );
             })}

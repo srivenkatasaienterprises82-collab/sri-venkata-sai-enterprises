@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Clock, ShieldCheck, Star, Users } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
 import { NumberTicker } from "@/components/ui/number-ticker";
@@ -16,13 +15,9 @@ export function TrustStrip() {
   return (
     <section className="border-y border-slate-200 bg-white px-6 py-8 sm:px-8">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <motion.div
+        {stats.map((stat) => (
+          <div
             key={stat.label}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.08, duration: 0.45 }}
             className="flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center shadow-sm"
           >
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600">
@@ -38,7 +33,7 @@ export function TrustStrip() {
             <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
               {stat.label}
             </span>
-          </motion.div>
+          </div>
         ))}
       </div>
     </section>
