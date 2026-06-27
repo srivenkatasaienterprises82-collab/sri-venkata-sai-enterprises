@@ -7,8 +7,8 @@ const cards = [
   {
     id: 1,
     src: "/images/promo-banner/promo-1.png",
-    alt: "iQOO 15 flagship smartphone - available at Sri Venkata Sai Enterprises",
-    href: "/products/iqoo-15",
+    alt: "iQOO 15 R smartphone - available at Sri Venkata Sai Enterprises",
+    href: "/products/iqoo-15r",
   },
   {
     id: 2,
@@ -22,10 +22,10 @@ const cards = [
     alt: "iPhone 17 Series - iPhone 17, Pro, Pro Max and Air",
     href: "/category/apple",
   },
-  {
+    {
     id: 4,
-    src: "/images/promo-banner/promo-4.png",
-    alt: "iQOO Neo 10 Pro - flagship gaming smartphone",
+    src: "/images/promo-banner/promo-4.jpg",
+    alt: "iQOO Neo 10 Pro",
     href: "/products/iqoo-neo-10-pro",
   },
 ];
