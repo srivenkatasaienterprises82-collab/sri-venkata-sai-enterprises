@@ -134,7 +134,7 @@ export function HeroSection({
                   transform: scale(0.92);
                   opacity: 0.7;
                   transform-origin: center center;
-                  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1), opacity 400ms ease;
+                  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease-out;
                   will-change: transform;
                   backface-visibility: hidden;
                 }
@@ -204,12 +204,14 @@ export function HeroSection({
                   modules={[Navigation, Pagination, Autoplay]}
                   loop={true}
                   centeredSlides={true}
-                  speed={400}
+                  speed={200}
                   autoplay={{
-                    delay: 3000,
+                    delay: 2000,
                     disableOnInteraction: false,
                     pauseOnMouseEnter: true,
                   }}
+                  touchRatio={2}
+                  touchStartPreventDefault={false}
                   navigation={{
                     prevEl: '.hero-swiper-prev',
                     nextEl: '.hero-swiper-next',
