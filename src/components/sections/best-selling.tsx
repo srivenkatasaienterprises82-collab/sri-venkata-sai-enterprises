@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { Section } from "@/components/layout/section";
 
 import { getStartingPrice, formatPrice } from "@/lib/data/products";
@@ -9,6 +10,20 @@ import type { Product } from "@/lib/data/products";
 
 export function BestSelling({ products }: { products: Product[] }) {
   const bestSellers = products.slice(0, 8);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } },
+  };
+
   return (
     <Section className="bg-slate-50" container="sm">
       <div className="w-full">
@@ -19,7 +34,7 @@ export function BestSelling({ products }: { products: Product[] }) {
             <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-blue-600">
               Popular Right Now
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
               Best Selling Phones
             </h2>
           </div>
@@ -33,7 +48,13 @@ export function BestSelling({ products }: { products: Product[] }) {
 
         {/* ── Scrollable on mobile, grid on desktop ── */}
         <div className="relative -mx-6 px-6 sm:mx-0 sm:px-0">
-          <div className="flex gap-4 overflow-x-auto pb-6 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 md:grid-cols-3 lg:grid-cols-4 sm:gap-6 hide-scrollbar">
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-3 lg:grid-cols-4"
+          >
             {bestSellers.map((product) => {
               const startingPrice = getStartingPrice(product);
               const originalPrice = product.variants[0]?.originalPrice;
@@ -46,9 +67,10 @@ export function BestSelling({ products }: { products: Product[] }) {
               const displayInfo = [displayVariant, colorNames].filter(Boolean).join(" · ");
 
               return (
-                <div
+                <motion.div
                   key={product.id}
-                  className="group flex w-[240px] flex-shrink-0 flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/10 sm:w-auto"
+                  variants={itemVariants}
+                  className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/20 w-full"
                 >
                   <Link
                     href={`/products/${product.slug}`}
@@ -99,10 +121,10 @@ export function BestSelling({ products }: { products: Product[] }) {
                       )}
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
 
         {/* Mobile "View All" link */}

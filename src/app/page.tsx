@@ -5,7 +5,6 @@ import { BrandStrip } from "@/components/sections/brand-strip";
 import { BrandCarousel } from "@/components/sections/brand-carousel";
 import { PromoBannerGrid } from "@/components/sections/promo-banner-grid";
 import { BestSelling } from "@/components/sections/best-selling";
-import { TopRatedPerformance } from "@/components/sections/top-rated-performance";
 import { ProductGrid } from "@/components/sections/product-grid";
 import { Footer } from "@/components/sections/footer";
 import { faqs as defaultFaqs } from "@/lib/data/faq";
@@ -224,7 +223,6 @@ export default async function Home() {
       <BrandCarousel />
         <BestSelling products={products} />
 
-        <TopRatedPerformance products={topRatedProducts} />
         <BentoDeals offers={bentoDeals} />
         <TrustStrip />
         <Testimonials testimonials={testimonials} />

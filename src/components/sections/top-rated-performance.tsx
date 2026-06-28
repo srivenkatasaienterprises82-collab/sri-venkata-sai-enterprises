@@ -23,7 +23,7 @@ const TARGET_SLUGS = [
 ];
 
 const swiperBreakpoints = {
-  0: { slidesPerView: 1.4, spaceBetween: 16 },
+  0: { slidesPerView: 1.2, spaceBetween: 16 },
   480: { slidesPerView: 2.2, spaceBetween: 16 },
   768: { slidesPerView: 3.2, spaceBetween: 20 },
   1024: { slidesPerView: 4.2, spaceBetween: 20 },
@@ -44,7 +44,7 @@ export function TopRatedPerformance({ products }: { products?: Product[] }) {
             <p className="text-xs font-bold tracking-[0.2em] text-blue-600 uppercase mb-2">
               Power &amp; Speed
             </p>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
               Top-Rated for Performance
             </h2>
           </div>

@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Section } from "@/components/layout/section";
+import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import type { SwiperClass } from "swiper/react";
@@ -15,7 +16,7 @@ import { getStartingPrice, formatPrice, isPriceOnEnquiry } from "@/lib/data/prod
 import type { Product } from "@/lib/data/products";
 
 const swiperBreakpoints = {
-  0: { slidesPerView: 1.5, spaceBetween: 16 },
+  0: { slidesPerView: 1.2, spaceBetween: 16 },
   480: { slidesPerView: 2.2, spaceBetween: 16 },
   768: { slidesPerView: 3.2, spaceBetween: 20 },
   1024: { slidesPerView: 4.2, spaceBetween: 20 },
@@ -23,15 +24,27 @@ const swiperBreakpoints = {
 
 export function ProductGrid({ products }: { products: Product[] }) {
   const swiperRef = useRef<SwiperClass | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <Section className="bg-white" container="sm" id="products">
       <div className="w-full">
-        <div className="mb-10 flex items-end justify-between">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="mb-10 flex items-end justify-between"
+        >
           <div>
             <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-blue-600">
               Our Catalog
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
               Latest Devices
             </h2>
           </div>
@@ -41,25 +54,36 @@ export function ProductGrid({ products }: { products: Product[] }) {
           >
             View All &rarr;
           </Link>
-        </div>
+        </motion.div>
 
-        <div className="relative -mx-4 px-4 sm:mx-0 sm:px-0 pb-4 pt-2">
-          <button
-            onClick={() => swiperRef.current?.slidePrev()}
-            className="absolute -left-3 top-1/2 z-20 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-md transition-all hover:bg-slate-50 hover:text-blue-600 hover:shadow-lg active:scale-95"
-            aria-label="Previous"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => swiperRef.current?.slideNext()}
-            className="absolute -right-3 top-1/2 z-20 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-md transition-all hover:bg-slate-50 hover:text-blue-600 hover:shadow-lg active:scale-95"
-            aria-label="Next"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="relative -mx-4 px-4 sm:mx-0 sm:px-0 pb-4 pt-2"
+        >
+          {mounted && (
+            <>
+              <button
+                onClick={() => swiperRef.current?.slidePrev()}
+                className="absolute -left-3 top-1/2 z-20 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-md transition-all hover:bg-slate-50 hover:text-blue-600 hover:shadow-lg active:scale-95"
+                aria-label="Previous"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => swiperRef.current?.slideNext()}
+                className="absolute -right-3 top-1/2 z-20 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-md transition-all hover:bg-slate-50 hover:text-blue-600 hover:shadow-lg active:scale-95"
+                aria-label="Next"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </>
+          )}
 
-          <Swiper
+          {mounted ? (
+            <Swiper
             modules={[Autoplay, Navigation]}
             onSwiper={(swiper) => { swiperRef.current = swiper; }}
             autoplay={{ delay: 2000, disableOnInteraction: false, pauseOnMouseEnter: true }}
@@ -80,7 +104,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
               return (
                 <SwiperSlide key={product.id}>
                   <div
-                    className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/10 animate-fade-in-up"
+                    className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/20"
                   >
                     <Link href={`/products/${product.slug}`} className="relative mb-4 flex h-[200px] w-full items-center justify-center overflow-hidden rounded-xl bg-slate-50 transition-colors group-hover:bg-slate-100/50">
                       <div className={`absolute left-3 top-3 z-10 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm
@@ -133,7 +157,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Link
                           href={`/products/${product.slug}`}
                           className="flex flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white py-2 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900 active:scale-95"
@@ -153,7 +177,14 @@ export function ProductGrid({ products }: { products: Product[] }) {
               );
             })}
           </Swiper>
-        </div>
+          ) : (
+            <div className="flex gap-4 overflow-hidden px-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="min-h-[420px] w-[280px] sm:w-[320px] lg:w-[280px] flex-shrink-0 animate-pulse rounded-2xl bg-slate-100" />
+              ))}
+            </div>
+          )}
+        </motion.div>
 
         <div className="mt-6 text-center sm:hidden">
           <Link
