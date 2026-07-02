@@ -219,6 +219,15 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                       </span>
                     )}
                   </>
+                ) : product.price ? (
+                  <>
+                    <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{formatPrice(product.price)}</span>
+                    {product.originalPrice && (
+                      <span className="mb-1.5 text-lg font-medium text-slate-400 line-through">
+                        {formatPrice(product.originalPrice)}
+                      </span>
+                    )}
+                  </>
                 ) : (
                   <span className="text-3xl font-extrabold text-slate-900">Price on Enquiry</span>
                 )}
