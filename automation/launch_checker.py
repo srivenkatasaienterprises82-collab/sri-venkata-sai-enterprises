@@ -1,10 +1,22 @@
 import argparse
 import os
+from datetime import datetime
 from sanity_api import fetch_all_products, update_price, create_product
 from amazon import get_amazon_price
 from flipkart import get_flipkart_price
 from utils import is_match
 from groq_ai import normalize_and_describe
+
+LOG_FILE = "price-changes.csv"
+
+
+def log_change(product_name, brand, old_price, new_price, source):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    diff = new_price - (old_price or 0)
+    arrow = "UP" if diff > 0 else "DOWN"
+    line = f"{now},{product_name},{brand},{old_price},{new_price},{diff},{arrow},{source}"
+    with open(LOG_FILE, "a") as f:
+        f.write(line + "\n")
 
 
 FLIPKART_BRANDS = ["Motorola", "Oppo", "Vivo", "Realme", "Poco", "Nothing"]
@@ -25,6 +37,9 @@ def get_assigned_source(product: dict) -> str | None:
 
 def sync_prices():
     print("Starting Price Sync...")
+    if not os.path.exists(LOG_FILE):
+        with open(LOG_FILE, "w") as f:
+            f.write("timestamp,product,brand,old_price,new_price,diff,direction,source\n")
     products = fetch_all_products()
     updated_count = 0
 
@@ -61,6 +76,7 @@ def sync_prices():
             brand = (product.get("brand") or {}).get("name", "")
             diff = display_price - (old_price or 0)
             arrow = "↑" if diff > 0 else "↓"
+            log_change(product["name"], brand, old_price, display_price, source)
             print(f"{arrow} {product['name']} ({brand}): ₹{old_price} → ₹{display_price} ({'+' if diff > 0 else ''}{diff}) via {source}")
 
     print(f"✓ Checked {len(products)} phones. Updated {updated_count} prices.")
