@@ -32,3 +32,5 @@ jobs:
         with:
           name: price-changes
           path: price-changes.csv
+      - name: Trigger Vercel Redeploy
+        run: curl -s -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"

@@ -28,3 +28,5 @@ jobs:
           SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python automation/launch_checker.py --mode launch
+      - name: Trigger Vercel Redeploy
+        run: curl -s -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
