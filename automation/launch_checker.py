@@ -9,6 +9,7 @@ from groq_ai import normalize_and_describe
 
 FLIPKART_BRANDS = ["Motorola", "Oppo", "Vivo", "Realme", "Poco", "Nothing"]
 AMAZON_BRANDS = ["iQOO", "Redmi"]
+BOTH_BRANDS = ["Apple", "Samsung", "OnePlus"]
 
 
 def get_assigned_source(product: dict) -> str | None:
@@ -17,6 +18,8 @@ def get_assigned_source(product: dict) -> str | None:
         return "flipkart"
     if brand in AMAZON_BRANDS:
         return "amazon"
+    if brand in BOTH_BRANDS:
+        return "both"
     return None
 
 
@@ -30,6 +33,7 @@ def sync_prices():
         if source is None:
             continue
 
+        old_price = product.get("price")
         amz_price = None
         flip_price = None
         display_price = None
@@ -40,20 +44,29 @@ def sync_prices():
         elif source == "amazon":
             amz_price = get_amazon_price(product.get("amazonUrl"))
             display_price = amz_price
+        elif source == "both":
+            flip_price = get_flipkart_price(product.get("flipkartUrl"))
+            amz_price = get_amazon_price(product.get("amazonUrl"))
+            prices = [p for p in [amz_price, flip_price] if p is not None]
+            if not prices:
+                continue
+            display_price = min(prices)
 
         if display_price is None:
             continue
 
-        if product.get("price") != display_price:
+        if old_price != display_price:
             update_price(product["_id"], amz_price, flip_price, display_price)
             updated_count += 1
             brand = (product.get("brand") or {}).get("name", "")
-            print(f"Updated {product['name']} ({brand}): ₹{display_price} via {source}")
+            diff = display_price - (old_price or 0)
+            arrow = "↑" if diff > 0 else "↓"
+            print(f"{arrow} {product['name']} ({brand}): ₹{old_price} → ₹{display_price} ({'+' if diff > 0 else ''}{diff}) via {source}")
 
     print(f"✓ Checked {len(products)} phones. Updated {updated_count} prices.")
 
 
-TRACKED_BRANDS = FLIPKART_BRANDS + AMAZON_BRANDS
+TRACKED_BRANDS = FLIPKART_BRANDS + AMAZON_BRANDS + BOTH_BRANDS
 
 
 def check_launches():
