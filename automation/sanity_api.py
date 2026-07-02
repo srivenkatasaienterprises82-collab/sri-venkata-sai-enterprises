@@ -7,7 +7,6 @@ DATASET = os.getenv("SANITY_DATASET")
 TOKEN = os.getenv("SANITY_TOKEN")
 
 BASE_URL = f"https://{PROJECT_ID}.api.sanity.io/v2024-01-01"
-DATA_URL = f"{BASE_URL}/data/{DATASET}"
 HEADERS = {
     "Authorization": f"Bearer {TOKEN}",
     "Content-Type": "application/json",
@@ -16,7 +15,7 @@ HEADERS = {
 
 def fetch_all_products():
     query = '*[_type == "product"]{_id, name, brand->{name}, amazonUrl, flipkartUrl, price, amazonPrice, flipkartPrice}'
-    url = f"{DATA_URL}/query?query={requests.utils.quote(query)}"
+    url = f"{BASE_URL}/data/query/{DATASET}?query={requests.utils.quote(query)}"
     res = requests.get(url, headers=HEADERS)
     if res.status_code == 200:
         return res.json().get("result", [])
@@ -25,7 +24,7 @@ def fetch_all_products():
 
 
 def create_product(product_data: dict) -> dict:
-    url = f"{DATA_URL}/mutate"
+    url = f"{BASE_URL}/data/mutate/{DATASET}"
     mutations = {
         "mutations": [
             {
@@ -52,7 +51,7 @@ def create_product(product_data: dict) -> dict:
 
 
 def update_price(product_id: str, amazon_price, flipkart_price, display_price) -> dict:
-    url = f"{DATA_URL}/mutate"
+    url = f"{BASE_URL}/data/mutate/{DATASET}"
     mutations = {
         "mutations": [
             {
