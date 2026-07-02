@@ -3,7 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const cards = [
+export interface PromoBanner {
+  id: string | number;
+  src: string;
+  alt: string;
+  href: string;
+}
+
+const staticBanners: PromoBanner[] = [
   {
     id: 1,
     src: "/images/promo-banner/promo-1.png",
@@ -22,7 +29,7 @@ const cards = [
     alt: "iPhone 17 Series - iPhone 17, Pro, Pro Max and Air",
     href: "/category/apple",
   },
-    {
+  {
     id: 4,
     src: "/images/promo-banner/promo-4.jpg",
     alt: "iQOO Neo 10 Pro",
@@ -30,12 +37,14 @@ const cards = [
   },
 ];
 
-export function PromoBannerGrid() {
+export function PromoBannerGrid({ banners }: { banners?: PromoBanner[] }) {
+  const displayBanners = banners && banners.length > 0 ? banners : staticBanners;
+
   return (
-    <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
+    <section className="bg-white px-4 py-16 sm:px-6 lg:px-8 animate-fade-in">
       <div className="mx-auto max-w-7xl">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-6">
-          {cards.map((card) => (
+          {displayBanners.map((card) => (
             <div key={card.id}>
               <Link
                 href={card.href}
@@ -48,6 +57,7 @@ export function PromoBannerGrid() {
                   height={500}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="h-auto w-full object-contain"
+                  priority
                 />
               </Link>
             </div>

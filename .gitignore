@@ -18,6 +18,10 @@
 /out/
 
 # production
+
+# python
+__pycache__/
+*.pyc
 /build
 
 # misc

@@ -59,6 +59,8 @@ export interface Product {
   specifications: { label: string; value: string }[];
   featured: boolean;
   tags: string[];
+  price?: number;
+  originalPrice?: number;
   /** When true, price is hidden — enquiry only. */
   priceOnEnquiry?: boolean;
 }
@@ -314,7 +316,8 @@ export function getStartingPrice(product: Product): number | undefined {
   const prices = product.variants
     .map((v) => v.price)
     .filter((pr): pr is number => typeof pr === "number");
-  return prices.length ? Math.min(...prices) : undefined;
+  if (prices.length) return Math.min(...prices);
+  return product.price;
 }
 
 export function isPriceOnEnquiry(product: Product): boolean {

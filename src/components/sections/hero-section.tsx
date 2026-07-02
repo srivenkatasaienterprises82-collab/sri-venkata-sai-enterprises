@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { formatPrice } from "@/lib/data/products";
+import { motion, AnimatePresence } from "framer-motion";
+import { formatPrice, getStartingPrice } from "@/lib/data/products";
 import type { Product } from "@/lib/data/products";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
@@ -26,6 +26,7 @@ export function HeroSection({
   primaryCtaLink,
   secondaryCtaText,
   secondaryCtaLink,
+  heroSlides,
 }: {
   products: Product[];
   title?: string | React.ReactNode;
@@ -34,12 +35,22 @@ export function HeroSection({
   primaryCtaLink?: string;
   secondaryCtaText?: string;
   secondaryCtaLink?: string;
+  heroSlides?: string[];
 }) {
   const [mounted, setMounted] = useState(false);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!heroSlides || heroSlides.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlideIndex((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroSlides]);
 
   const featured = products.filter((p) => p.featured).slice(0, 16);
   const carouselProducts = featured.length > 0 ? featured : products.slice(0, 16);
@@ -57,7 +68,22 @@ export function HeroSection({
 
   return (
     <section className="relative overflow-hidden bg-white px-4 pt-20 pb-12 md:px-8 md:pt-28 md:pb-16 lg:px-16 xl:px-20">
-      {/* Background — CSS only, no canvas particles */}
+      {/* Background — Dynamic Slideshow (if heroSlides provided) */}
+      {heroSlides && heroSlides.length > 0 && (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlideIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.15 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="pointer-events-none absolute inset-0 z-0"
+            style={{ backgroundImage: `url(${heroSlides[currentSlideIndex]})`, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}
+          />
+        </AnimatePresence>
+      )}
+
+      {/* Background — Gradient overlay (always on top of slideshow) */}
       <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-blue-50/80 via-white to-white" />
       <div className="pointer-events-none absolute -top-[10%] left-1/2 z-0 h-[700px] w-[900px] -translate-x-1/2 rounded-full bg-blue-400/10 blur-[120px]" />
       <div className="pointer-events-none absolute -bottom-[10%] right-0 z-0 h-[500px] w-[500px] rounded-full bg-indigo-400/10 blur-[100px]" />
@@ -260,7 +286,7 @@ export function HeroSection({
                               {product.name}
                             </h3>
                             <p className="mt-2 font-extrabold text-slate-900 text-base">
-                              {formatPrice(product.variants[0]?.price || 0)}
+                              {formatPrice(getStartingPrice(product) || 0)}
                             </p>
                           </div>
                         </Link>

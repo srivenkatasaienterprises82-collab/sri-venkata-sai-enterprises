@@ -7,6 +7,11 @@ export type SanityProduct = {
   price?: number;
   originalPrice?: number;
   priceOnEnquiry?: boolean;
+  amazonUrl?: string;
+  flipkartUrl?: string;
+  amazonPrice?: number;
+  flipkartPrice?: number;
+  lastUpdated?: string;
   brand: { name: string; slug: { current: string } };
   brandSlug: string;
   category?: { name: string; slug: { current: string } };

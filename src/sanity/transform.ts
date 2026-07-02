@@ -7,6 +7,9 @@ import type {
   SanityBrand,
   SanityTestimonial,
   SanityFaq,
+  SanityOffer,
+  SanityBanner,
+  SanityGallery,
 } from "./types";
 
 export function toProduct(s: SanityProduct): Product {
@@ -21,12 +24,14 @@ export function toProduct(s: SanityProduct): Product {
     slug: s.slug?.current || "",
     brand: s.brand?.name || "",
     brandSlug: s.brand?.slug?.current || s.brandSlug || "",
-    imageFolder: "", // Deprecated for CMS-managed products
+    imageFolder: "",
     type: (s.type || "smartphone") as ProductType,
     category: (s.categorySlug || "best-seller") as ProductCategory,
     stock: stockStatus,
     image: s.coverImage || "",
     description: s.description || "",
+    price: s.price,
+    originalPrice: s.originalPrice,
     colors: (s.colors || []) as ProductColor[],
     variants: (s.variants || []) as ProductVariant[],
     specifications: s.specifications || [],
@@ -85,4 +90,53 @@ export function toFaq(s: SanityFaq): FAQItem {
 
 export function toFaqs(data: SanityFaq[]): FAQItem[] {
   return data.map(toFaq);
+}
+
+export function toOffer(s: SanityOffer) {
+  return {
+    _id: s._id,
+    title: s.title,
+    badge: s.badge || "",
+    subtitle: s.subtitle || "",
+    discountText: s.discountText || "",
+    image: s.image || "",
+    link: s.link || "/",
+    cta: s.cta || "Claim Offer",
+    expiryDate: s.expiryDate,
+    type: s.type || "general",
+  };
+}
+
+export function toOffers(data: SanityOffer[]) {
+  return data.map(toOffer);
+}
+
+export function toBanner(s: SanityBanner) {
+  return {
+    id: s._id,
+    title: s.title,
+    subtitle: s.subtitle || "",
+    badge: s.badge || "",
+    cta: s.cta || "Shop Now",
+    backgroundColor: s.backgroundColor || "#D6EEF5",
+    src: s.image || "",
+    alt: s.title,
+    href: s.link || "/products",
+  };
+}
+
+export function toBanners(data: SanityBanner[]) {
+  return data.map(toBanner);
+}
+
+export function toGallery(s: SanityGallery) {
+  return {
+    id: s._id,
+    image: s.image,
+    caption: s.caption || "",
+  };
+}
+
+export function toGalleries(data: SanityGallery[]) {
+  return data.map(toGallery);
 }

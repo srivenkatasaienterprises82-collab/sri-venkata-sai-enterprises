@@ -6,6 +6,7 @@ import { BrandCarousel } from "@/components/sections/brand-carousel";
 import { PromoBannerGrid } from "@/components/sections/promo-banner-grid";
 import { BestSelling } from "@/components/sections/best-selling";
 import { ProductGrid } from "@/components/sections/product-grid";
+import { GallerySection } from "@/components/sections/gallery-section";
 import { Footer } from "@/components/sections/footer";
 import { faqs as defaultFaqs } from "@/lib/data/faq";
 import { safeSanityFetch } from "@/sanity/lib/live";
@@ -15,14 +16,16 @@ import {
   TESTIMONIALS_QUERY,
   HOME_PAGE_QUERY,
   FAQS_QUERY,
+  BANNERS_QUERY,
+  GALLERY_QUERY,
 } from "@/sanity/queries";
-import { toProducts, toBrands, toTestimonials, toFaqs } from "@/sanity/transform";
+import { toProducts, toBrands, toTestimonials, toFaqs, toBanners, toGalleries, toOffers } from "@/sanity/transform";
 import { getAllProducts } from "@/lib/data/products";
 import { getAllTestimonials } from "@/lib/data/testimonials";
 import { getFeaturedBrands } from "@/lib/data/brands";
 import { getSiteSettings } from "@/sanity/lib/settings";
 import { siteConfig } from "@/lib/data/siteConfig";
-import type { SanityHomePage, SanityBrand, SanityProduct, SanityTestimonial, SanityFaq } from "@/sanity/types";
+import type { SanityHomePage, SanityBrand, SanityProduct, SanityTestimonial, SanityFaq, SanityBanner, SanityGallery } from "@/sanity/types";
 import type { Metadata } from "next";
 
 // ── Lazy-loaded below-the-fold sections (code-split via dynamic import) ──
@@ -44,6 +47,8 @@ export default async function Home() {
     { data: sanityProducts },
     { data: sanityTestimonials },
     { data: sanityFaqs },
+    { data: sanityBanners },
+    { data: sanityGallery },
     settings,
   ] = await Promise.all([
     safeSanityFetch({ query: HOME_PAGE_QUERY }) as Promise<{ data: SanityHomePage | null }>,
@@ -51,6 +56,8 @@ export default async function Home() {
     safeSanityFetch({ query: PRODUCTS_QUERY }) as Promise<{ data: SanityProduct[] | null }>,
     safeSanityFetch({ query: TESTIMONIALS_QUERY }) as Promise<{ data: SanityTestimonial[] | null }>,
     safeSanityFetch({ query: FAQS_QUERY }) as Promise<{ data: SanityFaq[] | null }>,
+    safeSanityFetch({ query: BANNERS_QUERY }) as Promise<{ data: SanityBanner[] | null }>,
+    safeSanityFetch({ query: GALLERY_QUERY }) as Promise<{ data: SanityGallery[] | null }>,
     getSiteSettings(),
   ]);
 
@@ -59,6 +66,8 @@ export default async function Home() {
   const brands = sanityBrands?.length ? toBrands(sanityBrands) : getFeaturedBrands();
   const testimonials = sanityTestimonials?.length ? toTestimonials(sanityTestimonials) : getAllTestimonials();
   const faqs = sanityFaqs?.length ? toFaqs(sanityFaqs) : defaultFaqs;
+  const banners = sanityBanners?.length ? toBanners(sanityBanners) : undefined;
+  const gallery = sanityGallery?.length ? toGalleries(sanityGallery) : undefined;
 
   // Resolve Home Page CMS configurations with fallbacks
   const heroTitle = sanityHomePage?.heroTitle || undefined;
@@ -76,7 +85,7 @@ export default async function Home() {
     ? toProducts(sanityHomePage.topRatedPerformance)
     : undefined;
 
-  const bentoDeals = sanityHomePage?.bentoDeals || undefined;
+  const bentoDeals = sanityHomePage?.bentoDeals?.length ? toOffers(sanityHomePage.bentoDeals) : undefined;
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://srivenkatasaienterprises.com";
 
@@ -216,8 +225,9 @@ export default async function Home() {
           primaryCtaLink={primaryCtaLink}
           secondaryCtaText={secondaryCtaText}
           secondaryCtaLink={secondaryCtaLink}
+          heroSlides={sanityHomePage?.heroSlides}
         />
-      <PromoBannerGrid />
+      <PromoBannerGrid banners={banners} />
       <ProductGrid products={products} />
       <BrandStrip brands={brands} />
       <BrandCarousel />
@@ -225,6 +235,7 @@ export default async function Home() {
 
         <BentoDeals offers={bentoDeals} />
         <TrustStrip />
+        <GallerySection items={gallery} />
         <Testimonials testimonials={testimonials} />
         <FAQ items={faqs} />
         <ContactSection settings={settings} />

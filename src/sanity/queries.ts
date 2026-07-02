@@ -38,6 +38,7 @@ export const HOME_PAGE_QUERY = defineQuery(`*[_type == "homePage"][0]{
 
 export const PRODUCTS_QUERY = defineQuery(`*[_type == "product" && enabled != false] | order(order asc){
   _id, name, slug, type, stock, price, originalPrice, priceOnEnquiry,
+  amazonUrl, flipkartUrl, amazonPrice, flipkartPrice, lastUpdated,
   "brand": brand->{name, slug},
   "brandSlug": brand->slug.current,
   "category": category->{name, slug},
@@ -49,6 +50,7 @@ export const PRODUCTS_QUERY = defineQuery(`*[_type == "product" && enabled != fa
 
 export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[_type == "product" && featured == true && enabled != false] | order(order asc){
   _id, name, slug, type, stock, price, originalPrice, priceOnEnquiry,
+  amazonUrl, flipkartUrl, amazonPrice, flipkartPrice, lastUpdated,
   "brand": brand->{name, slug},
   "brandSlug": brand->slug.current,
   "category": category->{name, slug},
@@ -60,6 +62,7 @@ export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[_type == "product" && feat
 
 export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[_type == "product" && (slug.current == $slug || _id == $id) && enabled != false][0]{
   _id, name, slug, type, stock, price, originalPrice, priceOnEnquiry,
+  amazonUrl, flipkartUrl, amazonPrice, flipkartPrice, lastUpdated,
   "brand": brand->{name, slug},
   "brandSlug": brand->slug.current,
   "category": category->{name, slug},
@@ -72,6 +75,7 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[_type == "product" && (slug.
 
 export const PRODUCTS_BY_BRAND_QUERY = defineQuery(`*[_type == "product" && brand->slug.current == $brandSlug && enabled != false] | order(order asc){
   _id, name, slug, type, stock, price, originalPrice, priceOnEnquiry,
+  amazonUrl, flipkartUrl, amazonPrice, flipkartPrice, lastUpdated,
   "brand": brand->{name, slug},
   "brandSlug": brand->slug.current,
   "coverImage": coverImage.asset->url
