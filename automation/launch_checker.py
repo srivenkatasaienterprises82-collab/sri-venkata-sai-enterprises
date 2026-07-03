@@ -19,7 +19,7 @@ def log_change(product_name, brand, old_price, new_price, source):
         f.write(line + "\n")
 
 
-FLIPKART_BRANDS = ["Motorola", "Oppo", "Vivo", "Realme", "Poco", "Nothing"]
+FLIPKART_BRANDS = ["Motorola", "Oppo", "Vivo", "Realme", "Poco", "Nothing", "Narzo", "Google", "Infinix"]
 AMAZON_BRANDS = ["iQOO", "Redmi"]
 BOTH_BRANDS = ["Apple", "Samsung", "OnePlus"]
 

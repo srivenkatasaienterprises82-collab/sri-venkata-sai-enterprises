@@ -8,8 +8,15 @@ import { Section } from "@/components/layout/section";
 import { getStartingPrice, formatPrice } from "@/lib/data/products";
 import type { Product } from "@/lib/data/products";
 
+const POPULAR_BRANDS = [
+  "Apple", "Samsung", "OnePlus", "Vivo", "Oppo", "Realme",
+  "Motorola", "iQOO", "Google", "POCO", "Redmi", "Infinix", "Narzo",
+];
+
 export function BestSelling({ products }: { products: Product[] }) {
-  const bestSellers = products.slice(0, 8);
+  const bestSellers = products
+    .filter((p) => POPULAR_BRANDS.includes(p.brand))
+    .slice(0, 8);
 
   const containerVariants = {
     hidden: { opacity: 0 },
