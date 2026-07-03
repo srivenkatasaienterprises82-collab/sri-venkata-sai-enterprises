@@ -63,7 +63,9 @@ export default async function Home() {
 
   // Transform Sanity arrays with fallbacks
   const products = sanityProducts?.length ? toProducts(sanityProducts) : getAllProducts();
-  const brands = sanityBrands?.length ? toBrands(sanityBrands) : getFeaturedBrands();
+  const allBrands = sanityBrands?.length ? toBrands(sanityBrands) : getFeaturedBrands();
+  // Filter out HMD brand from home page
+  const brands = allBrands.filter((b) => b.slug !== "hmd");
   const testimonials = sanityTestimonials?.length ? toTestimonials(sanityTestimonials) : getAllTestimonials();
   const faqs = sanityFaqs?.length ? toFaqs(sanityFaqs) : defaultFaqs;
   const banners = sanityBanners?.length ? toBanners(sanityBanners) : undefined;

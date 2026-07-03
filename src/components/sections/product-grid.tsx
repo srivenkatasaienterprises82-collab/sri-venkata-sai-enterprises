@@ -22,9 +22,20 @@ const swiperBreakpoints = {
   1024: { slidesPerView: 4.2, spaceBetween: 20 },
 };
 
+/** Popular brands to show on home page - filter out cheap/lesser-known brands */
+const POPULAR_BRAND_SLUGS = [
+  "vivo", "iqoo", "motorola", "redmi", "samsung", "apple",
+  "oneplus", "oppo", "realme", "google", "nothing", "poco", "narzo"
+];
+
 export function ProductGrid({ products }: { products: Product[] }) {
   const swiperRef = useRef<SwiperClass | null>(null);
   const [mounted, setMounted] = useState(false);
+
+  // Filter to only popular brands
+  const filteredProducts = products.filter(
+    (p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase())
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -92,7 +103,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
             grabCursor
             rewind={true}
           >
-            {products.map((product) => {
+            {filteredProducts.map((product) => {
               const enquiry = isPriceOnEnquiry(product);
               const startingPrice = getStartingPrice(product);
               const variant = startingPrice

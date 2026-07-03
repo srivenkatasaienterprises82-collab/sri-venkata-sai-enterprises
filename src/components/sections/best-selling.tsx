@@ -9,8 +9,8 @@ import { getStartingPrice, formatPrice } from "@/lib/data/products";
 import type { Product } from "@/lib/data/products";
 
 const POPULAR_BRANDS = [
-  "Apple", "Samsung", "OnePlus", "Vivo", "Oppo", "Realme",
-  "Motorola", "iQOO", "Google", "POCO", "Redmi", "Infinix", "Narzo",
+  "Vivo", "iQOO", "Motorola", "Redmi", "Samsung", "Apple",
+  "OnePlus", "Oppo", "Realme", "Google", "Nothing", "POCO", "Narzo"
 ];
 
 export function BestSelling({ products }: { products: Product[] }) {

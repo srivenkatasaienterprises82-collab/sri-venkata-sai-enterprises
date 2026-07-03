@@ -17,6 +17,11 @@ import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
 
+/** Popular brands to show on home page */
+const POPULAR_BRAND_SLUGS = [
+  "vivo", "iqoo", "motorola", "redmi", "samsung", "apple",
+  "oneplus", "oppo", "realme", "google", "nothing", "poco", "narzo"
+];
 
 export function HeroSection({
   products,
@@ -52,8 +57,8 @@ export function HeroSection({
     return () => clearInterval(interval);
   }, [heroSlides]);
 
-  const featured = products.filter((p) => p.featured).slice(0, 16);
-  const carouselProducts = featured.length > 0 ? featured : products.slice(0, 16);
+  const featured = products.filter((p) => p.featured && POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase())).slice(0, 16);
+  const carouselProducts = featured.length > 0 ? featured : products.filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase())).slice(0, 16);
   const safeCarouselProducts = carouselProducts.filter((p) => p.slug);
   const displayTitle = title || (
     <>
