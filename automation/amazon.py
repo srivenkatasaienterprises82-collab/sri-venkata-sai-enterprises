@@ -1,4 +1,6 @@
 import re
+import time
+import random
 from playwright.sync_api import sync_playwright, TimeoutError as PwTimeout
 
 
@@ -21,8 +23,12 @@ def get_amazon_price(url: str) -> int | None:
 
         try:
             page.goto(url, wait_until="commit", timeout=120000)
-            page.wait_for_load_state("networkidle", timeout=60000)
-            page.wait_for_timeout(2000)
+            time.sleep(random.uniform(2, 4))
+
+            try:
+                page.wait_for_load_state("networkidle", timeout=30000)
+            except PwTimeout:
+                pass
 
             SELECTORS = [
                 "span.a-price-whole",

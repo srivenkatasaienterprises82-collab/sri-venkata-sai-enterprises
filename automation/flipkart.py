@@ -1,4 +1,6 @@
 import re
+import time
+import random
 from playwright.sync_api import sync_playwright, TimeoutError as PwTimeout
 
 
@@ -20,12 +22,17 @@ def get_flipkart_price(url: str) -> int | None:
         page.set_default_timeout(120000)
 
         try:
+            # Use "commit" instead of "domcontentloaded" and add a small random delay
             page.goto(url, wait_until="commit", timeout=120000)
-            page.wait_for_load_state("networkidle", timeout=60000)
+            time.sleep(random.uniform(2, 4))
 
-            # Small random delay to let JS finish rendering
-            page.wait_for_timeout(2000)
+            # Wait for network to settle
+            try:
+                page.wait_for_load_state("networkidle", timeout=30000)
+            except PwTimeout:
+                pass
 
+            # Wait for any price element to appear
             SELECTORS = [
                 "div.Nx9bqj",
                 "div._30jeq3",
