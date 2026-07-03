@@ -17,17 +17,21 @@ def get_flipkart_price(url: str) -> int | None:
             "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
         )
         page = context.new_page()
+        page.set_default_timeout(120000)
 
         try:
-            page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            page.goto(url, wait_until="commit", timeout=120000)
+            page.wait_for_load_state("networkidle", timeout=60000)
 
-            # Wait for any price element to appear (search pages load prices via JS)
+            # Small random delay to let JS finish rendering
+            page.wait_for_timeout(2000)
+
             SELECTORS = [
-                "div.Nx9bqj",           # product card price on search results
-                "div._30jeq3",          # alternate search-card price
-                "div[class*='_30jeq3']",  # class-prefix fallback
-                "span._30jeq3",         # span variant on search cards
-                "div.cN1AAd",           # alternate Flipkart price container
+                "div.Nx9bqj",
+                "div._30jeq3",
+                "div[class*='_30jeq3']",
+                "span._30jeq3",
+                "div.cN1AAd",
                 "div[class*='cN1AAd']",
                 "div[class*='Nx9bqj']",
             ]
@@ -35,7 +39,7 @@ def get_flipkart_price(url: str) -> int | None:
             price_el = None
             for sel in SELECTORS:
                 try:
-                    price_el = page.wait_for_selector(sel, timeout=8000)
+                    price_el = page.wait_for_selector(sel, timeout=10000)
                     if price_el:
                         break
                 except PwTimeout:

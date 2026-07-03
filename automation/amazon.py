@@ -17,9 +17,12 @@ def get_amazon_price(url: str) -> int | None:
             "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
         )
         page = context.new_page()
+        page.set_default_timeout(120000)
 
         try:
-            page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            page.goto(url, wait_until="commit", timeout=120000)
+            page.wait_for_load_state("networkidle", timeout=60000)
+            page.wait_for_timeout(2000)
 
             SELECTORS = [
                 "span.a-price-whole",
@@ -33,7 +36,7 @@ def get_amazon_price(url: str) -> int | None:
             price_el = None
             for sel in SELECTORS:
                 try:
-                    price_el = page.wait_for_selector(sel, timeout=8000)
+                    price_el = page.wait_for_selector(sel, timeout=10000)
                     if price_el:
                         break
                 except PwTimeout:
