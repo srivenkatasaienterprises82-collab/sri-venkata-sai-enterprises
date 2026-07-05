@@ -9,11 +9,11 @@ import Link from "next/link";
  * Edge gradients fade logos in/out at viewport edges.
  */
 
+import type { Brand } from "@/lib/data/brands";
+
 interface BrandLogo {
   name: string;
-  /** Path relative to /public, e.g. "/images/brand-logos/samsung logo.png" */
   src: string;
-  /** Optional href — wraps logo in a link */
   href?: string;
 }
 
@@ -72,9 +72,16 @@ function LogoSlide({ logo }: { logo: BrandLogo }) {
  *    which is visually identical to scrolling one full set.
  * 3. On hover, the animation pauses smoothly via animation-play-state.
  */
-export function BrandCarousel() {
+export function BrandCarousel({ brands }: { brands?: Brand[] }) {
+  const brandLogos: BrandLogo[] = brands && brands.length > 0
+    ? brands.filter((b) => b.logo).map((b) => ({
+        name: b.name,
+        src: b.logo!,
+        href: `/products?brand=${b.slug}`,
+      }))
+    : BRAND_LOGOS;
   // Duplicate the array so the track loops seamlessly
-  const logos = [...BRAND_LOGOS, ...BRAND_LOGOS];
+  const logos = [...brandLogos, ...brandLogos];
 
   return (
     <section

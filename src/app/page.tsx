@@ -232,11 +232,11 @@ export default async function Home() {
       <PromoBannerGrid banners={banners} />
       <ProductGrid products={products} />
       <BrandStrip brands={brands} />
-      <BrandCarousel />
+      <BrandCarousel brands={brands} />
         <BestSelling products={products} />
 
         <BentoDeals offers={bentoDeals} />
-        <TrustStrip />
+        <TrustStrip settings={settings} />
         <GallerySection items={gallery} />
         <Testimonials testimonials={testimonials} />
         <FAQ items={faqs} />

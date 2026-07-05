@@ -140,3 +140,17 @@ export function toGallery(s: SanityGallery) {
 export function toGalleries(data: SanityGallery[]) {
   return data.map(toGallery);
 }
+
+export function toPageContent(blocks: any[] | null | undefined): string {
+  if (!blocks || !Array.isArray(blocks)) return "";
+  return blocks
+    .filter((b: any) => b._type === "block" && b.children?.length)
+    .map((b: any) => {
+      const text = b.children
+        .filter((c: any) => c._type === "span")
+        .map((c: any) => c.text)
+        .join("");
+      return text;
+    })
+    .join("\n\n");
+}

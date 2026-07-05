@@ -86,6 +86,14 @@ export type SanityOffer = {
   type: "general" | "bento" | "seasonal" | "flash";
 };
 
+export type SanityPage = {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  seoDescription?: string;
+  content?: any[];
+};
+
 export type SanitySiteSettings = {
   companyName: string;
   companyShortName?: string;

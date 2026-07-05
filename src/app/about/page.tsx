@@ -4,6 +4,10 @@ import { GradientText } from "@/components/ui/gradient-text";
 import { Button } from "@/components/ui/button";
 import { getAllBrands } from "@/lib/data/brands";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { safeSanityFetch } from "@/sanity/lib/live";
+import { PAGE_QUERY } from "@/sanity/queries";
+import { PortableText } from "@portabletext/react";
+import type { SanityPage } from "@/sanity/types";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -20,12 +24,20 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: `About Us | ${siteConfig.storeName} — ${siteConfig.address.city} Mobile Store`,
-  description:
-    `${siteConfig.address.city}'s trusted mobile store with ${siteConfig.happyCustomers} happy customers. Genuine smartphones, official warranty, EMI options, fair exchange values & personal service. ${siteConfig.address.line2}, ${siteConfig.address.line4}.`,
-  alternates: { canonical: "/about" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const { data: page } = await safeSanityFetch({ query: PAGE_QUERY, params: { slug: "about" } }) as { data: SanityPage | null };
+    if (page?.title) {
+      return { title: `About Us | ${page.title}`, description: page.seoDescription || undefined, alternates: { canonical: "/about" } };
+    }
+  } catch {}
+  return {
+    title: `About Us | ${siteConfig.storeName} \u2014 ${siteConfig.address.city} Mobile Store`,
+    description:
+      `${siteConfig.address.city}'s trusted mobile store with ${siteConfig.happyCustomers} happy customers. Genuine smartphones, official warranty, EMI options, fair exchange values & personal service. ${siteConfig.address.line2}, ${siteConfig.address.line4}.`,
+    alternates: { canonical: "/about" },
+  };
+}
 
 const stats = [
   { icon: Users, value: siteConfig.happyCustomers, label: "Happy Customers" },
@@ -57,7 +69,8 @@ const values = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { data: sanityPage } = await safeSanityFetch({ query: PAGE_QUERY, params: { slug: "about" } }) as { data: SanityPage | null };
   const brands = getAllBrands();
 
   return (
@@ -149,25 +162,38 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold tracking-tight text-slate-900">
               Our Story
             </h2>
-            <div className="mt-8 flex flex-col gap-6 text-lg text-slate-600 leading-relaxed text-left">
-              <p>
-                Located on Kurnool Road in the heart of {siteConfig.address.city}, {siteConfig.storeName}
-                stocks <span className="font-semibold text-slate-900">{siteConfig.phonesInStock} smartphones</span>{" "}
-                from top brands including Apple, Samsung, Vivo, iQOO, Oppo, Motorola, OnePlus, and
-                Realme. Every device we sell is 100% genuine, sourced from authorized distributors,
-                and comes with official brand warranty and a GST invoice.
-              </p>
-              <p>
-                We believe buying a smartphone should be simple, transparent, and enjoyable. That&apos;s
-                why we offer flexible EMI options, fair exchange values, competitive pricing, and
-                personal guidance to help you choose the perfect device.
-              </p>
-              <p>
-                Whether you visit our store, call us, or WhatsApp us, you&apos;ll always get honest
-                advice, genuine products, and the best possible price. Our customers come back
-                because they trust us — and we work hard to earn that trust every single day.
-              </p>
-            </div>
+            {sanityPage?.content && Array.isArray(sanityPage.content) && sanityPage.content.length > 0 ? (
+              <div className="mt-8 text-left text-lg text-slate-600 leading-relaxed prose prose-slate max-w-none">
+                <PortableText
+                  value={sanityPage.content}
+                  components={{
+                    block: {
+                      normal: ({ children }) => <p className="mb-4">{children}</p>,
+                    },
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="mt-8 flex flex-col gap-6 text-lg text-slate-600 leading-relaxed text-left">
+                <p>
+                  Located on Kurnool Road in the heart of {siteConfig.address.city}, {siteConfig.storeName}
+                  stocks <span className="font-semibold text-slate-900">{siteConfig.phonesInStock} smartphones</span>{" "}
+                  from top brands including Apple, Samsung, Vivo, iQOO, Oppo, Motorola, OnePlus, and
+                  Realme. Every device we sell is 100% genuine, sourced from authorized distributors,
+                  and comes with official brand warranty and a GST invoice.
+                </p>
+                <p>
+                  We believe buying a smartphone should be simple, transparent, and enjoyable. That&apos;s
+                  why we offer flexible EMI options, fair exchange values, competitive pricing, and
+                  personal guidance to help you choose the perfect device.
+                </p>
+                <p>
+                  Whether you visit our store, call us, or WhatsApp us, you&apos;ll always get honest
+                  advice, genuine products, and the best possible price. Our customers come back
+                  because they trust us — and we work hard to earn that trust every single day.
+                </p>
+              </div>
+            )}
           </div>
         </Section>
 

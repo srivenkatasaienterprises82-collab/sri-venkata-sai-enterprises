@@ -3,15 +3,19 @@
 import { Clock, ShieldCheck, Star, Users } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import type { SanitySiteSettings } from "@/sanity/types";
 
-const stats = [
-  { icon: Star, value: siteConfig.rating, label: "Google rating", animated: false },
-  { icon: Users, value: siteConfig.happyCustomers, label: "Happy customers", animated: true, target: 4500, suffix: "+" },
-  { icon: ShieldCheck, value: "100%", label: "Genuine products", animated: false },
-  { icon: Clock, value: "10-9", label: "Open every day", animated: false },
-];
+function defaultStats(settings?: SanitySiteSettings) {
+  return [
+    { icon: Star, value: settings?.seoTitleTemplate ? "4.9" : siteConfig.rating, label: "Google rating", animated: false },
+    { icon: Users, value: settings?.companyName ? "4500+" : siteConfig.happyCustomers, label: "Happy customers", animated: true, target: 4500, suffix: "+" },
+    { icon: ShieldCheck, value: "100%", label: "Genuine products", animated: false },
+    { icon: Clock, value: "10-9", label: "Open every day", animated: false },
+  ];
+}
 
-export function TrustStrip() {
+export function TrustStrip({ settings }: { settings?: SanitySiteSettings }) {
+  const stats = defaultStats(settings);
   return (
     <section className="border-y border-slate-200 bg-white px-6 py-8 sm:px-8">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">

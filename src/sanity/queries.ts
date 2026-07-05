@@ -105,3 +105,7 @@ export const FAQS_QUERY = defineQuery(`*[_type == "faq"] | order(order asc){
 export const GALLERY_QUERY = defineQuery(`*[_type == "gallery"] | order(order asc){
   _id, image, caption
 }`);
+
+export const PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == $slug][0]{
+  _id, title, slug, seoDescription, content
+}`);

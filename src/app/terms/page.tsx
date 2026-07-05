@@ -1,20 +1,31 @@
 import { Section } from "@/components/layout/section";
 import { Footer } from "@/components/sections/footer";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { safeSanityFetch } from "@/sanity/lib/live";
+import { PAGE_QUERY } from "@/sanity/queries";
+import { PortableText } from "@portabletext/react";
+import type { SanityPage } from "@/sanity/types";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description:
-    "Terms for using the Sri Venkata Sai Enterprises website, including pricing, ordering, warranty, and support.",
-  alternates: { canonical: "/terms" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const { data: page } = await safeSanityFetch({ query: PAGE_QUERY, params: { slug: "terms" } }) as { data: SanityPage | null };
+    if (page?.title) {
+      return { title: page.title, description: page.seoDescription || undefined, alternates: { canonical: "/terms" } };
+    }
+  } catch {}
+  return {
+    title: "Terms of Service",
+    description: "Terms for using the Sri Venkata Sai Enterprises website, including pricing, ordering, warranty, and support.",
+    alternates: { canonical: "/terms" },
+  };
+}
 
-const sections = [
+const staticSections = [
   {
     title: "1. Pricing & Availability",
     body: [
-      "All prices shown on this website are indicative and subject to change without notice. Prices marked “Price on Enquiry” are confirmed on WhatsApp or at the store. Final pricing, including applicable taxes and any active offers, is confirmed at the time of purchase.",
+      "All prices shown on this website are indicative and subject to change without notice. Prices marked \u201cPrice on Enquiry\u201d are confirmed on WhatsApp or at the store. Final pricing, including applicable taxes and any active offers, is confirmed at the time of purchase.",
       "Product availability, colours, and storage variants may vary. We will confirm real-time stock before confirming your order.",
     ],
   },
@@ -33,13 +44,13 @@ const sections = [
   {
     title: "4. Warranty & Support",
     body: [
-      "All smartphones carry the official brand warranty (typically 1 year) as per the manufacturer’s service policy. Warranty and support claims are handled through the brand’s authorised service centres and are subject to verification at our store.",
+      "All smartphones carry the official brand warranty (typically 1 year) as per the manufacturer\u2019s service policy. Warranty and support claims are handled through the brand\u2019s authorised service centres and are subject to verification at our store.",
     ],
   },
   {
     title: "5. Returns & Refunds",
     body: [
-      "As sealed electronic goods, smartphones are non-returnable once unboxed unless defective and covered under the brand’s warranty or applicable consumer protection law. Please inspect your device at the time of purchase or delivery.",
+      "As sealed electronic goods, smartphones are non-returnable once unboxed unless defective and covered under the brand\u2019s warranty or applicable consumer protection law. Please inspect your device at the time of purchase or delivery.",
     ],
   },
   {
@@ -50,7 +61,10 @@ const sections = [
   },
 ];
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const { data: sanityPage } = await safeSanityFetch({ query: PAGE_QUERY, params: { slug: "terms" } }) as { data: SanityPage | null };
+  const hasContent = sanityPage?.content && Array.isArray(sanityPage.content) && sanityPage.content.length > 0;
+
   return (
     <>
       <main className="pt-24 bg-slate-50 min-h-screen">
@@ -58,23 +72,39 @@ export default function TermsPage() {
           <div className="mx-auto max-w-3xl">
             <p className="text-sm font-medium text-slate-500">Last updated: June 2026</p>
             <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
-              Terms of Service
+              {sanityPage?.title || "Terms of Service"}
             </h1>
             <div className="mt-8 flex flex-col gap-8 text-slate-600 font-medium leading-relaxed">
-              <p>
-                These terms govern your use of the {siteConfig.storeName} website and the orders you
-                place through it. By using this site, you agree to the terms below.
-              </p>
-              {sections.map((s) => (
-                <div key={s.title}>
-                  <h2 className="text-xl font-bold text-slate-900">{s.title}</h2>
-                  <div className="mt-3 flex flex-col gap-2 text-[15px]">
-                    {s.body.map((line, i) => (
-                      <p key={i}>{line}</p>
-                    ))}
-                  </div>
+              {hasContent ? (
+                <div className="prose prose-slate max-w-none">
+                  <PortableText
+                    value={sanityPage!.content!}
+                    components={{
+                      block: {
+                        h2: ({ children }) => <h2 className="text-xl font-bold text-slate-900 mt-6 mb-3">{children}</h2>,
+                        normal: ({ children }) => <p className="text-[15px] leading-relaxed mb-3">{children}</p>,
+                      },
+                    }}
+                  />
                 </div>
-              ))}
+              ) : (
+                <>
+                  <p>
+                    These terms govern your use of the {siteConfig.storeName} website and the orders you
+                    place through it. By using this site, you agree to the terms below.
+                  </p>
+                  {staticSections.map((s) => (
+                    <div key={s.title}>
+                      <h2 className="text-xl font-bold text-slate-900">{s.title}</h2>
+                      <div className="mt-3 flex flex-col gap-2 text-[15px]">
+                        {s.body.map((line, i) => (
+                          <p key={i}>{line}</p>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
               <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm mt-4">
                 <h2 className="text-xl font-bold text-slate-900">Questions?</h2>
                 <p className="mt-3 text-[15px] font-medium text-slate-600">
