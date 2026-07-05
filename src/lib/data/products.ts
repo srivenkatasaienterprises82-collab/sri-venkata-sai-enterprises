@@ -111,7 +111,8 @@ export const products: Product[] = [
     flipkartUrl: "https://www.flipkart.com/search?q=Vivo+V70+Elite"
   }),
   p({ id: "vivo-v70", name: "Vivo V70", slug: "vivo-v70", brand: "Vivo", brandSlug: "vivo", imageFolder: "vivo-v70", type: "smartphone", category: "new-arrival", stock: "inStock", description: "Vivo V70 - a premium mid-range phone with a stunning display, capable cameras, and a refined design.", colors: [C.black, C.yellow, C.red], variants: [{ ram: "8 GB", storage: "256 GB", price: 53999 }], specifications: [{ label: "Display", value: '6.77" AMOLED, 120Hz' }, { label: "Processor", value: "Snapdragon 7 Gen series" }, { label: "Camera", value: "50MP OIS" }, { label: "Battery", value: "6000mAh" }, { label: "Charging", value: "80W" }, { label: "OS", value: "Android, Funtouch OS" }], featured: true, tags: ["5G", "AMOLED", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=Vivo+V70"
+    flipkartUrl: "https://www.flipkart.com/vivo-v70-passion-red-256-gb/p/itmecfa7a31699de",
+    amazonUrl: "https://www.amazon.in/vivo-V70-Passion-256GB-Storage/dp/B0GHQH9FN7"
   }),
   p({ id: "vivo-v70-fe", name: "Vivo V70 FE", slug: "vivo-v70-fe", brand: "Vivo", brandSlug: "vivo", imageFolder: "vivo-v70-fe", type: "smartphone", category: "deal", stock: "inStock", description: "A value-focused V70 variant - flagship looks at a friendlier price.", colors: [C.purple, C.blue], variants: [{ ram: "8 GB", storage: "128 GB", price: 37999 }, { ram: "8 GB", storage: "256 GB", price: 49999 }], specifications: [{ label: "Display", value: '6.67" AMOLED, 120Hz' }, { label: "Camera", value: "50MP OIS" }, { label: "Battery", value: "5500mAh" }, { label: "Charging", value: "80W" }, { label: "OS", value: "Android, Funtouch OS" }], featured: false, tags: ["5G", "AMOLED", "EMI Available"],
     flipkartUrl: "https://www.flipkart.com/search?q=Vivo+V70+FE"
@@ -132,7 +133,8 @@ export const products: Product[] = [
     flipkartUrl: "https://www.flipkart.com/search?q=Vivo+T4+Pro"
   }),
   p({ id: "vivo-t4-ultra", name: "Vivo T4 Ultra", slug: "vivo-t4-ultra", brand: "Vivo", brandSlug: "vivo", imageFolder: "vivo-t4-ultra", image: "/images/products/vivo-t4-ultra/2.webp", type: "smartphone", category: "flagship", stock: "limited", description: "The flagship of the T series - top-tier chipset, fast charging, and a premium build.", colors: [C.gold], variants: [{ ram: "12 GB", storage: "256 GB", price: 37999 }], specifications: [{ label: "Display", value: '6.78" AMOLED, 144Hz' }, { label: "Processor", value: "Dimensity 9400e" }, { label: "Camera", value: "50MP Triple Camera" }, { label: "Battery", value: "6000mAh" }, { label: "Charging", value: "90W" }, { label: "OS", value: "Android, Funtouch OS" }], featured: true, tags: ["5G", "Flagship", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=Vivo+T4+Ultra"
+    flipkartUrl: "https://www.flipkart.com/vivo-t4-ultra-5g-meteor-grey-256-gb/p/itm9cfd8118c9ce0",
+    amazonUrl: "https://www.amazon.in/VIVO-T4-Ultra-5G-Meteor/dp/B0FFB1L75V"
   }),
   p({ id: "vivo-t5x", name: "Vivo T5x", slug: "vivo-t5x", brand: "Vivo", brandSlug: "vivo", imageFolder: "vivo-t5x", type: "smartphone", category: "new-arrival", stock: "inStock", description: "Latest 5G tech at a balanced price - great display, solid camera, reliable battery.", colors: [C.green, C.silver], variants: [{ ram: "6 GB", storage: "128 GB", price: 22999 }, { ram: "8 GB", storage: "128 GB", price: 24999 }, { ram: "8 GB", storage: "256 GB", price: 26999 }], specifications: [{ label: "Display", value: '6.72" LCD, 120Hz' }, { label: "Battery", value: "6500mAh" }, { label: "OS", value: "Android, Funtouch OS" }], featured: false, tags: ["5G", "Budget", "EMI Available"],
     flipkartUrl: "https://www.flipkart.com/search?q=Vivo+T5x"
@@ -158,7 +160,8 @@ export const products: Product[] = [
     amazonUrl: "https://www.amazon.in/s?k=iQOO+Neo+10"
   }),
   p({ id: "iqoo-15", name: "iQOO 15", slug: "iqoo-15", brand: "iQOO", brandSlug: "iqoo", imageFolder: "iqoo-15", image: "/images/products/iqoo-15/1.jpg", type: "smartphone", category: "flagship", stock: "inStock", description: "The flagship iQOO 15 — flagship silicon, fast charging, and a pro-grade display.", colors: [C.legend, C.alpha], variants: [{ ram: "12 GB", storage: "256 GB", price: 76999 }, { ram: "16 GB", storage: "512 GB", price: 83999 }], specifications: [{ label: "Display", value: '6.82" LTPO AMOLED, 144Hz' }, { label: "Processor", value: "Snapdragon 8 Elite" }, { label: "Camera", value: "50MP Triple Camera" }, { label: "Battery", value: "6500mAh" }, { label: "Charging", value: "120W" }, { label: "OS", value: "Android, Funtouch OS" }], featured: true, tags: ["5G", "Flagship", "Gaming", "120W Charging", "EMI Available"],
-    amazonUrl: "https://www.amazon.in/s?k=iQOO+15"
+    amazonUrl: "https://www.amazon.in/iQOO-Storage-Fastest-Snapdragon-Processor/dp/B0FYGBSKFB",
+    flipkartUrl: "https://www.flipkart.com/iqoo-15-5g-legend-512-gb/p/itm3187e36213a01"
   }),
   p({ id: "iqoo-15r", name: "iQOO 15R", slug: "iqoo-15r", brand: "iQOO", brandSlug: "iqoo", imageFolder: "iqoo-15r", image: "/images/products/iqoo-15r/1.jpg", type: "smartphone", category: "new-arrival", stock: "inStock", description: "A more affordable 15 series with flagship-class performance.", colors: [C.silver, C.black], variants: [{ ram: "8 GB", storage: "256 GB", price: 49999 }, { ram: "12 GB", storage: "256 GB", price: 54999 }], specifications: [{ label: "Display", value: '6.78" AMOLED, 144Hz' }, { label: "Processor", value: "Snapdragon 8s Gen 4" }, { label: "Camera", value: "50MP OIS" }, { label: "Battery", value: "7000mAh" }, { label: "Charging", value: "90W" }, { label: "OS", value: "Android, Funtouch OS" }], featured: false, tags: ["5G", "Gaming", "144Hz", "EMI Available"],
     amazonUrl: "https://www.amazon.in/s?k=iQOO+15R"
@@ -175,13 +178,16 @@ export const products: Product[] = [
 
   // ════════════════ SAMSUNG ════════════════
   p({ id: "samsung-s26-plus", name: "Samsung Galaxy S26+", slug: "samsung-s26-plus", brand: "Samsung", brandSlug: "samsung", imageFolder: "samsung-s26-plus", image: "/images/products/samsung-s26-plus/1.jpg", type: "smartphone", category: "flagship", stock: "inStock", description: "Samsung's flagship S26+ with a pro-grade camera system and a stunning display.", colors: [C.violet], variants: [{ ram: "12 GB", storage: "512 GB", price: 134999 }], specifications: [{ label: "Display", value: '6.9" Dynamic AMOLED 2X, 120Hz' }, { label: "Processor", value: "Snapdragon 8 Elite for Galaxy" }, { label: "Camera", value: "50 MP + 50 MP + 50 MP" }, { label: "Battery", value: "4900 mAh, 45W" }, { label: "OS", value: "Android, One UI" }], featured: true, tags: ["5G", "Flagship", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=Samsung+Galaxy+S26+Plus"
+    flipkartUrl: "https://www.flipkart.com/samsung-galaxy-s26-5g-black-256-gb/p/itm2db9dbf5966af",
+    amazonUrl: "https://www.amazon.in/Samsung-Storage-Creative-Wireless-Charging/dp/B0GL8H3XFN"
   }),
   p({ id: "samsung-s25-ultra", name: "Samsung Galaxy S25 Ultra", slug: "samsung-s25-ultra", brand: "Samsung", brandSlug: "samsung", imageFolder: "samsung-s25-ultra", image: "/images/products/samsung-s25-ultra/1.jpg", type: "smartphone", category: "flagship", stock: "limited", description: "The ultimate Samsung flagship with the S Pen, 200 MP camera, and titanium build.", colors: [C.black, C.silver], variants: [{ ram: "12 GB", storage: "256 GB", price: 129999 }], specifications: [{ label: "Display", value: '6.9" Dynamic AMOLED 2X, 120Hz' }, { label: "Processor", value: "Snapdragon 8 Elite for Galaxy" }, { label: "Camera", value: "200 MP + 50 MP + 10 MP + 12 MP" }, { label: "Battery", value: "5000 mAh, 45W" }, { label: "OS", value: "Android, One UI" }], featured: true, tags: ["5G", "Flagship", "S Pen", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=Samsung+Galaxy+S25+Ultra"
+    flipkartUrl: "https://www.flipkart.com/samsung-galaxy-s25-ultra-5g-titanium-black-512-gb/p/itmc5f14b041aa5b",
+    amazonUrl: "https://www.amazon.in/Samsung-Galaxy-Ultra-Titanium-Storage/dp/B0FLQLT41D"
   }),
   p({ id: "samsung-s25-fe", name: "Samsung Galaxy S25 FE", slug: "samsung-s25-fe", brand: "Samsung", brandSlug: "samsung", imageFolder: "samsung-s25-fe", type: "smartphone", category: "new-arrival", stock: "inStock", description: "A fan-edition flagship — core S25 experience at a friendlier price.", colors: [C.navy, C.black, C.white], variants: [{ ram: "8 GB", storage: "128 GB", price: 74999 }], specifications: [{ label: "Display", value: '6.7" Dynamic AMOLED 2X, 120Hz' }, { label: "Processor", value: "Exynos 2400e" }, { label: "Camera", value: "50 MP + 12 MP + 8 MP" }, { label: "Battery", value: "4400 mAh, 25W" }, { label: "OS", value: "Android, One UI" }], featured: false, tags: ["5G", "Flagship", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=Samsung+Galaxy+S25+FE"
+    flipkartUrl: "https://www.flipkart.com/samsung-galaxy-s25-fe-5g-white-128-gb/p/itm686ea83612e85",
+    amazonUrl: "https://www.amazon.in/Samsung-Smartphone-JetBlack-Storage-ProVisual/dp/B0FNMQW9HW"
   }),
   p({ id: "samsung-tab-s10-lite", name: "Samsung Galaxy Tab S10 Lite", slug: "samsung-tab-s10-lite", brand: "Samsung", brandSlug: "samsung", imageFolder: "samsung-tab-s10-lite", image: "/images/products/samsung-tab-s10-lite/1.jpg", type: "tablet", category: "new-arrival", stock: "inStock", description: "A large-screen tablet with S Pen support — great for work and entertainment.", colors: [C.silver], variants: [{ ram: "6 GB", storage: "128 GB", price: 44999 }], specifications: [{ label: "Display", value: '12.4" Dynamic AMOLED' }, { label: "Processor", value: "Octa-core" }, { label: "Camera", value: "13 MP rear / 12 MP front" }, { label: "Battery", value: "10090 mAh" }, { label: "Connectivity", value: "Wi-Fi + SIM" }], featured: false, tags: ["Tablet", "S Pen", "EMI Available"],
     flipkartUrl: "https://www.flipkart.com/search?q=Samsung+Galaxy+Tab+S10+Lite"
@@ -243,18 +249,22 @@ export const products: Product[] = [
     flipkartUrl: "https://www.flipkart.com/search?q=Motorola+Edge+60+Pro"
   }),
   p({ id: "moto-edge-70-pro", name: "Motorola Edge 70 Pro", slug: "moto-edge-70-pro", brand: "Motorola", brandSlug: "motorola", imageFolder: "moto-edge-70-pro", type: "smartphone", category: "flagship", stock: "inStock", description: "The ultimate Motorola flagship — Snapdragon 8 Elite, 200MP camera, curved pOLED display, and 125W TurboPower charging.", colors: [C.black, C.silver], variants: [{ ram: "12 GB", storage: "256 GB", price: 44999 }, { ram: "12 GB", storage: "512 GB", price: 49999 }], specifications: [{ label: "Display", value: '6.8" LTPO pOLED, 165Hz' }, { label: "Processor", value: "Snapdragon 8 Elite" }, { label: "Camera", value: "200MP OIS + 50MP Ultrawide + 12MP Telephoto" }, { label: "Battery", value: "5500mAh" }, { label: "Charging", value: "125W TurboPower + 50W Wireless" }, { label: "OS", value: "Android 15, Stock" }], featured: true, tags: ["5G", "Flagship", "Stock Android", "200MP", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=Motorola+Edge+70+Pro"
+    flipkartUrl: "https://www.flipkart.com/motorola-edge-70-pro-pantone-tea-256-gb/p/itm8e1524c8da543",
+    amazonUrl: "https://www.amazon.in/Motorola-Satin-Luxe-Dimensity-Processor-Smartphone/dp/B0GZGSZ3S9"
   }),
 
   // ════════════════ APPLE ════════════════
   p({ id: "iphone-17", name: "iPhone 17", slug: "iphone-17", brand: "Apple", brandSlug: "apple", imageFolder: "iphone-17", type: "smartphone", category: "new-arrival", stock: "inStock", description: "The standard iPhone 17 with the A19 chip, Dynamic Island, and a stunning Super Retina XDR display.", colors: [C.black, C.white, C.blue, C.green], variants: [{ ram: "8 GB", storage: "128 GB", price: 79900 }, { ram: "8 GB", storage: "256 GB", price: 89900 }], specifications: [{ label: "Display", value: '6.3" Super Retina XDR OLED, 120Hz' }, { label: "Processor", value: "A19 Bionic" }, { label: "Camera", value: "48MP Fusion + 12MP Ultrawide" }, { label: "Battery", value: "All-day battery life" }, { label: "Charging", value: "USB-C, MagSafe" }, { label: "OS", value: "iOS 19" }], featured: true, tags: ["5G", "iOS", "MagSafe", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=iPhone+17"
+    flipkartUrl: "https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd",
+    amazonUrl: "https://www.amazon.in/iPhone-17-256-Promotion-Resistance/dp/B0FQFYXCC4"
   }),
   p({ id: "iphone-17-pro", name: "iPhone 17 Pro", slug: "iphone-17-pro", brand: "Apple", brandSlug: "apple", imageFolder: "iphone-17-pro", type: "smartphone", category: "flagship", stock: "inStock", description: "iPhone 17 Pro with the A19 Pro chip, ProMotion, and a pro-grade triple camera system with 5x optical zoom.", colors: [C.black, C.white, C.silver], variants: [{ ram: "8 GB", storage: "256 GB", price: 119900 }, { ram: "8 GB", storage: "512 GB", price: 139900 }, { ram: "8 GB", storage: "1 TB", price: 159900 }], specifications: [{ label: "Display", value: '6.3" Super Retina XDR OLED, 120Hz ProMotion, Always-On' }, { label: "Processor", value: "A19 Pro" }, { label: "Camera", value: "48MP Fusion + 12MP Ultrawide + 12MP 5x Telephoto" }, { label: "Battery", value: "All-day battery life" }, { label: "Charging", value: "USB-C, MagSafe" }, { label: "OS", value: "iOS 19" }], featured: true, tags: ["5G", "Flagship", "iOS", "ProMotion", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=iPhone+17+Pro"
+    flipkartUrl: "https://www.flipkart.com/apple-iphone-17-pro-cosmic-orange-256-gb/p/itm76fe37ca9ea8c",
+    amazonUrl: "https://www.amazon.in/iPhone-Pro-256-Promotion-Breakthrough/dp/B0FQG1LPVF"
   }),
   p({ id: "iphone-17-pro-max", name: "iPhone 17 Pro Max", slug: "iphone-17-pro-max", brand: "Apple", brandSlug: "apple", imageFolder: "iphone-17-pro-max", type: "smartphone", category: "flagship", stock: "limited", description: "The ultimate iPhone — A19 Pro chip, 6.9-inch ProMotion display, titanium build, and the best camera system ever on an iPhone.", colors: [C.black, C.white, C.silver], variants: [{ ram: "8 GB", storage: "256 GB", price: 144900 }, { ram: "8 GB", storage: "512 GB", price: 164900 }, { ram: "8 GB", storage: "1 TB", price: 184900 }], specifications: [{ label: "Display", value: '6.9" Super Retina XDR OLED, 120Hz ProMotion, Always-On' }, { label: "Processor", value: "A19 Pro" }, { label: "Camera", value: "48MP Fusion + 48MP Ultrawide + 12MP 5x Telephoto" }, { label: "Battery", value: "Longest battery life ever" }, { label: "Build", value: "Titanium" }, { label: "Charging", value: "USB-C, MagSafe" }, { label: "OS", value: "iOS 19" }], featured: true, tags: ["5G", "Flagship", "iOS", "ProMotion", "Titanium", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=iPhone+17+Pro+Max"
+    flipkartUrl: "https://www.flipkart.com/apple-iphone-17-pro-max-cosmic-orange-256-gb/p/itm81f3a173391c4",
+    amazonUrl: "https://www.amazon.in/iPhone-Pro-Max-256-Promotion/dp/B0FQFV2XKS"
   }),
   p({ id: "iphone-17-air", name: "iPhone 17 Air", slug: "iphone-17-air", brand: "Apple", brandSlug: "apple", imageFolder: "iphone-17-air", type: "smartphone", category: "new-arrival", stock: "inStock", description: "The thinnest iPhone ever — ultra-slim design, A19 chip, and a stunning edge-to-edge display.", colors: [C.black, C.white], variants: [{ ram: "8 GB", storage: "256 GB", price: 99900 }, { ram: "8 GB", storage: "512 GB", price: 119900 }], specifications: [{ label: "Display", value: '6.6" Super Retina XDR OLED, 120Hz' }, { label: "Processor", value: "A19" }, { label: "Camera", value: "48MP Fusion + 12MP Ultrawide" }, { label: "Design", value: "5.5mm thin, Aerospace-grade aluminum" }, { label: "Charging", value: "USB-C, MagSafe" }, { label: "OS", value: "iOS 19" }], featured: true, tags: ["5G", "iOS", "Ultra-Slim", "EMI Available"],
     flipkartUrl: "https://www.flipkart.com/search?q=iPhone+17+Air"
@@ -262,13 +272,15 @@ export const products: Product[] = [
 
   // ════════════════ ONEPLUS ════════════════
   p({ id: "oneplus-13", name: "OnePlus 13", slug: "oneplus-13", brand: "OnePlus", brandSlug: "oneplus", imageFolder: "oneplus-13", type: "smartphone", category: "flagship", stock: "inStock", description: "The OnePlus flagship — powerful cameras, flagship silicon, and ultra-fast charging.", colors: [C.blue], variants: [{ ram: "12 GB", storage: "256 GB", price: 63999 }], specifications: [{ label: "Display", value: '6.82" QHD+ AMOLED, 120Hz' }, { label: "Processor", value: "Snapdragon 8 Elite" }, { label: "Camera", value: "50MP Triple Camera" }, { label: "Battery", value: "6000mAh" }, { label: "Charging", value: "100W SuperVOOC" }, { label: "OS", value: "Android, OxygenOS" }], featured: true, tags: ["5G", "Flagship", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=OnePlus+13"
+    flipkartUrl: "https://www.flipkart.com/oneplus-13-black-eclipse-256-gb/p/itmb4659fd2a037f",
+    amazonUrl: "https://www.amazon.in/OnePlus-13-256GB-Midnight-Ocean/dp/B0DPS7FB4J"
   }),
   p({ id: "oneplus-nord-6", name: "OnePlus Nord 6", slug: "oneplus-nord-6", brand: "OnePlus", brandSlug: "oneplus", imageFolder: "oneplus-nord-6", type: "smartphone", category: "new-arrival", stock: "inStock", description: "A premium Nord with a fast display and flagship-grade feel.", colors: [C.mint], variants: [{ ram: "8 GB", storage: "256 GB", price: 44300 }, { ram: "12 GB", storage: "256 GB", price: 50485 }], specifications: [{ label: "Display", value: '6.74" AMOLED, 120Hz' }, { label: "Processor", value: "Snapdragon 7+ Gen 3" }, { label: "Camera", value: "50MP OIS" }, { label: "Battery", value: "5500mAh" }, { label: "Charging", value: "100W" }, { label: "OS", value: "Android, OxygenOS" }], featured: false, tags: ["5G", "AMOLED", "EMI Available"],
     flipkartUrl: "https://www.flipkart.com/search?q=OnePlus+Nord+6"
   }),
   p({ id: "oneplus-nord-5", name: "OnePlus Nord 5", slug: "oneplus-nord-5", brand: "OnePlus", brandSlug: "oneplus", imageFolder: "oneplus-nord-5", type: "smartphone", category: "best-seller", stock: "inStock", description: "A popular Nord with a big battery and a smooth AMOLED.", colors: [C.dryice], variants: [{ ram: "8 GB", storage: "256 GB", price: 29999 }], specifications: [{ label: "Display", value: '6.83" AMOLED, 120Hz' }, { label: "Processor", value: "Snapdragon 8s Gen 3" }, { label: "Camera", value: "50MP OIS" }, { label: "Battery", value: "6800mAh" }, { label: "Charging", value: "80W" }, { label: "OS", value: "Android, OxygenOS" }], featured: true, tags: ["5G", "AMOLED", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=OnePlus+Nord+5"
+    flipkartUrl: "https://www.flipkart.com/oneplus-nord-5-phantom-grey-256-gb/p/itma9ab5953fa9b9",
+    amazonUrl: "https://www.amazon.in/OnePlus-Snapdragon-Flagship-Powered-Phantom/dp/B0FCML3CQJ"
   }),
   p({ id: "oneplus-nord-ce6", name: "OnePlus Nord CE6", slug: "oneplus-nord-ce6", brand: "OnePlus", brandSlug: "oneplus", imageFolder: "oneplus-nord-ce6", type: "smartphone", category: "deal", stock: "inStock", description: "A value Nord CE with the core OnePlus experience.", colors: [C.black, C.blue], variants: [{ ram: "8 GB", storage: "128 GB", price: 34762 }, { ram: "8 GB", storage: "256 GB", price: 37872 }], specifications: [{ label: "Display", value: '6.7" AMOLED, 120Hz' }, { label: "Processor", value: "Snapdragon 7 Gen 3" }, { label: "Camera", value: "50MP OIS" }, { label: "Battery", value: "5500mAh" }, { label: "Charging", value: "100W" }, { label: "OS", value: "Android, OxygenOS" }], featured: false, tags: ["5G", "AMOLED", "EMI Available"],
     flipkartUrl: "https://www.flipkart.com/search?q=OnePlus+Nord+CE6"
@@ -323,7 +335,8 @@ export const products: Product[] = [
 
   // ════════════════ REALME ════════════════
   p({ id: "realme-16-pro-plus", name: "Realme 16 Pro+", slug: "realme-16-pro-plus", brand: "Realme", brandSlug: "realme", imageFolder: "realme-16-pro-plus", type: "smartphone", category: "flagship", stock: "inStock", description: "The top-tier Realme 16 with a pro-grade camera and flagship design.", colors: [C.gold], variants: [{ ram: "8 GB", storage: "128 GB", price: 46999 }], specifications: [{ label: "Camera", value: "50MP Triple Camera" }, { label: "Charging", value: "100W" }, { label: "OS", value: "Android, realme UI" }], featured: true, tags: ["5G", "Flagship", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=Realme+16+Pro+Plus"
+    flipkartUrl: "https://www.flipkart.com/realme-16-pro-5g/p/itmf8e5c193facd1",
+    amazonUrl: "https://www.amazon.in/realme-Smartphone-SuperVOOC-Periscope-Snapdragon/dp/B0GC6XCMRB"
   }),
   p({ id: "realme-16-pro", name: "Realme 16 Pro", slug: "realme-16-pro", brand: "Realme", brandSlug: "realme", imageFolder: "realme-16-pro", type: "smartphone", category: "new-arrival", stock: "inStock", description: "A premium Realme 16 with a refined design and fast charging.", colors: [C.gold, C.grey], variants: [{ ram: "8 GB", storage: "128 GB", price: 36999 }, { ram: "8 GB", storage: "256 GB", price: 39999 }], specifications: [{ label: "Display", value: "AMOLED 120Hz" }, { label: "Camera", value: "50MP OIS" }, { label: "Charging", value: "80W" }, { label: "OS", value: "Android, realme UI" }], featured: false, tags: ["5G", "AMOLED", "EMI Available"],
     flipkartUrl: "https://www.flipkart.com/search?q=Realme+16+Pro"
@@ -424,10 +437,12 @@ export const products: Product[] = [
 
   // ════════════════ GOOGLE ════════════════
   p({ id: "pixel-10a", name: "Google Pixel 10a", slug: "pixel-10a", brand: "Google", brandSlug: "google", imageFolder: "pixel-10a", image: "/images/products/pixel-10a/1.jpg", type: "smartphone", category: "new-arrival", stock: "inStock", description: "Google's A-series Pixel — the best of Android AI at an accessible price.", colors: [C.black, C.red, C.white, C.blue], variants: [{ ram: "8 GB", storage: "256 GB", price: 49999 }], specifications: [{ label: "Display", value: '6.1" OLED, 120Hz' }, { label: "Processor", value: "Google Tensor G5" }, { label: "Camera", value: "48 MP + 13 MP" }, { label: "Battery", value: "4500 mAh" }, { label: "OS", value: "Android, Pixel" }], featured: true, tags: ["5G", "AI Camera", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=Google+Pixel+10a"
+    flipkartUrl: "https://www.flipkart.com/google-pixel-10a-fog-256-gb/p/itmeaa46d52e228a",
+    amazonUrl: "https://www.amazon.in/Google-Pixel-10a-256GB-Storage/dp/B0GP8SY9MB"
   }),
   p({ id: "pixel-10", name: "Google Pixel 10", slug: "pixel-10", brand: "Google", brandSlug: "google", imageFolder: "pixel-10", image: "/images/products/pixel-10/1.jpg", type: "smartphone", category: "flagship", stock: "limited", description: "The flagship Pixel 10 with Google's most advanced AI photography.", colors: [C.indigo, C.black, C.frost], variants: [{ ram: "12 GB", storage: "256 GB", price: 79999 }], specifications: [{ label: "Display", value: '6.3" LTPO OLED, 120Hz' }, { label: "Processor", value: "Google Tensor G5" }, { label: "Camera", value: "50 MP + 48 MP + 48 MP" }, { label: "Battery", value: "4900 mAh" }, { label: "OS", value: "Android, Pixel" }], featured: true, tags: ["5G", "Flagship", "AI Camera", "EMI Available"],
-    flipkartUrl: "https://www.flipkart.com/search?q=Google+Pixel+10"
+    flipkartUrl: "https://www.flipkart.com/google-pixel-10-frost-256-gb/p/itm180af25bcc197",
+    amazonUrl: "https://www.amazon.in/Google-Pixel-Obsidian-256GB-Storage/dp/B0FNPNL2D8"
   }),
 
   // ════════════════ APPLE ════════════════

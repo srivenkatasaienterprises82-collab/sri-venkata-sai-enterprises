@@ -1445,6 +1445,10 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - Brand-to-scraper mapping: Flipkart → Motorola/Oppo/Vivo/Realme/Poco/Nothing; Amazon → iQOO/Redmi; Both → Apple/Samsung/OnePlus
 
 ## Progress
+### Done (July 5 cont.)
+- Added real Flipkart AND Amazon URLs to 15 products in `src/lib/data/products.ts` (iphone-17, iphone-17-pro, iphone-17-pro-max, iqoo-15, oneplus-13, oneplus-nord-5, pixel-10, pixel-10a, samsung-s25-fe, samsung-s25-ultra, samsung-s26-plus, moto-edge-70-pro, realme-16-pro-plus, vivo-v70, vivo-t4-ultra)
+- TypeScript compiles with zero errors
+
 ### Done
 - Created Editor API token "cms" (`skOX...`) and added to `.env.local` as `SANITY_TOKEN`
 - Ran `npx tsx scripts/seed-sanity.ts`: 6 categories, 22 brands, 132 products seeded
@@ -1483,9 +1487,10 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - Price sync automation (`launch_checker.py`) is NOT responsible for null prices — the bug was in the seed script from the start
 
 ## Next Steps
-1. Commit all changes and push to GitHub to trigger Vercel redeploy so Sanity data feeds through
+1. Commit and push all changes to trigger Vercel redeploy
 2. Verify all pages display correctly with Sanity data (homepage bento deals, testimonials, FAQs, banners, gallery, info pages)
-3. Add `amazonUrl`/`flipkartUrl` to product data so price sync can actually scrape real prices
+3. Add real Flipkart/Amazon URLs for remaining products (currently only 15 of ~96 have real URLs)
+4. Re-run price sync workflow to scrape updated prices for the 15 products with real URLs
 
 ## Critical Context
 - ALL 132 products have `price: null` in Sanity — NOT caused by price sync, but by the seed script never writing top-level prices (all prices are only in `variants[]`)
