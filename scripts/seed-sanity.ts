@@ -140,8 +140,15 @@ async function seedProducts(): Promise<void> {
   console.log("\n--- Seeding Products ---");
   let created = 0;
   let errors = 0;
+  let skipped = 0;
+
+  const validBrandSlugs = new Set(brands.map((b) => b.slug));
 
   for (const product of products) {
+    if (product.brandSlug && !validBrandSlugs.has(product.brandSlug)) {
+      skipped++;
+      continue;
+    }
     const doc = productToSanityDoc(product);
     const mutation = {
       createOrReplace: {
@@ -159,6 +166,7 @@ async function seedProducts(): Promise<void> {
   }
 
   console.log(`\n  ✓ ${created} products created`);
+  if (skipped) console.log(`  - ${skipped} skipped (brand not seeded)`);
   if (errors) console.error(`  ✗ ${errors} errors`);
 }
 
