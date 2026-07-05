@@ -28,6 +28,12 @@ import { siteConfig } from "@/lib/data/siteConfig";
 import type { SanityHomePage, SanityBrand, SanityProduct, SanityTestimonial, SanityFaq, SanityBanner, SanityGallery } from "@/sanity/types";
 import type { Metadata } from "next";
 
+/** Popular brands to show on home page - filter out cheap/lesser-known brands */
+const POPULAR_BRAND_SLUGS = [
+  "vivo", "iqoo", "motorola", "redmi", "samsung", "apple",
+  "oneplus", "oppo", "realme", "google", "nothing", "poco", "narzo"
+];
+
 // ── Lazy-loaded below-the-fold sections (code-split via dynamic import) ──
 const BentoDeals = dynamic(() => import("@/components/sections/bento-deals"));
 const Testimonials = dynamic(() => import("@/components/sections/testimonials").then(m => ({ default: m.Testimonials })));
@@ -62,7 +68,9 @@ export default async function Home() {
   ]);
 
   // Transform Sanity arrays with fallbacks
-  const products = sanityProducts?.length ? toProducts(sanityProducts) : getAllProducts();
+  const allProducts = sanityProducts?.length ? toProducts(sanityProducts) : getAllProducts();
+  // Filter to only popular brands for home page
+  const products = allProducts.filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase()));
   const allBrands = sanityBrands?.length ? toBrands(sanityBrands) : getFeaturedBrands();
   // Filter out HMD brand from home page
   const brands = allBrands.filter((b) => b.slug !== "hmd");
@@ -80,11 +88,11 @@ export default async function Home() {
   const secondaryCtaLink = sanityHomePage?.secondaryCtaLink || undefined;
 
   const heroProducts = sanityHomePage?.featuredCarousel?.length
-    ? toProducts(sanityHomePage.featuredCarousel)
+    ? toProducts(sanityHomePage.featuredCarousel).filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase()))
     : products;
 
   const topRatedProducts = sanityHomePage?.topRatedPerformance?.length
-    ? toProducts(sanityHomePage.topRatedPerformance)
+    ? toProducts(sanityHomePage.topRatedPerformance).filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase()))
     : undefined;
 
   const bentoDeals = sanityHomePage?.bentoDeals?.length ? toOffers(sanityHomePage.bentoDeals) : undefined;
