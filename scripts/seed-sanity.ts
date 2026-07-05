@@ -6,12 +6,15 @@
  * Falls back gracefully if Sanity token is missing.
  */
 
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+
 import { products } from "../src/lib/data/products";
 import type { Product } from "../src/lib/data/products";
 import { brands } from "../src/lib/data/brands";
 import { siteConfig } from "../src/lib/data/siteConfig";
 
-const PROJECT_ID = "8shdnlxt";
+const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "homvjne9";
 const DATASET = "production";
 const API_VERSION = "v2024-01-01";
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/${API_VERSION}`;
