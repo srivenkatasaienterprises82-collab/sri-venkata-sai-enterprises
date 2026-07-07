@@ -112,6 +112,7 @@ export function toOffers(data: SanityOffer[]) {
 }
 
 export function toBanner(s: SanityBanner) {
+  const rawSrc = typeof s.image === "string" ? s.image.trim() : "";
   return {
     id: s._id,
     title: s.title,
@@ -119,7 +120,7 @@ export function toBanner(s: SanityBanner) {
     badge: s.badge || "",
     cta: s.cta || "Shop Now",
     backgroundColor: s.backgroundColor || "#D6EEF5",
-    src: s.image || "",
+    src: rawSrc || "/images/promo-banner/promo-1.png",
     alt: s.title,
     href: s.link || "/products",
   };
