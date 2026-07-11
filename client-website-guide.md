@@ -87,7 +87,7 @@ Example: change the price of a product.
    - **Price (₹)** and **Original Price (₹)**.
    - **Brand** — click and pick the brand from the list (Apple, Samsung…).
    - **Category** — click and pick a category.
-   - **Cover Image URL** — see Section 6 (Images).
+    - **Cover Image** — see Section 6 (Images).
    - **Description** — write a short description.
    - **Featured** — turn ON if you want it shown prominently on the home page.
 4. Click **Publish**.
@@ -98,74 +98,54 @@ To **delete** a product: open it → menu (⋯ or the dots) → **Delete** → c
 
 ## 6. How to Add and Edit Images (Photos) — DETAILED
 
-> ⚠️ **Read this first.** On this website, a photo is shown by putting its
-> **link (web address)** or **path (folder location)** into a text box. There is
-> **no "Upload" button** inside the tool yet. You simply paste the photo's
-> address into the box, then Publish.
+> ✅ **Good news:** the tool now has a proper **Upload** button. You can add a
+> photo straight from your computer or phone — **no links, no copy-paste
+> needed.** Just click the image box, choose your file, and Publish.
 
-### What do the image boxes look like?
-They are normal text boxes with labels such as:
-- **Cover Image URL** (the main product photo)
-- **Images** (extra product photos)
-- **Logo URL** (brand logo)
-- **Image URL** (banner, offer, gallery, avatar photo)
+### What do the image areas look like?
+They are image fields (not text boxes) with labels such as:
+- **Cover Image** (the main product photo)
+- **Images** (extra product photos — a gallery)
+- **Logo** (brand logo)
+- **Image** (banner, offer, gallery, testimonial avatar photo)
 
-A correct value looks like one of these:
-- A web link: `https://i.ibb.co/xxxx/iphone.jpg`
-- A website path: `/images/products/iphone-17/1.webp`
+Each shows either a small preview of the current photo or a box that says
+**"Upload"** / **"Drop image here"** when empty.
 
 ---
 
 ### 6A. How to ADD a new image (the box is empty)
 
-**Method 1 — Use a photo already on the internet (easiest)**
-1. Open the website that shows the picture you want (e.g. Google Images,
-   the brand's site, WhatsApp Web, etc.).
-2. **Right-click** on the picture.
-3. Click **"Copy image address"** (some browsers say "Copy image link").
-   - This copies the picture's web address to your clipboard.
-4. In the Studio, click inside the empty image box.
-5. Press **Ctrl + V** (or right-click → Paste) to paste the link.
-6. Click **Publish**.
+1. Open the item (e.g. click **Products** → click the product name).
+2. Find the image area (e.g. **Cover Image**).
+3. **Click the image area** (or the **"Upload"** button / the dashed box).
+4. A file window opens. **Pick the photo** from your computer or phone.
+   - You can also **drag the photo file** and drop it onto the box.
+5. Wait a moment — a small preview of the photo appears.
+6. Click **Publish** (top-right).
+7. Refresh the website — the new photo shows. ✅
 
-**Method 2 — Use your own photo from phone/computer**
-1. Upload your photo to a free image host:
-   - Go to **imgbb.com** or **postimages.org**.
-   - Click **Upload**, choose your photo, wait for it to finish.
-   - Copy the link it gives you (it ends in `.jpg`, `.png`, or `.webp`).
-2. In the Studio, paste that link into the image box (Ctrl + V).
-3. Click **Publish**.
-
-**Method 3 — Ask the developer to place the photo (best for product photos)**
-1. Send the photo to the developer (by email/WhatsApp).
-2. They save it on the website and give you a path like:
-   `/images/products/iphone-17/1.webp`
-3. In the Studio, type/paste that exact path into the image box.
-4. Click **Publish**.
+> 💡 Preferred formats: `.jpg`, `.png`, or `.webp`. Keep each file under
+> ~3 MB so pages load fast. Clear, bright, well-lit photos look best.
 
 ---
 
 ### 6B. How to EDIT / REPLACE an image that is ALREADY there
 
-Use this when a product already shows a photo and you want to change it to a
-different photo.
+Use this when a photo is already showing and you want to change it.
 
 1. Open the item (e.g. click **Products** → click the product name).
-2. Scroll down to the image box (e.g. **Cover Image URL**).
-3. You will see the current photo's link written in the box, for example:
-   `/images/products/iphone-17/1.webp`
-   (A small preview of the current photo may also appear.)
-4. **Click inside that box** so the text is selected/cursor is blinking.
-5. **Delete the old link**: press **Ctrl + A** (select all) then **Delete**,
-   or just backspace the old text until the box is empty.
-6. **Paste the new photo link** (see Method 1/2/3 above to get a link).
-7. Check the box now shows only the new link (no extra spaces).
-8. Click **Publish**.
-9. Refresh the website — the new photo appears.
+2. Scroll to the image area (e.g. **Cover Image**). You'll see the current
+   photo preview.
+3. **Click on the preview / the image field.**
+4. Click **"Replace"** (or the small upload icon), then choose your new photo
+   from your device (or drag-and-drop the new file onto it).
+5. The preview updates to the new photo.
+6. Click **Publish**.
+7. Refresh the website — the new photo appears.
 
-> 💡 If a small picture preview is shown next to the box, it updates to the new
-> photo after you paste the link. If it stays blank, the link may be wrong
-> (see troubleshooting below).
+> To **remove** a photo: open the item, click the image, then click the small
+> **🗑 / "Clear"** icon, and Publish.
 
 ---
 
@@ -173,25 +153,24 @@ different photo.
 
 1. Click **Products** in the left menu.
 2. Use the Search box (top) → type `iPhone 17` → click the result.
-3. Scroll to **Cover Image URL**.
-4. Click in the box, select all (Ctrl+A), delete.
-5. Paste your new image link, e.g.
-   `https://i.ibb.co/abcd/iphone17-new.jpg`
-6. Click **Publish** (top-right).
-7. Open the website → go to that product → the new photo is showing. ✅
+3. Scroll to **Cover Image**. Click on the current photo preview.
+4. Click **Replace** (or the upload icon) and choose your new photo
+   (`iphone17-new.jpg` from your computer).
+5. Click **Publish** (top-right).
+6. Open the website → go to that product → the new photo is showing. ✅
 
 ---
 
-### 6D. Adding EXTRA photos (the "Images" box)
+### 6D. Adding EXTRA photos (the "Images" gallery)
 
-Some items (products) have an **Images** box that can hold **more than one**
-photo (a gallery). To add extra photos:
-1. Click in the **Images** box.
-2. Paste the first link, then press **Enter**.
-3. A new empty line appears — paste the next link, press **Enter**.
-4. Repeat for each photo.
-5. Click **Publish**.
-(To remove one: click the small ✕ / delete icon next to that line.)
+Some items (products) have an **Images** gallery that holds **more than one**
+photo.
+1. Scroll to the **Images** area.
+2. Click **"Upload"** (or drop files) to add photos — you can select several
+   files at once.
+3. Each photo appears as a thumbnail. You can **drag thumbnails** to reorder
+   them, or click the ✕ to remove one.
+4. Click **Publish**.
 
 ---
 
@@ -202,14 +181,16 @@ photo (a gallery). To add extra photos:
 - Preferred formats: `.jpg`, `.png`, or `.webp`.
 
 ### 6F. Troubleshooting
-- **The box turns red / says "invalid":** the link is not a proper image
-  address. Make sure it ends in `.jpg`, `.png`, or `.webp`, and has no spaces.
-  Re-paste a correct link.
-- **Photo doesn't appear on the website after Publish:** refresh the page
-  (Ctrl+R). If still blank, double-check the link opens correctly when you paste
-  it into a normal browser tab.
-- **Broken / old photo showing:** you may not have clicked **Publish**, or the
-  old link is still in the box. Repeat Section 6B.
+- **The image area is empty / no photo on the website:** you may not have
+  clicked **Publish**, or the photo wasn't actually selected. Open the item
+  again, re-upload, and Publish.
+- **Photo doesn't appear after Publish:** refresh the page (Ctrl+R / F5). If
+  still blank, make sure the file is a real image (`.jpg/.png/.webp`) and not
+  too large.
+- **A red message appears:** the file may be the wrong type or corrupted. Try a
+  different photo file.
+- **You have many photos to add at once:** it's faster to send them all to the
+  developer (email/WhatsApp) and ask them to upload in one go.
 
 ## 7. How to Edit the Other Pages
 
@@ -224,7 +205,7 @@ photo (a gallery). To add extra photos:
   button text, link, and image → set **Active** ON to show it → Publish.
 - **Offers (Deal boxes):** Click **Offers** → edit title, badge, discount text,
   image, link → choose a **Type** → Publish.
-- **Gallery (Store photos):** Click **Gallery** → add/edit image links and
+- **Gallery (Store photos):** Click **Gallery** → add/edit images and
   captions → Publish.
 - **Site Settings (Your shop info):** Click **Site Settings** → update:
   - Company name, short name, tagline
@@ -287,8 +268,8 @@ then refresh the website.
 A: https://www.srivenkatasaienterprises.com/studio
 
 **Q: Can I upload a photo directly from my computer inside this tool?**
-A: Not directly. Paste an image link (see Section 6), or send the photo to the
-developer to add it for you.
+A: Yes! Just click the image area and choose your file (or drag-and-drop it).
+See Section 6 for the full steps.
 
 **Q: I made a mistake. Can I undo it?**
 A: Open the item, check the history/versions if available, or ask the developer
