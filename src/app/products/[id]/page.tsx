@@ -1,7 +1,7 @@
 import { ProductDetail } from "@/components/sections/product-detail";
 import { Footer } from "@/components/sections/footer";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { getProductBySlug } from "@/lib/data/products";
+import { getProductBySlug, getStartingPrice } from "@/lib/data/products";
 import { notFound } from "next/navigation";
 import { siteConfig } from "@/lib/data/siteConfig";
 import fs from "fs";
@@ -12,7 +12,7 @@ import { PRODUCT_BY_SLUG_QUERY } from "@/sanity/queries";
 import { toProduct } from "@/sanity/transform";
 import { resolveImage } from "@/sanity/lib/image";
 import { getSiteSettings } from "@/sanity/lib/settings";
-import type { Product, ProductVariant } from "@/lib/data/products";
+import type { Product } from "@/lib/data/products";
 import type { SanityProduct } from "@/sanity/types";
 
 async function getGalleryImages(imageFolder: string, fallbackImage: string): Promise<string[]> {
@@ -72,7 +72,7 @@ export async function generateMetadata({
   }
 
   const { product } = data;
-  const price = product.variants.find((variant: ProductVariant) => variant.price)?.price;
+  const price = getStartingPrice(product);
   const priceText = price ? ` from ₹${price.toLocaleString("en-IN")}` : "";
 
   return {

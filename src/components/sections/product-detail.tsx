@@ -16,8 +16,41 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const scrollRef = useRef<HTMLDivElement>(null);
   
   const enquiryOnly = isPriceOnEnquiry(product);
+  const hasProductPrice = typeof product.price === "number" && Number.isFinite(product.price);
+  const displayPrice = hasProductPrice ? product.price : activeVariant?.price;
+  const displayOriginalPrice = hasProductPrice ? product.originalPrice : activeVariant?.originalPrice;
 
   const images = galleryImages ?? [product.image];
+
+  const schemaOffers = hasProductPrice
+    ? [{
+        "@type": "Offer",
+        sku: product.slug,
+        name: product.name,
+        price: product.price!,
+        priceCurrency: "INR",
+        availability: product.stock === "inStock"
+          ? "https://schema.org/InStock"
+          : product.stock === "limited"
+            ? "https://schema.org/LimitedAvailability"
+            : "https://schema.org/OutOfStock",
+        seller: { "@type": "Organization", name: siteConfig.storeName },
+      }]
+    : product.variants
+        .filter((v) => v.price)
+        .map((v) => ({
+          "@type": "Offer",
+          sku: `${product.slug}-${v.ram}-${v.storage}`,
+          name: `${product.name} ${v.ram} ${v.storage}`,
+          price: v.price!,
+          priceCurrency: "INR",
+          availability: product.stock === "inStock"
+            ? "https://schema.org/InStock"
+            : product.stock === "limited"
+              ? "https://schema.org/LimitedAvailability"
+              : "https://schema.org/OutOfStock",
+          seller: { "@type": "Organization", name: siteConfig.storeName },
+        }));
 
   const scrollToIndex = (index: number) => {
     if (!scrollRef.current) return;
@@ -45,21 +78,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
     brand: { "@type": "Brand", name: product.brand },
     sku: product.slug,
     image: galleryImages ?? [product.image],
-    offers: product.variants
-      .filter((v) => v.price)
-      .map((v) => ({
-        "@type": "Offer",
-        sku: `${product.slug}-${v.ram}-${v.storage}`,
-        name: `${product.name} ${v.ram} ${v.storage}`,
-        price: v.price!,
-        priceCurrency: "INR",
-        availability: product.stock === "inStock"
-          ? "https://schema.org/InStock"
-          : product.stock === "limited"
-            ? "https://schema.org/LimitedAvailability"
-            : "https://schema.org/OutOfStock",
-        seller: { "@type": "Organization", name: siteConfig.storeName },
-      })),
+    offers: schemaOffers,
     aggregateRating: {
       "@type": "AggregateRating",
       // Store-wide rating sourced from Justdial (see siteConfig.ratingSourceUrl).
@@ -210,21 +229,12 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
               <div className="mb-10 flex items-end gap-3">
                 {enquiryOnly ? (
                   <span className="text-3xl font-extrabold text-slate-900">Price on Enquiry</span>
-                ) : activeVariant?.price ? (
+                ) : displayPrice ? (
                   <>
-                    <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{formatPrice(activeVariant.price)}</span>
-                    {activeVariant.originalPrice && (
+                    <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{formatPrice(displayPrice)}</span>
+                    {displayOriginalPrice && (
                       <span className="mb-1.5 text-lg font-medium text-slate-400 line-through">
-                        {formatPrice(activeVariant.originalPrice)}
-                      </span>
-                    )}
-                  </>
-                ) : product.price ? (
-                  <>
-                    <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{formatPrice(product.price)}</span>
-                    {product.originalPrice && (
-                      <span className="mb-1.5 text-lg font-medium text-slate-400 line-through">
-                        {formatPrice(product.originalPrice)}
+                        {formatPrice(displayOriginalPrice)}
                       </span>
                     )}
                   </>
