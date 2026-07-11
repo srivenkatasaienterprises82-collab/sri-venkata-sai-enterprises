@@ -1,10 +1,6 @@
 import { Metadata } from "next";
-import { Toaster } from "sonner";
-import { Nav } from "@/components/layout/nav";
-import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
-import { CartProvider } from "@/context/CartContext";
 import { getSiteSettings } from "@/sanity/lib/settings";
-import { SanityLive } from "@/sanity/lib/live";
+import { SiteChrome } from "@/components/layout/site-chrome";
 import "./globals.css";
 
 function SkipLink() {
@@ -75,13 +71,9 @@ export default async function RootLayout({
       </head>
       <body suppressHydrationWarning className="min-h-screen bg-white text-slate-900 antialiased">
         <SkipLink />
-        <CartProvider>
-          <Nav settings={settings} />
-          <main id="main">{children}</main>
-          <WhatsAppFloat settings={settings} />
-          {isDraftMode && process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && <SanityLive />}
-          <Toaster position="top-right" theme="dark" />
-        </CartProvider>
+        <SiteChrome settings={settings} isDraftMode={isDraftMode}>
+          {children}
+        </SiteChrome>
       </body>
     </html>
   );
