@@ -544,6 +544,7 @@ export function getFlagshipProducts(): Product[] {
 }
 
 export function getStartingPrice(product: Product): number | undefined {
+  if (typeof product.price === "number" && Number.isFinite(product.price)) return product.price;
   const prices = product.variants
     .map((v) => v.price)
     .filter((pr): pr is number => typeof pr === "number");

@@ -68,7 +68,7 @@ export function HeroSection({
       </AnimatedGradientText>
     </>
   );
-  const displaySubtitle = subtitle || "Shop genuine smartphones with EMI options, exchange offers, and personal buying help";
+  const displaySubtitle = subtitle || "Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo, Motorola, OnePlus & more.";
   const hasValidSlug = (product: Product) => product.slug && product.slug.trim().length > 0;
 
   return (
@@ -116,14 +116,23 @@ export function HeroSection({
           {displayTitle}
         </motion.h1>
 
-        <motion.p
+        <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, type: "spring", bounce: 0.4 }}
-          className="mb-10 text-[9px] xxs:text-[10px] xs:text-xs sm:text-sm md:text-lg lg:text-xl leading-relaxed text-slate-500 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
+          className="mb-10 flex w-full justify-center px-4"
         >
-          {displaySubtitle}
-        </motion.p>
+          <div className="inline-flex max-w-full items-center gap-2 sm:gap-3 rounded-full border border-slate-200/80 bg-white/70 p-1.5 pr-4 sm:pr-6 shadow-sm backdrop-blur-md">
+            <span className="shrink-0 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
+              Sri Venkata Sai
+            </span>
+            <span className="truncate text-[11px] sm:text-sm font-medium text-slate-700">
+              <span className="font-bold text-slate-900">Ongole’s Best Mobile Deals</span>
+              <span className="text-slate-300 mx-1.5 sm:mx-2">|</span>
+              {displaySubtitle}
+            </span>
+          </div>
+        </motion.div>
 
         <div className="animate-fade-in-up delay-400 mb-10 flex w-full flex-col sm:flex-row items-center justify-center gap-4 px-4 sm:px-0">
           <Link href={primaryCtaLink || "/products"} className="w-full sm:w-auto">

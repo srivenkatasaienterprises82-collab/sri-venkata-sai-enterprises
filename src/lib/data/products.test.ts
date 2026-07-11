@@ -25,12 +25,19 @@ describe("product data helpers", () => {
     assert.equal(products.every((product) => product.brandSlug === "vivo"), true);
   });
 
-  it("calculates the lowest variant price", () => {
-    const product = getProductBySlug("vivo-t4r");
+it("calculates the lowest variant price", () => {
+  const product = getProductBySlug("vivo-t4r");
 
-    assert.ok(product);
-    assert.equal(getStartingPrice(product), 22999);
-  });
+  assert.ok(product);
+  assert.equal(getStartingPrice(product), 22999);
+});
+
+it("prefers top-level product price when present", () => {
+  const base = getProductBySlug("vivo-t4r");
+
+  assert.ok(base);
+  assert.deepEqual(getStartingPrice({ ...(base!), price: 24500 }), 24500);
+});
 
   it("keeps every product slug unique", () => {
     const slugs = getAllProducts().map((product) => product.slug);
