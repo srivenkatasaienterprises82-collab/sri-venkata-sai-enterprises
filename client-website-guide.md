@@ -96,35 +96,120 @@ Example: change the price of a product.
 To **delete** a product: open it → menu (⋯ or the dots) → **Delete** → confirm.
 (Only delete if you are sure — deleted items cannot be easily recovered.)
 
-## 6. How to Add or Change Images (Photos)
+## 6. How to Add and Edit Images (Photos) — DETAILED
 
-> ⚠️ **Read this carefully.** In this website, a photo is added by pasting a
-> **link (web address) of the image**, not by clicking an "upload" button.
+> ⚠️ **Read this first.** On this website, a photo is shown by putting its
+> **link (web address)** or **path (folder location)** into a text box. There is
+> **no "Upload" button** inside the tool yet. You simply paste the photo's
+> address into the box, then Publish.
 
-### Option A — Use a photo that is already on the internet
-1. Right-click the picture on any website → choose **"Copy image address"**
-   (or "Copy image link").
-2. In the Studio, paste that link into the image box (e.g. **Cover Image URL**).
-3. Publish.
+### What do the image boxes look like?
+They are normal text boxes with labels such as:
+- **Cover Image URL** (the main product photo)
+- **Images** (extra product photos)
+- **Logo URL** (brand logo)
+- **Image URL** (banner, offer, gallery, avatar photo)
 
-### Option B — Use your own photo (from your phone/computer)
-You have two simple choices:
+A correct value looks like one of these:
+- A web link: `https://i.ibb.co/xxxx/iphone.jpg`
+- A website path: `/images/products/iphone-17/1.webp`
 
-- **Easy way:** Upload your photo to a free image-hosting site (for example
-  ImgBB, PostImage, or Google Photos "Get shareable link"), copy the link that
-  ends in `.jpg` / `.png` / `.webp`, and paste it into the image box. Then Publish.
-- **Best way (recommended for product photos):** Send the photo to the developer.
-  They will place it on the website's image folder. After that, you type the
-  path they give you, for example: `/images/products/samsung-s26/1.webp`,
-  into the image box, and Publish.
+---
 
-> 📌 The image boxes are labeled things like **Cover Image URL**, **Logo URL**,
-> **Image URL**, or **Images**. Just paste the link/path there.
+### 6A. How to ADD a new image (the box is empty)
 
-### Good photo tips
-- Use clear, bright photos.
-- Square or landscape photos look best.
-- Keep file size reasonable (under a few MB) so the page loads fast.
+**Method 1 — Use a photo already on the internet (easiest)**
+1. Open the website that shows the picture you want (e.g. Google Images,
+   the brand's site, WhatsApp Web, etc.).
+2. **Right-click** on the picture.
+3. Click **"Copy image address"** (some browsers say "Copy image link").
+   - This copies the picture's web address to your clipboard.
+4. In the Studio, click inside the empty image box.
+5. Press **Ctrl + V** (or right-click → Paste) to paste the link.
+6. Click **Publish**.
+
+**Method 2 — Use your own photo from phone/computer**
+1. Upload your photo to a free image host:
+   - Go to **imgbb.com** or **postimages.org**.
+   - Click **Upload**, choose your photo, wait for it to finish.
+   - Copy the link it gives you (it ends in `.jpg`, `.png`, or `.webp`).
+2. In the Studio, paste that link into the image box (Ctrl + V).
+3. Click **Publish**.
+
+**Method 3 — Ask the developer to place the photo (best for product photos)**
+1. Send the photo to the developer (by email/WhatsApp).
+2. They save it on the website and give you a path like:
+   `/images/products/iphone-17/1.webp`
+3. In the Studio, type/paste that exact path into the image box.
+4. Click **Publish**.
+
+---
+
+### 6B. How to EDIT / REPLACE an image that is ALREADY there
+
+Use this when a product already shows a photo and you want to change it to a
+different photo.
+
+1. Open the item (e.g. click **Products** → click the product name).
+2. Scroll down to the image box (e.g. **Cover Image URL**).
+3. You will see the current photo's link written in the box, for example:
+   `/images/products/iphone-17/1.webp`
+   (A small preview of the current photo may also appear.)
+4. **Click inside that box** so the text is selected/cursor is blinking.
+5. **Delete the old link**: press **Ctrl + A** (select all) then **Delete**,
+   or just backspace the old text until the box is empty.
+6. **Paste the new photo link** (see Method 1/2/3 above to get a link).
+7. Check the box now shows only the new link (no extra spaces).
+8. Click **Publish**.
+9. Refresh the website — the new photo appears.
+
+> 💡 If a small picture preview is shown next to the box, it updates to the new
+> photo after you paste the link. If it stays blank, the link may be wrong
+> (see troubleshooting below).
+
+---
+
+### 6C. Worked Example — Change the cover photo of "iPhone 17"
+
+1. Click **Products** in the left menu.
+2. Use the Search box (top) → type `iPhone 17` → click the result.
+3. Scroll to **Cover Image URL**.
+4. Click in the box, select all (Ctrl+A), delete.
+5. Paste your new image link, e.g.
+   `https://i.ibb.co/abcd/iphone17-new.jpg`
+6. Click **Publish** (top-right).
+7. Open the website → go to that product → the new photo is showing. ✅
+
+---
+
+### 6D. Adding EXTRA photos (the "Images" box)
+
+Some items (products) have an **Images** box that can hold **more than one**
+photo (a gallery). To add extra photos:
+1. Click in the **Images** box.
+2. Paste the first link, then press **Enter**.
+3. A new empty line appears — paste the next link, press **Enter**.
+4. Repeat for each photo.
+5. Click **Publish**.
+(To remove one: click the small ✕ / delete icon next to that line.)
+
+---
+
+### 6E. Photo tips
+- Use clear, bright, well-lit photos.
+- Landscape (wide) or square photos look best.
+- Keep each file small (under ~3 MB) so pages load fast.
+- Preferred formats: `.jpg`, `.png`, or `.webp`.
+
+### 6F. Troubleshooting
+- **The box turns red / says "invalid":** the link is not a proper image
+  address. Make sure it ends in `.jpg`, `.png`, or `.webp`, and has no spaces.
+  Re-paste a correct link.
+- **Photo doesn't appear on the website after Publish:** refresh the page
+  (Ctrl+R). If still blank, double-check the link opens correctly when you paste
+  it into a normal browser tab.
+- **Broken / old photo showing:** you may not have clicked **Publish**, or the
+  old link is still in the box. Repeat Section 6B.
 
 ## 7. How to Edit the Other Pages
 
