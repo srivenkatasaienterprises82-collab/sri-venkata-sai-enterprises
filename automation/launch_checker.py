@@ -50,6 +50,10 @@ def sync_prices():
     matched = 0
 
     for product in products:
+        if product.get("priceLocked"):
+            print(f"  SKIP {product['name']}: price locked (manual override)")
+            continue
+
         source = get_assigned_source(product)
         brand = (product.get("brand") or {}).get("name", "")
         if source is None:

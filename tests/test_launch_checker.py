@@ -61,3 +61,18 @@ def test_dry_run_does_not_create(monkeypatch, capsys):
     assert added == 1
     assert created == []
     assert "DRY RUN" in capsys.readouterr().out
+
+
+def test_sync_skips_locked_product(monkeypatch, capsys):
+    locked = [{
+        "_id": "p1", "name": "Locked Phone", "brand": {"name": "iQOO"},
+        "amazonUrl": "https://amazon.in/dp/x", "price": 27999, "priceLocked": True,
+    }]
+    monkeypatch.setattr(LC, "fetch_all_products", lambda: locked)
+    monkeypatch.setattr(LC, "log_change", lambda *a, **k: None)
+    updated = []
+    monkeypatch.setattr(LC, "update_price", lambda *a, **k: updated.append(a))
+    monkeypatch.setattr(LC, "get_amazon_price", lambda u: 22999)
+    monkeypatch.setattr(LC, "get_flipkart_price", lambda u: 22999)
+    LC.sync_prices()
+    assert updated == []

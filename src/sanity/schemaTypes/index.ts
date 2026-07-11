@@ -50,6 +50,13 @@ export const product = defineType({
     defineField({ name: "price", title: "Price (₹)", type: "number" }),
     defineField({ name: "originalPrice", title: "Original Price (₹)", type: "number" }),
     defineField({ name: "priceOnEnquiry", title: "Price on Enquiry", type: "boolean", initialValue: false }),
+    defineField({
+      name: "priceLocked",
+      title: "Lock price (ignore auto-sync)",
+      type: "boolean",
+      initialValue: false,
+      description: "When checked, the 6-hour price-sync will NOT overwrite this product's price. Use this to keep a manual Studio price.",
+    }),
     defineField({ name: "brand", title: "Brand", type: "reference", to: [{ type: "brand" }] }),
     defineField({ name: "brandSlug", title: "Brand Slug", type: "string" }),
     defineField({ name: "category", title: "Category", type: "reference", to: [{ type: "category" }] }),

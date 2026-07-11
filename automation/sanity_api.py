@@ -14,7 +14,7 @@ HEADERS = {
 
 
 def fetch_all_products():
-    query = '*[_type == "product"]{_id, name, slug, brand->{name}, amazonUrl, flipkartUrl, price, amazonPrice, flipkartPrice}'
+    query = '*[_type == "product"]{_id, name, slug, brand->{name}, amazonUrl, flipkartUrl, price, amazonPrice, flipkartPrice, priceLocked}'
     url = f"{BASE_URL}/data/query/{DATASET}?query={requests.utils.quote(query)}"
     res = requests.get(url, headers=HEADERS)
     if res.status_code == 200:
