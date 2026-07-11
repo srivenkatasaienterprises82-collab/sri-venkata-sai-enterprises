@@ -79,15 +79,23 @@ function productToSanityDoc(product: Product): SanityDoc {
     flipkartUrl: product.flipkartUrl,
     coverImage: product.image,
     description: product.description,
-    colors: product.colors,
-    variants: product.variants.map((v) => ({
-      _key: `v-${v.ram || "na"}-${v.storage || "na"}`,
+    colors: (product.colors ?? []).map((c, i) => ({
+      _key: `color-${i}-${c.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") || i}`,
+      name: c.name,
+      hex: c.hex,
+    })),
+    variants: product.variants.map((v, i) => ({
+      _key: `v-${i}-${v.ram || "na"}-${v.storage || "na"}`,
       ram: v.ram,
       storage: v.storage,
       price: v.price,
       originalPrice: v.originalPrice,
     })),
-    specifications: product.specifications,
+    specifications: (product.specifications ?? []).map((s, i) => ({
+      _key: `spec-${i}-${s.label?.toLowerCase().replace(/[^a-z0-9]+/g, "-") || i}`,
+      label: s.label,
+      value: s.value,
+    })),
     featured: product.featured,
     lastUpdated: new Date().toISOString(),
     images: [product.image],
