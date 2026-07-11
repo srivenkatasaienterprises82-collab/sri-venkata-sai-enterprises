@@ -15,7 +15,7 @@ export const brand = defineType({
   fields: [
     defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
     slugField,
-    defineField({ name: "logo", title: "Logo URL", type: "url", description: "Plain image URL (not a Sanity asset)" }),
+    defineField({ name: "logo", title: "Logo URL", type: "string", description: "Image URL or /public path (e.g. /images/brand-logos/x.png)" }),
     defineField({ name: "description", title: "Description", type: "text" }),
     defineField({ name: "featured", title: "Featured", type: "boolean", initialValue: false }),
   ],
@@ -28,7 +28,7 @@ export const category = defineType({
   fields: [
     defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
     slugField,
-    defineField({ name: "image", title: "Image URL", type: "url" }),
+    defineField({ name: "image", title: "Image URL", type: "string", description: "Image URL or /public path" }),
     defineField({ name: "description", title: "Description", type: "text" }),
   ],
 });
@@ -56,12 +56,12 @@ export const product = defineType({
     defineField({ name: "categorySlug", title: "Category Slug", type: "string" }),
     defineField({ name: "amazonUrl", title: "Amazon URL", type: "url" }),
     defineField({ name: "flipkartUrl", title: "Flipkart URL", type: "url" }),
-    defineField({ name: "coverImage", title: "Cover Image URL", type: "url" }),
+    defineField({ name: "coverImage", title: "Cover Image URL", type: "string", description: "Image URL or /public path" }),
     defineField({
       name: "images",
       title: "Images",
       type: "array",
-      of: [{ type: "url" }],
+      of: [{ type: "string" }],
     }),
     defineField({ name: "featured", title: "Featured", type: "boolean", initialValue: false }),
     defineField({ name: "description", title: "Description", type: "text" }),
@@ -123,7 +123,7 @@ export const banner = defineType({
     defineField({ name: "badge", title: "Badge", type: "string" }),
     defineField({ name: "cta", title: "CTA Text", type: "string" }),
     defineField({ name: "backgroundColor", title: "Background Color", type: "string", description: "Hex color" }),
-    defineField({ name: "image", title: "Image URL", type: "url" }),
+    defineField({ name: "image", title: "Image URL", type: "string", description: "Image URL or /public path" }),
     defineField({ name: "link", title: "Link", type: "url" }),
     defineField({ name: "active", title: "Active", type: "boolean", initialValue: true }),
     defineField({ name: "order", title: "Order", type: "number" }),
@@ -138,7 +138,7 @@ export const testimonial = defineType({
     defineField({ name: "name", title: "Name", type: "string", validation: (r) => r.required() }),
     defineField({ name: "quote", title: "Quote", type: "text" }),
     defineField({ name: "rating", title: "Rating", type: "number", validation: (r) => r.min(1).max(5) }),
-    defineField({ name: "avatar", title: "Avatar URL", type: "url" }),
+    defineField({ name: "avatar", title: "Avatar URL", type: "string", description: "Image URL or /public path" }),
   ],
 });
 
@@ -158,7 +158,7 @@ export const gallery = defineType({
   title: "Gallery Item",
   type: "document",
   fields: [
-    defineField({ name: "image", title: "Image URL", type: "url", validation: (r) => r.required() }),
+    defineField({ name: "image", title: "Image URL", type: "string", validation: (r) => r.required(), description: "Image URL or /public path" }),
     defineField({ name: "caption", title: "Caption", type: "string" }),
     defineField({ name: "order", title: "Order", type: "number" }),
   ],
@@ -173,7 +173,7 @@ export const offer = defineType({
     defineField({ name: "badge", title: "Badge", type: "string" }),
     defineField({ name: "subtitle", title: "Subtitle", type: "string" }),
     defineField({ name: "discountText", title: "Discount Text", type: "string" }),
-    defineField({ name: "image", title: "Image URL", type: "url" }),
+    defineField({ name: "image", title: "Image URL", type: "string", description: "Image URL or /public path" }),
     defineField({ name: "link", title: "Link", type: "url" }),
     defineField({ name: "cta", title: "CTA Text", type: "string" }),
     defineField({ name: "expiryDate", title: "Expiry Date", type: "date" }),
@@ -207,7 +207,7 @@ export const siteSettings = defineType({
     defineField({ name: "companyName", title: "Company Name", type: "string", validation: (r) => r.required() }),
     defineField({ name: "companyShortName", title: "Company Short Name", type: "string" }),
     defineField({ name: "tagline", title: "Tagline", type: "string" }),
-    defineField({ name: "logo", title: "Logo URL", type: "url" }),
+    defineField({ name: "logo", title: "Logo URL", type: "string", description: "Image URL or /public path" }),
     defineField({ name: "announcement", title: "Announcement", type: "string" }),
     defineField({ name: "phoneDisplay", title: "Phone (Display)", type: "string" }),
     defineField({ name: "phoneTel", title: "Phone (tel:)", type: "string" }),
@@ -230,7 +230,7 @@ export const siteSettings = defineType({
     defineField({ name: "seoTitleTemplate", title: "SEO Title Template", type: "string" }),
     defineField({ name: "seoDescription", title: "SEO Description", type: "text" }),
     defineField({ name: "seoKeywords", title: "SEO Keywords", type: "array", of: [{ type: "string" }] }),
-    defineField({ name: "openGraphImage", title: "Open Graph Image URL", type: "url" }),
+    defineField({ name: "openGraphImage", title: "Open Graph Image URL", type: "string", description: "Image URL or /public path" }),
   ],
 });
 
