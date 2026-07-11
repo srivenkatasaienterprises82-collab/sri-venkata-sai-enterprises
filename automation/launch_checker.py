@@ -108,11 +108,11 @@ def sync_prices():
         update_price(product["_id"], amz_price, flip_price, display_price)
         updated_count += 1
         diff = display_price - (old_price or 0)
-        arrow = "↑" if diff > 0 else "↓"
+        arrow = "^" if diff > 0 else "v"
         log_change(product["name"], brand, old_price, display_price, source)
         print(f"  {arrow} {product['name']} ({brand}): ₹{old_price} → ₹{display_price} ({'+' if diff > 0 else ''}{diff}) via {source}")
 
-    print(f"✓ Checked {checked} phones. Updated {updated_count}. Matched {matched}. No URL: {skipped_no_url}. Scrape failed: {skipped_no_price}.")
+    print(f"[OK] Checked {checked} phones. Updated {updated_count}. Matched {matched}. No URL: {skipped_no_url}. Scrape failed: {skipped_no_price}.")
 
 TRACKED_BRANDS = FLIPKART_BRANDS + AMAZON_BRANDS + BOTH_BRANDS
 
@@ -166,7 +166,7 @@ def check_launches(dry_run: bool = False):
 
             added += 1
 
-    print(f"✓ Found/added {added} new phone(s).")
+    print(f"[OK] Found/added {added} new phone(s).")
     return added
 
 
