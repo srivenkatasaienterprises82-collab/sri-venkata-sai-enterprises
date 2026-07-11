@@ -176,3 +176,104 @@ def _try_playwright(url: str) -> int | None:
     except ImportError:
         print("  Playwright not available, skipping fallback")
         return None
+
+
+def get_amazon_details(url: str) -> dict:
+    if not url:
+        return {}
+    try:
+        time.sleep(random.uniform(1.5, 3))
+        resp = requests.get(url, headers=HEADERS, timeout=30)
+        if resp.status_code != 200:
+            return {}
+        return _parse_amazon_details(resp.text)
+    except requests.RequestException as e:
+        print(f"  Amazon detail error: {e}")
+        return {}
+
+
+def _parse_amazon_details(html: str) -> dict:
+    soup = BeautifulSoup(html, "lxml")
+    price = _extract_jsonld_price(soup)
+    return {
+        "price": price,
+        "images": _extract_amazon_images(soup),
+        "description": _extract_amazon_description(soup),
+        "specifications": _extract_amazon_specs(soup),
+        "colors": _extract_amazon_colors(soup),
+        "variants": _extract_amazon_variants(soup),
+    }
+
+
+def _extract_amazon_images(soup: BeautifulSoup) -> list:
+    imgs = []
+    el = soup.find("img", id="landingImage") or soup.find("img", id="imgBlkFront")
+    if el:
+        src = el.get("src") or el.get("data-old-hires") or ""
+        if src.startswith("http"):
+            imgs.append(src)
+    for img in soup.select("#altImages img, #imageBlockThumbs img"):
+        src = img.get("src") or ""
+        if src.startswith("http") and src not in imgs:
+            imgs.append(src)
+    return imgs
+
+
+def _extract_amazon_description(soup: BeautifulSoup):
+    el = soup.find("div", id="productDescription")
+    if el:
+        return el.get_text(" ", strip=True)
+    meta = soup.find("meta", attrs={"name": "description"})
+    if meta and meta.get("content"):
+        return meta["content"].strip()
+    return None
+
+
+def _extract_amazon_specs(soup: BeautifulSoup) -> list:
+    specs = []
+    for table in soup.find_all("table", id=lambda i: i and "techSpec" in i):
+        for row in table.find_all("tr"):
+            cells = row.find_all(["td", "th"])
+            if len(cells) >= 2:
+                label = cells[0].get_text(" ", strip=True)
+                value = cells[1].get_text(" ", strip=True)
+                if label and value:
+                    specs.append({"label": label, "value": value})
+    seen = set()
+    out = []
+    for s in specs:
+        key = (s["label"], s["value"])
+        if key not in seen:
+            seen.add(key)
+            out.append(s)
+    return out
+
+
+def _extract_amazon_colors(soup: BeautifulSoup) -> list:
+    colors = []
+    for el in soup.find_all("li", class_=lambda c: c and "swatch" in c.lower()):
+        name = el.get("title") or el.get_text(strip=True)
+        style = el.get("style", "")
+        hex_match = re.search(r"#([0-9a-fA-F]{6})", style)
+        hexv = "#" + hex_match.group(1) if hex_match else None
+        if name:
+            colors.append({"name": name, "hex": hexv})
+    return colors
+
+
+def _extract_amazon_variants(soup: BeautifulSoup) -> list:
+    variants = []
+    for el in soup.find_all(string=re.compile(r"\d+\s*GB\s*/\s*\d+\s*GB", re.I)):
+        m = re.search(r"(\d+)\s*GB\s*/\s*(\d+)\s*GB", el, re.I)
+        if m:
+            variants.append(
+                {"ram": f"{m.group(1)} GB", "storage": f"{m.group(2)} GB", "price": None}
+            )
+    seen = set()
+    out = []
+    for v in variants:
+        key = (v["ram"], v["storage"])
+        if key not in seen:
+            seen.add(key)
+            out.append(v)
+    return out

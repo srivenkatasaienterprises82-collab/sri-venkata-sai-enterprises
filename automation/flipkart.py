@@ -182,3 +182,100 @@ def _try_playwright(url: str) -> int | None:
     except ImportError:
         print("  Playwright not available, skipping fallback")
         return None
+
+
+def get_flipkart_details(url: str) -> dict:
+    if not url:
+        return {}
+    try:
+        time.sleep(random.uniform(1, 2))
+        resp = requests.get(url, headers=HEADERS, timeout=30)
+        if resp.status_code != 200:
+            return {}
+        return _parse_flipkart_details(resp.text)
+    except requests.RequestException as e:
+        print(f"  Flipkart detail error: {e}")
+        return {}
+
+
+def _parse_flipkart_details(html: str) -> dict:
+    soup = BeautifulSoup(html, "lxml")
+    price = _extract_jsonld_price(soup)
+    return {
+        "price": price,
+        "images": _extract_flipkart_images(soup),
+        "description": _extract_flipkart_description(soup),
+        "specifications": _extract_flipkart_specs(soup),
+        "colors": _extract_flipkart_colors(soup),
+        "variants": _extract_flipkart_variants(soup),
+    }
+
+
+def _extract_flipkart_images(soup: BeautifulSoup) -> list:
+    imgs = []
+    for img in soup.find_all("img"):
+        src = img.get("src") or img.get("data-src") or ""
+        if src.startswith("http") and ("rukminim" in src or "fkimg" in src):
+            if src not in imgs:
+                imgs.append(src)
+    return imgs
+
+
+def _extract_flipkart_description(soup: BeautifulSoup):
+    el = soup.find("div", class_=lambda c: c and "description" in c.lower())
+    if el:
+        return el.get_text(" ", strip=True)
+    meta = soup.find("meta", attrs={"name": "description"})
+    if meta and meta.get("content"):
+        return meta["content"].strip()
+    return None
+
+
+def _extract_flipkart_specs(soup: BeautifulSoup) -> list:
+    specs = []
+    for table in soup.find_all("table"):
+        for row in table.find_all("tr"):
+            cells = row.find_all(["td", "th"])
+            if len(cells) >= 2:
+                label = cells[0].get_text(" ", strip=True)
+                value = cells[1].get_text(" ", strip=True)
+                if label and value and label.lower() != value.lower():
+                    specs.append({"label": label, "value": value})
+    seen = set()
+    out = []
+    for s in specs:
+        key = (s["label"], s["value"])
+        if key not in seen:
+            seen.add(key)
+            out.append(s)
+    return out
+
+
+def _extract_flipkart_colors(soup: BeautifulSoup) -> list:
+    colors = []
+    for el in soup.find_all("div", class_=lambda c: c and "color" in c.lower()):
+        style = el.get("style", "")
+        name = el.get("title") or el.get("data-color") or el.get_text(strip=True)
+        hex_match = re.search(r"#([0-9a-fA-F]{6})", style)
+        hexv = "#" + hex_match.group(1) if hex_match else None
+        if name:
+            colors.append({"name": name, "hex": hexv})
+    return colors
+
+
+def _extract_flipkart_variants(soup: BeautifulSoup) -> list:
+    variants = []
+    for el in soup.find_all(string=re.compile(r"\d+\s*GB\s*/\s*\d+\s*GB", re.I)):
+        m = re.search(r"(\d+)\s*GB\s*/\s*(\d+)\s*GB", el, re.I)
+        if m:
+            variants.append(
+                {"ram": f"{m.group(1)} GB", "storage": f"{m.group(2)} GB", "price": None}
+            )
+    seen = set()
+    out = []
+    for v in variants:
+        key = (v["ram"], v["storage"])
+        if key not in seen:
+            seen.add(key)
+            out.append(v)
+    return out
