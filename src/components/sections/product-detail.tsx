@@ -291,8 +291,8 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                       <Tag className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-900">HDFC Bank Credit Cards</p>
-                      <p className="text-sm text-slate-600 mt-1">Flat ₹5,000 Instant Discount on EMI and Non-EMI transactions.</p>
+                      <p className="text-sm font-bold text-slate-900">Selected Bank Offers</p>
+                      <p className="text-sm text-slate-600 mt-1">On selected banks get ₹2,000 instant discount.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
