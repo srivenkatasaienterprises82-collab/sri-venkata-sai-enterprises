@@ -2,6 +2,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { SITE_SETTINGS_QUERY } from "@/sanity/queries";
 import { siteConfig } from "@/lib/data/siteConfig";
 import type { SanitySiteSettings } from "@/sanity/types";
+import { resolveImage } from "./image";
 
 export async function getSiteSettings(): Promise<SanitySiteSettings> {
   try {
@@ -9,7 +10,11 @@ export async function getSiteSettings(): Promise<SanitySiteSettings> {
     if (!settings || !settings.companyName) {
       throw new Error("No settings in Sanity");
     }
-    return settings;
+    return {
+      ...settings,
+      logo: resolveImage(settings.logo),
+      openGraphImage: resolveImage(settings.openGraphImage),
+    };
   } catch (err) {
     console.warn(`⚠️ Failed to load site settings from Sanity, falling back to static config: ${err instanceof Error ? err.message : String(err)}`);
     return {

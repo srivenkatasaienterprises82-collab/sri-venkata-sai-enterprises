@@ -11,6 +11,7 @@ import type {
   SanityBanner,
   SanityGallery,
 } from "./types";
+import { resolveImage } from "./lib/image";
 
 export function toProduct(s: SanityProduct): Product {
   // Map stock status value safely
@@ -28,7 +29,7 @@ export function toProduct(s: SanityProduct): Product {
     type: (s.type || "smartphone") as ProductType,
     category: (s.categorySlug || "best-seller") as ProductCategory,
     stock: stockStatus,
-    image: s.coverImage || "",
+    image: resolveImage(s.coverImage),
     description: s.description || "",
     price: s.price,
     originalPrice: s.originalPrice,
@@ -72,7 +73,7 @@ export function toBrand(s: SanityBrand): Brand {
   return {
     name: s.name,
     slug,
-    logo: s.logo || localLogo,
+    logo: resolveImage(s.logo) || localLogo,
     featured: s.featured || false,
   };
 }
@@ -99,7 +100,7 @@ export function toOffer(s: SanityOffer) {
     badge: s.badge || "",
     subtitle: s.subtitle || "",
     discountText: s.discountText || "",
-    image: s.image || "",
+    image: resolveImage(s.image),
     link: s.link || "/",
     cta: s.cta || "Claim Offer",
     expiryDate: s.expiryDate,
@@ -112,7 +113,7 @@ export function toOffers(data: SanityOffer[]) {
 }
 
 export function toBanner(s: SanityBanner) {
-  const rawSrc = typeof s.image === "string" ? s.image.trim() : "";
+  const rawSrc = resolveImage(s.image);
   return {
     id: s._id,
     title: s.title,
@@ -133,7 +134,7 @@ export function toBanners(data: SanityBanner[]) {
 export function toGallery(s: SanityGallery) {
   return {
     id: s._id,
-    image: s.image,
+    image: resolveImage(s.image),
     caption: s.caption || "",
   };
 }
