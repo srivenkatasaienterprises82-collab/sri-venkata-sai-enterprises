@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { getSiteSettings } from "@/sanity/lib/settings";
 import { SiteChrome } from "@/components/layout/site-chrome";
+import { SanityLive } from "@/sanity/lib/live";
 import "./globals.css";
 
 function SkipLink() {
@@ -71,9 +72,8 @@ export default async function RootLayout({
       </head>
       <body suppressHydrationWarning className="min-h-screen bg-white text-slate-900 antialiased">
         <SkipLink />
-        <SiteChrome settings={settings} isDraftMode={isDraftMode}>
-          {children}
-        </SiteChrome>
+        <SiteChrome settings={settings}>{children}</SiteChrome>
+        {isDraftMode && process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && <SanityLive />}
       </body>
     </html>
   );
