@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 import { sanityFetch } from "@/sanity/lib/live";
 import { PRODUCT_BY_SLUG_QUERY } from "@/sanity/queries";
 import { toProduct } from "@/sanity/transform";
+import { resolveImage } from "@/sanity/lib/image";
 import { getSiteSettings } from "@/sanity/lib/settings";
 import type { Product, ProductVariant } from "@/lib/data/products";
 import type { SanityProduct } from "@/sanity/types";
@@ -107,9 +108,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         query: PRODUCT_BY_SLUG_QUERY,
         params: { slug: resolvedParams.id, id: resolvedParams.id },
       }) as { data: SanityProduct | null };
-      if (rawSanityProduct?.images?.length) {
-        galleryImages = rawSanityProduct.images;
-      }
+  if (rawSanityProduct?.images?.length) {
+    galleryImages = rawSanityProduct.images.map(resolveImage).filter(Boolean);
+  }
     } catch {
       // Keep single cover image
     }
