@@ -19,9 +19,9 @@ def log_change(product_name, brand, old_price, new_price, source):
         f.write(line + "\n")
 
 
-FLIPKART_BRANDS = ["Motorola", "Oppo", "Vivo", "Realme", "Poco", "Nothing", "Narzo", "Google", "Infinix"]
+FLIPKART_BRANDS = ["Motorola", "Oppo", "Vivo", "Realme", "Poco", "Nothing", "Apple", "Samsung", "OnePlus"]
 AMAZON_BRANDS = ["iQOO", "Redmi"]
-BOTH_BRANDS = ["Apple", "Samsung", "OnePlus"]
+BOTH_BRANDS = []
 
 
 def get_assigned_source(product: dict) -> str | None:
@@ -90,6 +90,13 @@ def sync_prices():
 
         if display_price is None:
             print(f"  SKIP {product['name']}: scraper returned None (old={old_price})")
+            skipped_no_price += 1
+            continue
+
+        # Plausibility guard: reject clearly-wrong prices (e.g. a variant or
+        # accessory captured by mistake). Phones/accessories fall in this band.
+        if display_price < 1000 or display_price > 250000:
+            print(f"  SKIP {product['name']}: implausible price ₹{display_price} (skipped)")
             skipped_no_price += 1
             continue
 

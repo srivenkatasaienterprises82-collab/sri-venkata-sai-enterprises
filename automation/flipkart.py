@@ -46,11 +46,8 @@ def _try_requests(url: str) -> int | None:
         if price:
             return price
 
-        # Strategy 3: First price-like number near ₹ in the HTML
-        price = _extract_first_price_in_html(html)
-        if price:
-            return price
-
+        # No reliable price found — DO NOT fall back to the first "₹" in the
+        # HTML, as that often captures a variant, accessory, or sponsored price.
         return None
 
     except requests.RequestException as e:
@@ -59,23 +56,27 @@ def _try_requests(url: str) -> int | None:
 
 
 def _extract_jsonld_price(soup: BeautifulSoup) -> int | None:
-    for script in soup.find_all("script", type="application/ld+json"):
-        import json
+    import json
 
+    candidates = []
+    for script in soup.find_all("script", type="application/ld+json"):
         try:
             data = json.loads(script.string)
-            if isinstance(data, list):
-                for item in data:
-                    price = _get_offers_price(item)
-                    if price:
-                        return price
-            elif isinstance(data, dict):
-                price = _get_offers_price(data)
-                if price:
-                    return price
         except (json.JSONDecodeError, AttributeError):
             continue
-    return None
+
+        items = data if isinstance(data, list) else [data]
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            # Prefer the actual Product / AggregateOffer block
+            if item.get("@type") in ("Product", "AggregateOffer") or "offers" in item:
+                price = _get_offers_price(item)
+                if price:
+                    candidates.append(price)
+
+    # Return the first Product-type price we found
+    return candidates[0] if candidates else None
 
 
 def _get_offers_price(data: dict) -> int | None:
@@ -119,22 +120,6 @@ def _extract_card_price(soup: BeautifulSoup) -> int | None:
     return None
 
 
-def _extract_first_price_in_html(html: str) -> int | None:
-    patterns = [
-        r"₹\s*([0-9,]+(?:\.\d{2})?)",
-        r"Rs\.\s*([0-9,]+(?:\.\d{2})?)",
-        r"\"price\"\s*:\s*(\d+)",
-    ]
-    for pattern in patterns:
-        matches = re.findall(pattern, html)
-        if matches:
-            raw = matches[0]
-            digits = re.sub(r"[^\d]", "", raw)
-            if digits and int(digits) > 100:  # Skip tiny numbers (not prices)
-                return int(digits)
-    return None
-
-
 def _try_playwright(url: str) -> int | None:
     try:
         from playwright.sync_api import sync_playwright, TimeoutError as PwTimeout
@@ -159,6 +144,13 @@ def _try_playwright(url: str) -> int | None:
                     page.wait_for_load_state("networkidle", timeout=20000)
                 except PwTimeout:
                     pass
+
+                # Prefer JSON-LD from the fully-rendered page
+                price = _extract_jsonld_price(
+                    BeautifulSoup(page.content(), "lxml")
+                )
+                if price:
+                    return price
 
                 SELECTORS = [
                     "div.Nx9bqj",
