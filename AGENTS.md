@@ -1480,6 +1480,15 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - Wired About page to use Sanity page title/metadata with portable text for "Our Story" section
 - All 8 new content types seeded to Sanity (134 products, 14 brands, 6 categories, 4 banners, 6 testimonials, 8 FAQs, 3 gallery, 5 offers, 4 pages, siteSettings, homePage)
 
+## Done (July 11) — New Phone Launch Automation (IMPLEMENTED & PUSHED)
+- Built full TDD automation so newly-launched phones per brand become **draft** Sanity product docs:
+  - `automation/sanity_api.py`: `_query`, `fetch_brand_id`, `fetch_category_id` (falls back smartphone→mobile), `fetch_existing_slugs`, `unique_slug`, `create`, `create_full_product` (tolerant draft doc: `enabled:false`, remote image URLs, references for brand/category).
+  - `automation/listing.py` (NEW): `get_brand_listings` + `_parse_flipkart`/`_parse_amazon` (regex over product anchors, deduped).
+  - `automation/flipkart.py` & `amazon.py`: `get_flipkart_details`/`get_amazon_details` → {price (JSON-LD), images, description, specifications, colors, variants}.
+  - `automation/launch_checker.py`: `check_launches(dry_run)` rewritten — per-brand listing diff vs Sanity, detail fetch, plausibility guard (<₹1000/>₹250000 skip), `--dry-run` support. `launch_checker.py --mode launch` already wired in the "New Phone Launch Checker" workflow, scheduled daily (`0 3 * * *`, 03:00 UTC).
+  - Tests: `tests/test_sanity_api.py`, `test_listing.py` (+fixtures), `test_details.py` (+fixtures), `test_launch_checker.py`. `tests/conftest.py` adds `automation/` to sys.path for bare-import style.
+  - `pytest` 9.0.3 local: **16 passed**. 7 commits pushed to `origin/main`.
+
 ## Key Decisions
 - Removed `coalesce()` from GROQ queries entirely since all image fields are plain URL strings — avoids next-sanity v13.1.1 `filterResponse: false` issue
 - Set `hidden: true` on unwanted brands in Sanity rather than deleting them (preserves product references)
