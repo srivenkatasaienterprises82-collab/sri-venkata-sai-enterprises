@@ -4,5 +4,6 @@ export const client = createClient({
   projectId: "homvjne9",
   dataset: "production",
   apiVersion: "2026-06-23",
-  useCdn: true,
+  // Fetch straight from the API (not the CDN) so published edits show immediately.
+  useCdn: false,
 });

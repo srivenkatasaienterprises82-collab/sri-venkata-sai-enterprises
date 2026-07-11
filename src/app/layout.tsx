@@ -1,5 +1,9 @@
 import { Metadata } from "next";
 import { getSiteSettings } from "@/sanity/lib/settings";
+
+// Re-render on every request and re-fetch Sanity each time, so content
+// published in the Studio (products, logo, settings) appears without a redeploy.
+export const dynamic = "force-dynamic";
 import { SiteChrome } from "@/components/layout/site-chrome";
 import { SanityLive } from "@/sanity/lib/live";
 import "./globals.css";
