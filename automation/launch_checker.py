@@ -1,11 +1,11 @@
 import argparse
 import os
 from datetime import datetime
-from sanity_api import fetch_all_products, update_price, create_product
-from amazon import get_amazon_price
-from flipkart import get_flipkart_price
+from sanity_api import fetch_all_products, update_price, create_full_product
+from amazon import get_amazon_price, get_amazon_details
+from flipkart import get_flipkart_price, get_flipkart_details
+from listing import get_brand_listings
 from utils import is_match
-from groq_ai import normalize_and_describe
 
 LOG_FILE = "price-changes.csv"
 
@@ -117,37 +117,65 @@ def sync_prices():
 TRACKED_BRANDS = FLIPKART_BRANDS + AMAZON_BRANDS + BOTH_BRANDS
 
 
-def check_launches():
-    print("Checking for new launches...")
-    existing_products = fetch_all_products()
-    existing_titles = [p["name"] for p in existing_products]
+def _source_for_brand(brand: str) -> str | None:
+    if brand in FLIPKART_BRANDS:
+        return "flipkart"
+    if brand in AMAZON_BRANDS:
+        return "amazon"
+    return None
 
-    scraped_phones = []
 
-    added_count = 0
-    for phone in scraped_phones:
-        if phone["brand"] not in TRACKED_BRANDS:
+def check_launches(dry_run: bool = False):
+    print(f"Checking for new launches...{' (DRY RUN)' if dry_run else ''}")
+    existing = fetch_all_products()
+    existing_names = [p.get("name", "") for p in existing]
+
+    added = 0
+    for brand in TRACKED_BRANDS:
+        source = _source_for_brand(brand)
+        if source is None:
             continue
-        ai_data = normalize_and_describe(phone["raw_name"], phone["brand"])
-        clean_title = ai_data.get("title", phone["raw_name"])
+        print(f"  Scanning {brand} on {source}...")
+        try:
+            listings = get_brand_listings(brand, source)
+        except Exception as e:
+            print(f"    ERROR fetching listings for {brand}: {e}")
+            continue
 
-        is_already_added = any(is_match(clean_title, exist) for exist in existing_titles)
-        if not is_already_added:
-            print(f"Found new phone: {clean_title}")
-            phone["amazonUrl"] = "https://amazon.in/dp/XXXX"
-            phone["flipkartUrl"] = "https://flipkart.com/product/XXXX"
-            phone.update(ai_data)
-            create_product(phone)
-            added_count += 1
+        for name, url in listings:
+            if any(is_match(name, ex) for ex in existing_names):
+                continue
 
-    print(f"✓ Added {added_count} new phones.")
+            details = (
+                get_flipkart_details(url) if source == "flipkart"
+                else get_amazon_details(url)
+            )
+            price = details.get("price")
+            if price is not None and (price < 1000 or price > 250000):
+                print(f"    SKIP {name}: implausible price ₹{price}")
+                continue
+
+            if dry_run:
+                print(f"    [DRY RUN] would add: {name} ({brand}) {url}")
+            else:
+                res = create_full_product(name, brand, source, url, details)
+                if res is None:
+                    print(f"    SKIP {name}: could not create (brand missing?)")
+                    continue
+                print(f"    + added draft: {name} ({brand})")
+
+            added += 1
+
+    print(f"✓ Found/added {added} new phone(s).")
+    return added
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", type=str, required=True, choices=["sync", "launch"])
+    parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     if args.mode == "sync":
         sync_prices()
     elif args.mode == "launch":
-        check_launches()
+        check_launches(dry_run=args.dry_run)
