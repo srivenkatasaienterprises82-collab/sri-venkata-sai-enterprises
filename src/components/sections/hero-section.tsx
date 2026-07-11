@@ -123,12 +123,12 @@ export function HeroSection({
           className="mb-10 flex w-full justify-center px-4"
         >
           <div className="inline-flex max-w-full items-center gap-2 sm:gap-3 rounded-full border border-slate-200/80 bg-white/70 p-1.5 pr-4 sm:pr-6 shadow-sm backdrop-blur-md">
-            <span className="shrink-0 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
-              Sri Venkata Sai
-            </span>
-            <span className="truncate text-[11px] sm:text-sm font-medium text-slate-700">
-              <span className="font-bold text-slate-900">Ongole’s Best Mobile Deals</span>
-              <span className="text-slate-300 mx-1.5 sm:mx-2">|</span>
+<span className="shrink-0 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
+  Sri Sai Venkat Enterprises
+</span>
+<span className="truncate text-[11px] sm:text-sm font-medium text-slate-700">
+<span className="font-bold text-slate-900">Best Mobile Deals</span>
+<span className="text-slate-300 mx-1.5 sm:mx-2">|</span>
               {displaySubtitle}
             </span>
           </div>
