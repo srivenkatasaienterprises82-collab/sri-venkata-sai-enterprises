@@ -12,7 +12,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Button } from "@/components/ui/button";
-import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
+
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
@@ -60,14 +60,8 @@ export function HeroSection({
   const featured = products.filter((p) => p.featured && POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase())).slice(0, 16);
   const carouselProducts = featured.length > 0 ? featured : products.filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase())).slice(0, 16);
   const safeCarouselProducts = carouselProducts.filter((p) => p.slug);
-  const displayTitle = title || (
-    <>
-      Latest Mobiles{" "}
-      <AnimatedGradientText className="whitespace-nowrap">
-        at Best Prices
-      </AnimatedGradientText>
-    </>
-  );
+  const displayTitle =
+    title ?? "Ongole's Best Mobile Deals";
   const displaySubtitle = subtitle || "Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo, Motorola, OnePlus & more.";
   const hasValidSlug = (product: Product) => product.slug && product.slug.trim().length > 0;
 
@@ -107,14 +101,14 @@ export function HeroSection({
           {siteConfig.address.city}&apos;s trusted mobile store
         </div>
 
-        <motion.h1
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, type: "spring", bounce: 0.4 }}
-          className="mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-slate-900 whitespace-nowrap max-w-full overflow-hidden text-ellipsis px-4"
-        >
-          {displayTitle}
-        </motion.h1>
+<motion.h1
+initial={{ opacity: 0, scale: 0.95, y: 20 }}
+animate={{ opacity: 1, scale: 1, y: 0 }}
+transition={{ duration: 0.8, delay: 0.2, type: "spring", bounce: 0.4 }}
+className="mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-slate-900 whitespace-nowrap max-w-full px-4"
+>
+{displayTitle}
+</motion.h1>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
