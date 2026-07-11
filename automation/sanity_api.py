@@ -66,6 +66,45 @@ def unique_slug(name: str) -> str:
     return f"{base}-{i}"
 
 
+def create(product_doc: dict) -> dict:
+    url = f"{BASE_URL}/data/mutate/{DATASET}"
+    mutations = {"mutations": [{"create": product_doc}]}
+    res = requests.post(url, headers=HEADERS, json=mutations)
+    print(f"Created draft product {product_doc.get('name')}: {res.status_code}")
+    return res.json()
+
+
+def create_full_product(name, brand_name, source, url, details):
+    brand_id = fetch_brand_id(brand_name)
+    if not brand_id:
+        print(f"Skipping {name}: brand '{brand_name}' not found in Sanity")
+        return None
+    category_id = fetch_category_id("smartphone")
+    slug = unique_slug(name)
+    images = details.get("images") or []
+    doc = {
+        "_type": "product",
+        "name": name,
+        "slug": {"_type": "slug", "current": slug},
+        "brand": {"_ref": brand_id, "_type": "reference"},
+        "category": {"_ref": category_id, "_type": "reference"} if category_id else None,
+        "enabled": False,
+        "type": "smartphone",
+        "stock": "in-stock",
+        "description": details.get("description"),
+        "price": details.get("price"),
+        "images": images,
+        "coverImage": images[0] if images else None,
+        "colors": details.get("colors") or [],
+        "variants": details.get("variants") or [],
+        "specifications": details.get("specifications") or [],
+        "amazonUrl": url if source == "amazon" else None,
+        "flipkartUrl": url if source == "flipkart" else None,
+        "lastUpdated": datetime.now().isoformat(),
+    }
+    return create(doc)
+
+
 def create_product(product_data: dict) -> dict:
     url = f"{BASE_URL}/data/mutate/{DATASET}"
     mutations = {
