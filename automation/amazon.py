@@ -418,18 +418,99 @@ def _extract_amazon_colors(soup: BeautifulSoup) -> list:
 
 
 def _extract_amazon_variants(soup: BeautifulSoup) -> list:
-    variants = []
+    """Extract RAM/Storage variant combos from the page HTML.
+
+    Uses two strategies (merged, JSON-LD prices win):
+      1. Text-pattern scan  — find "X GB / Y GB" patterns anywhere in text
+         (yields variants with price=None for RAM/Storage combos).
+      2. JSON-LD offers     — parse structured-data offers whose name/desc
+         contains a RAM/Storage pattern, giving us per-variant prices.
+
+    Returns a deduplicated list of {"ram", "storage", "price"} dicts.
+    """
+    # ── Strategy 1: text-pattern scan ──────────────────────────────────
+    text_variants = {}
     for el in soup.find_all(string=re.compile(r"\d+\s*GB\s*/\s*\d+\s*GB", re.I)):
         m = re.search(r"(\d+)\s*GB\s*/\s*(\d+)\s*GB", el, re.I)
         if m:
-            variants.append(
-                {"ram": f"{m.group(1)} GB", "storage": f"{m.group(2)} GB", "price": None}
-            )
-    seen = set()
+            key = (f"{m.group(1)} GB", f"{m.group(2)} GB")
+            if key not in text_variants:
+                text_variants[key] = {"ram": key[0], "storage": key[1], "price": None}
+
+    # ── Strategy 2: JSON-LD offers (structured data with real prices) ──
+    ld_variants = _extract_variants_from_jsonld(soup)
+    for v in ld_variants:
+        key = (v["ram"], v["storage"])
+        text_variants[key] = v  # JSON-LD price (may be None) overwrites
+
+    return list(text_variants.values())
+
+
+def _extract_variants_from_jsonld(soup: BeautifulSoup) -> list:
+    """Parse JSON-LD structured data for multi-offer variant prices.
+
+    Flipkart and Amazon both embed JSON-LD with an ``offers`` array when
+    the product has multiple variants (RAM/Storage/Color). Each offer may
+    include a ``name`` like "8 GB / 128 GB" and a ``price``.
+
+    Returns a list of {"ram", "storage", "price"} dicts (may be empty).
+    """
+    variants = []
+    for script in soup.find_all("script", type="application/ld+json"):
+        try:
+            # json is already imported at module level
+            data = json.loads(script.string)
+        except (json.JSONDecodeError, AttributeError):
+            continue
+
+        items = data if isinstance(data, list) else [data]
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            if item.get("@type") not in ("Product", "AggregateOffer"):
+                continue
+
+            offers = item.get("offers")
+            if not offers:
+                continue
+
+            # Normalise to list
+            offer_list = offers if isinstance(offers, list) else [offers]
+
+            for offer in offer_list:
+                if not isinstance(offer, dict):
+                    continue
+                price_str = offer.get("price", "")
+                digits = re.sub(r"[^\d]", "", str(price_str))
+                price = int(digits) if digits else None
+
+                # Try to get variant info from offer name or description
+                offer_name = offer.get("name", "") or offer.get("description", "") or ""
+                m = re.search(r"(\d+)\s*GB\s*/\s*(\d+)\s*GB", str(offer_name), re.I)
+                if m:
+                    variants.append({
+                        "ram": f"{m.group(1)} GB",
+                        "storage": f"{m.group(2)} GB",
+                        "price": price,
+                    })
+
+                # Also check itemOffered (nested Product with same pattern)
+                offered = offer.get("itemOffered") or {}
+                if isinstance(offered, dict):
+                    oname = offered.get("name", "") or ""
+                    m2 = re.search(r"(\d+)\s*GB\s*/\s*(\d+)\s*GB", str(oname), re.I)
+                    if m2:
+                        variants.append({
+                            "ram": f"{m2.group(1)} GB",
+                            "storage": f"{m2.group(2)} GB",
+                            "price": price,
+                        })
+
+    # Deduplicate (JSON-LD may list the same variant multiple times)
+    seen = {}
     out = []
     for v in variants:
         key = (v["ram"], v["storage"])
-        if key not in seen:
-            seen.add(key)
-            out.append(v)
-    return out
+        if key not in seen or seen[key]["price"] is None:
+            seen[key] = v
+    return list(seen.values())
