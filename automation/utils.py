@@ -101,31 +101,34 @@ def price_change_is_plausible(old, new):
 
 def url_name_matches(name: str, url: str) -> bool:
     """Heuristic: extract the product-slug tail of a Flipkart/Amazon URL and
-    compare its key tokens to the Sanity product name. Returns True only if
-    there is a strong overlap — strong enough to confidently call the URL
-    the right product. Returns False if:
+    compare its model identifier to the Sanity product name.
 
-      * The URL contains accessory keywords ( tempered-glass, screen-guard,
-        cover, case, charger, cable, earphones, ... ) — guaranteed wrong.
-      * The URL slug tokens don't overlap the product name at all.
-      * The URL slug has model tokens that don't appear in the product name
-        (catches Redmi A4 vs /redmi-a7-pro-5g-processor: "a7" is a strong
-        model token that isn't in "Redmi A4").
+    Returns False (skip + log) only for the high-signal cases:
+
+      * The URL contains accessory keywords (tempered-glass, screen-guard,
+        cover, case, charger, ... ) — guaranteed wrong.
+      * The product name names a specific model (letter+digit id like a4,
+        t4x, c83, k13) and the URL slug names a DIFFERENT model. This caught
+        Redmi-A4-stored-as-Redmi-A7, Vivo-T4x-stored-as-T4-Lite, etc.
+
+    Returns True otherwise. Importantly, generic marketplace slugs that name
+    NO model (e.g. ".../Storage-Segments-Fastest-Processor-Smoothest") are
+    accepted — and storage/screen-size numbers (128, 256, 12, 11) are NOT
+    treated as model ids because they appear in countless legitimate slugs.
+    Real price errors are still caught downstream by the price-band and
+    relative-delta guards.
     """
     if not url:
         return False
     path = url.split("?", 1)[0]
-    tokens: set[str] = set()
     slug = ""
     # Flipkart product path: /<slug-with-dashes>/p/<id>
     m = re.search(r"/([a-z0-9][a-z0-9\-+]{3,})/p/", path, re.I)
-    if m:
-        slug = m.group(1)
-    else:
+    if not m:
         # Amazon pretty URL: /<slug-with-dashes>/dp/<ASIN>
         m = re.search(r"/([a-z0-9][a-z0-9\-+]{3,})/dp/", path, re.I)
-        if m:
-            slug = m.group(1)
+    if m:
+        slug = m.group(1)
     if not slug:
         # Bare /dp/<ASIN> URLs have no human-readable title. Can't validate;
         # accept and rely on the relative-delta guard downstream.
@@ -135,87 +138,52 @@ def url_name_matches(name: str, url: str) -> bool:
     # slug is strong evidence the listing is for an accessory, not a phone.
     accessory_patterns = [
         r"tempered[\-\s]?glass", r"screen[\-\s]?guard", r"screen[\-\s]?protector",
-        r"\bcover\b", r"\bcase\b", r"\bcharger\b", r"\bcable\b",
-        r"\bearphone", r"\bbuds\b", r"\badapter\b", r"\bbattery\b",
-        r"\bstand\b", r"\bholder\b", r"\bskin\b", r"\bsleeve\b",
-        r"\bmount\b", r"\bstrap\b", r"\bband\b", r"\bflip[\-\s]?cover\b",
+        r"\bskin\b", r"\bsleeve\b", r"\bstand\b", r"\bholder\b",
+        r"\bmount\b", r"\bstrap\b", r"\bband\b", r"\bpouch\b", r"\bsticker\b",
     ]
     slug_lower = slug.lower()
     for pat in accessory_patterns:
         if re.search(pat, slug_lower):
             return False
 
-    tokens.update(_tokenize_slug(slug))
-    name_tokens = set(_tokenize_slug(name))
     noise = {"5g", "4g", "gb", "ram", "rom", "2026", "2025", "pro", "lite",
              "max", "plus", "ultra", "fe", "ne", "2024", "refurbished",
              "smartphone", "mobile", "phone"}
-    url_tokens_strong = tokens - noise
-    name_tokens_strong = name_tokens - noise
-    if not url_tokens_strong or not name_tokens_strong:
-        # Nothing meaningful to compare — accept and lean on downstream guards.
-        return True
+    name_strong = set(_tokenize_slug(name)) - noise
+    url_strong = set(_tokenize_slug(slug)) - noise
 
-    intersection = name_tokens_strong & url_tokens_strong
-    # Match if every strong token of the product name appears in the URL
-    # slug. This is the natural orientation: the URL describes a phone and
-    # must contain at least the product's brand + model identifier tokens.
-    if name_tokens_strong.issubset(url_tokens_strong):
-        # But also reject when the URL contains a *strong competing model
-        # token* the product name doesn't have. Catches Redmi-A4-stored-as-Redmi-A7:
-        # URL tokens {redmi, a7, processor}; name tokens {redmi, a4}; "a7" is
-        # not in the name and looks like a model identifier.
-        url_extras = url_tokens_strong - name_tokens_strong
-        if any(_looks_like_model_identifier(t) for t in url_extras):
-            return False
-        return True
-    # Also accept the looser half-overlap rule for cases where the product
-    # name has tokens the URL doesn't (e.g. the Studio added a "5G" tag in
-    # the name even though we filtered it out as noise... rare but possible).
-    if len(intersection) >= max(1, (len(name_tokens_strong) + 1) // 2):
-        # AND no competing strong model identifier in the URL.
-        url_extras = url_tokens_strong - name_tokens_strong
-        if any(_looks_like_model_identifier(t) for t in url_extras):
-            return False
-        return True
-    return False
+    # High-signal catch: the product name names a specific model (letter+
+    # digit id like a4, t4x, c83, k13) and the URL slug names a DIFFERENT
+    # model. Generic slugs that name no model are accepted.
+    name_model = next((t for t in name_strong if _looks_like_model_identifier(t)), None)
+    url_models = [t for t in url_strong if _looks_like_model_identifier(t)]
+    if name_model and name_model not in url_models and url_models:
+        return False
+
+    return True
 
 
 _MODEL_TOKEN_RE = re.compile(r"^[a-z]?\d+[a-z]*$", re.I)
 
 
 def _looks_like_model_identifier(token: str) -> bool:
-    """Heuristic: detect tokens like "a4", "a7", "t4", "t7", "x100", "z9" etc.
+    """Heuristic: detect letter+digit model ids like "a4", "a7", "t4x", "c83",
+    "k13", "s10" — the tokens that disambiguate one phone model from another.
 
-    These are model identifiers (a letter + digits OR all digits) that, when
-    found in the URL but not in the product name, are a strong signal the URL
-    points at a *different* model.
-
-    We deliberately treat "red" or "blue" or "vinegar" as non-model tokens —
-    they're colors and shouldn't trip the matcher. The strict regex covers
-    the phone model naming scheme used by Xiaomi/Vivo/Realme/Oppo/Samsung.
+    Pure-digit tokens (e.g. "128", "256", "12", "11") are deliberately NOT
+    treated as model ids: they are storage capacities and screen sizes that
+    appear in countless legitimate slugs, and treating them as model ids
+    caused false rejections of correct URLs. Genuine all-digit model numbers
+    (Redmi Note 12 vs 13) are a rarer case and are still protected by the
+    price-band / relative-delta guards downstream.
     """
     t = token.lower()
     if not t:
         return False
-    # All-digit token (e.g. "70", "100") is a model identifier only if it's
-    # the kind of token that appears in a model name. We require it to be 2
-    # or 3 chars and not be a year like "2026".
-    # All-digit token is a model number only if it's not a storage size
-    # like 64, 128, 256, 512 (common storage capacities) and not a year.
-    _STORAGE_VALUES = {"64", "128", "256", "512", "1024", "32", "16", "8", "4"}
     if t.isdigit():
-        if t in _STORAGE_VALUES:
-            return False
-        if int(t) >= 2100:
-            return False
-        # 2-3 digit numbers that aren't storage sizes (a4, a7, t4, t7...) 
-        # are treated as model identifiers; this catches the a7 vs a4 case.
-        return 2 <= len(t) <= 3
-    # Letter + digits(+ optional letters): a4, a7, t4, t7, x100, z9, m7, c83, f70, v70
-    if _MODEL_TOKEN_RE.match(t):
-        return True
-    return False
+        return False
+    # Letter + digits(+ optional letters): a4, a7, t4x, c83, k13, s10, x100.
+    return bool(_MODEL_TOKEN_RE.match(t))
 
 
 def _tokenize_slug(s: str):

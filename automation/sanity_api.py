@@ -183,3 +183,30 @@ def update_price(product_id: str, amazon_price, flipkart_price, display_price) -
     if not body.get("results"):
         print(f"  WARNING: Sanity returned no mutation results for {product_id}: {body}")
     return body
+
+
+def update_url(product_id: str, url: str) -> dict:
+    """Set a product's marketplace URL in Sanity.
+
+    Routes the URL to the right field by host (flipkart.com -> flipkartUrl,
+    amazon.in -> amazonUrl) and clears the other field so a stale URL for the
+    wrong marketplace can't linger. Raises RuntimeError on a non-2xx response
+    so callers can fail loudly instead of reporting green.
+    """
+    field = "flipkartUrl" if "flipkart.com" in url else "amazonUrl"
+    other = "amazonUrl" if field == "flipkartUrl" else "flipkartUrl"
+    set_fields = {field: url}
+    unset_fields = [other]
+    url = f"{BASE_URL}/data/mutate/{DATASET}"
+    mutations = {
+        "mutations": [
+            {"patch": {"id": product_id, "set": set_fields, "unset": unset_fields}}
+        ]
+    }
+    res = requests.post(url, headers=HEADERS, json=mutations)
+    if res.status_code not in (200, 201):
+        raise RuntimeError(
+            f"Sanity url update failed for {product_id}: "
+            f"HTTP {res.status_code} {res.text[:200]}"
+        )
+    return res.json() if res.text else {}
