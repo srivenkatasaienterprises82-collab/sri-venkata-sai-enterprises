@@ -41,9 +41,12 @@ export async function sanityFetchNoCache<T>({
 }): Promise<{ data: T | null; tags: string[] }> {
   try {
     const result = await client.fetch<T>(query, params ?? {}, {
-      // `filterResponse: false` matches the contract callers expect
-      // (next-sanity's sanityFetch returns the full envelope).
-      filterResponse: false,
+      // NOTE: do NOT pass `filterResponse: false` here. @sanity/client's
+      // `fetch` returns the *unwrapped* query result by default, and
+      // `filterResponse: false` instead returns the full response envelope
+      // (`{ result: [...], ms, query }`). Our callers (toProduct, etc.)
+      // expect the documents directly — passing the envelope made every
+      // product page render with `undefined` name/price.
       // Bypass the Next.js Data Cache and the full request cache.
       // This makes every render hit the Sanity Content Lake.
       next: { revalidate: 0 },
@@ -54,7 +57,12 @@ export async function sanityFetchNoCache<T>({
       // right after the price-sync GitHub Action runs.
       useCdn: false,
     } as any);
-    return { data: result as unknown as T, tags: [] };
+    // Defensive unwrap in case a future client version returns the envelope.
+    const data =
+      result && typeof result === "object" && "result" in (result as any)
+        ? (result as any).result
+        : result;
+    return { data: data as unknown as T, tags: [] };
   } catch (err) {
     console.warn(`⚠️ Sanity fetch (no-cache) error for query ${query}: ${err instanceof Error ? err.message : String(err)}`);
     return { data: null, tags: [] };
