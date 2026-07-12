@@ -1,0 +1,48 @@
+name: Site Price Verification
+
+# Closes the gap left by price-sync: that job only compares the scraped
+# marketplace price against Sanity. It never fetches the storefront, so a
+# rendering bug (e.g. the earlier `filterResponse:false` envelope that showed
+# `undefined` prices) passed every check while customers saw garbage.
+#
+# This job fetches every live PDP and asserts the displayed price equals the
+# price Sanity holds. Any mismatch / fetch error / missing price is logged to
+# `site_price_mismatch.csv` and the run goes RED (non-zero exit) so it's never
+# reported green by mistake.
+
+on:
+  schedule:
+    # Daily at 04:30 UTC — after the 03:00 price-sync run has settled.
+    - cron: "30 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  verify-site-prices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Verify live site prices against Sanity
+        env:
+          SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
+          SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
+          SITE_URL: "https://www.srivenkatasaienterprises.com"
+        # PYTHONUNBUFFERED=1 makes the per-product STATUS rows visible live.
+        run: PYTHONUNBUFFERED=1 python automation/site_verify.py
+      - name: Upload mismatch report
+        uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: site-price-mismatch
+          path: site_price_mismatch.csv
