@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Automatically discover newly-launched phones for tracked brands from Flipkart/Amazon, scrape full details, and create complete **draft** product documents in Sanity.
+**Goal:** Automatically discover newly-launched phones for tracked brands from Flipkart/Amazon, scrape full details, and create complete product documents in Sanity (auto-published, `enabled: true`).
 
-**Architecture:** `listing.py` scrapes each brand's listing page (per assigned platform) and diffs against Sanity via `utils.is_match`. For each new product, `flipkart.py`/`amazon.py` `get_*_details()` scrape the detail page (JSON-LD + tolerant selectors). `sanity_api.py` resolves brand/category references and writes a full product doc with `enabled:false`. `launch_checker.py`'s `check_launches()` orchestrates it, with a `--dry-run` flag.
+**Architecture:** `listing.py` scrapes each brand's listing page (per assigned platform) and diffs against Sanity via `utils.is_match`. For each new product, `flipkart.py`/`amazon.py` `get_*_details()` scrape the detail page (JSON-LD + tolerant selectors). `sanity_api.py` resolves brand/category references and writes a full product doc with `enabled:true` (auto-published). `launch_checker.py`'s `check_launches()` orchestrates it, with a `--dry-run` flag.
 
 **Tech Stack:** Python 3.10, requests, beautifulsoup4, lxml, rapidfuzz, Sanity HTTP API, pytest (added).
 
@@ -619,7 +619,7 @@ Expected: `main -> main`.
 
 ## Self-Review Notes
 
-- **Spec coverage:** Discovery (Task 4/6), draft mode `enabled:false` (Task 3), remote URL images (Task 3/5), full-but-tolerant fields (Task 5) — all covered.
+- **Spec coverage:** Discovery (Task 4/6), auto-publish mode `enabled:true` (Task 3), remote URL images (Task 3/5), full-but-tolerant fields (Task 5) — all covered.
 - **No placeholders:** every task has code; selectors flagged tolerant where Flipkart/Amazon markup varies.
 - **Type consistency:** `get_brand_listings` → list of `{name,url,price,image}`; `get_*_details` → `{price,images,description,specifications,colors,variants}`; `create_full_product(name, brand_name, platform, source_url, details)` — signatures match across Task 3/5/6.
 - **Caveat:** Flipkart/Amazon markup selectors (`_1xgj1`, `_30jeq3`, `_1sMYq3`, `s-result-item`) are best-effort and may need live tuning; the dry-run (Task 7 Step 2) is the verification gate.

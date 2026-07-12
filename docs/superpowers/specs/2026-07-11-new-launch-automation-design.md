@@ -8,7 +8,7 @@
 
 ## 1. Context
 
-The "New Phone Launch Checker" GitHub Actions workflow runs `automation/launch_checker.py --mode launch` on a schedule (~every 6h) but is currently a **no-op stub**: `check_launches()` sets `scraped_phones = []` and iterates nothing. `create_product()` in `sanity_api.py` only writes a minimal doc (title, brand ref, slug, price, URLs, description, `enabled: false`) — no images, specs, category, colors, or variants.
+The "New Phone Launch Checker" GitHub Actions workflow runs `automation/launch_checker.py --mode launch` on a schedule (~every 6h) but is currently a **no-op stub**: `check_launches()` sets `scraped_phones = []` and iterates nothing. `create_product()` in `sanity_api.py` only writes a minimal doc (title, brand ref, slug, price, URLs, description, `enabled: true`) — no images, specs, category, colors, or variants.
 
 The price-sync half (`--mode sync`) was recently fixed to extract prices reliably from JSON-LD. This spec extends the same resilient scraping approach to **new-product discovery and full-detail creation**.
 
@@ -22,7 +22,7 @@ The price-sync half (`--mode sync`) was recently fixed to extract prices reliabl
 ## 2. Decisions (confirmed with user)
 
 1. **Discovery:** Listing diff per brand — scrape each tracked brand's listing page on its assigned platform, diff against Sanity, add products not already present.
-2. **Publish mode:** Draft — new products are created with `enabled: false` and held in Sanity Studio for staff review before going live.
+2. **Publish mode:** Auto-publish — new products are created with `enabled: true` and go live immediately (no manual review step).
 3. **Images:** Remote URLs stored directly in `images[]` (plain URL strings), matching how existing Sanity products work. No uploads, no repo bloat.
 4. **Field depth:** Full but tolerant — attempt price, images, description, specifications, colors, variants; never block the add if a fragile field fails to extract.
 
@@ -65,7 +65,7 @@ The price-sync half (`--mode sync`) was recently fixed to extract prices reliabl
     - `images: list[str]` (remote URLs), `image` (first URL)
     - `description`, `specifications: list[{label, value}]`
     - `colors: list[{name, hex}]`, `variants: list[...]`
-    - `enabled: false`, `lastUpdated: now()`
+    - `enabled: true`, `lastUpdated: now()`
   - **Helpers to add:**
     - `fetch_brand_id(brand_name)` — query Sanity for the brand doc `_id` by name.
     - `fetch_category_id(slug_or_name)` — query Sanity for the "smartphone" category `_id`.
@@ -89,7 +89,7 @@ The price-sync half (`--mode sync`) was recently fixed to extract prices reliabl
 
 ### 3.5 Workflow
 - Existing "New Phone Launch Checker" workflow already calls `launch_checker.py --mode launch` on schedule. It will pick up the rewritten function automatically after push. No `.github/workflows` change needed.
-- (Optional, not in initial scope) Trigger a Vercel redeploy after adds so Studio drafts are reflected — skipped since drafts are `enabled: false` and not shown.
+- (Optional, not in initial scope) Trigger a Vercel redeploy after adds — skipped since pages are force-dynamic, so no redeploy is needed for new products to appear.
 
 ---
 
@@ -102,7 +102,7 @@ Schedule (GitHub Actions, ~6h)
         get_brand_listings(brand, platform)   [listing.py]
         → diff vs Sanity (is_match)
         → for new: get_product_details(url)     [flipkart.py / amazon.py]
-        → create_full_product(...)             [sanity_api.py]  (enabled:false)
+         → create_full_product(...)             [sanity_api.py]  (enabled:true)
     → log additions
 ```
 
@@ -122,14 +122,14 @@ Schedule (GitHub Actions, ~6h)
 
 1. **Unit-ish local check:** run `python automation/launch_checker.py --mode launch --dry-run` for a single brand; confirm it discovers the right products and the would-be Sanity doc shape is complete (price, images, specs, etc.).
 2. **Live compare:** for a known new phone, confirm the scraped price/images match the platform page (same JSON-LD approach validated for price-sync).
-3. **Sanity Studio:** after a real run, confirm new draft products appear with full fields and `enabled: false`.
+3. **Sanity Studio:** after a real run, confirm new products appear live with full fields (`enabled: true`).
 4. **Bot-block reality:** if GitHub Actions IP is blocked, discovery returns empty → run logs "Added 0"; this is acceptable (safe) and can be retried later.
 
 ---
 
 ## 7. Out of Scope
 
-- Auto-publishing (`enabled: true`) — deferred; products stay drafts for review.
+- Auto-publishing (`enabled: true`) — implemented; new products go live immediately.
 - Uploading images to Sanity assets — using remote URLs instead.
 - Manual CSV/seed ingestion — not needed; discovery is automatic.
 - Price updates for newly-added products — handled by the separate `--mode sync` run.
