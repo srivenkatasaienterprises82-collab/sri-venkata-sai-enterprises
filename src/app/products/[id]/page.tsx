@@ -7,13 +7,19 @@ import { siteConfig } from "@/lib/data/siteConfig";
 import fs from "fs";
 import path from "path";
 import type { Metadata } from "next";
-import { sanityFetch } from "@/sanity/lib/live";
+import { sanityFetchNoCache } from "@/sanity/lib/live";
 import { PRODUCT_BY_SLUG_QUERY } from "@/sanity/queries";
 import { toProduct } from "@/sanity/transform";
 import { resolveImage } from "@/sanity/lib/image";
 import { getSiteSettings } from "@/sanity/lib/settings";
 import type { Product } from "@/lib/data/products";
 import type { SanityProduct } from "@/sanity/types";
+
+// The product detail page is price-sensitive. Force a fresh render for
+// every request so updated Sanity documents are reflected immediately
+// after the price-sync GitHub Action runs, with no stale Data Cache.
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 async function getGalleryImages(imageFolder: string, fallbackImage: string): Promise<string[]> {
   if (!imageFolder) return [fallbackImage];
@@ -36,7 +42,7 @@ async function getGalleryImages(imageFolder: string, fallbackImage: string): Pro
 
 async function fetchProduct(param: string): Promise<{ product: Product; isSanity: boolean } | null> {
   try {
-    const { data: sanityProduct } = await sanityFetch({
+    const { data: sanityProduct } = await sanityFetchNoCache({
       query: PRODUCT_BY_SLUG_QUERY,
       params: { slug: param, id: param },
     }) as { data: SanityProduct | null };
@@ -104,7 +110,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     // If it's a Sanity product, it has CDN gallery images in it.
     // Let's refetch Sanity images directly (PRODUCT_BY_SLUG_QUERY returns images in s.images)
     try {
-      const { data: rawSanityProduct } = await sanityFetch({
+      const { data: rawSanityProduct } = await sanityFetchNoCache({
         query: PRODUCT_BY_SLUG_QUERY,
         params: { slug: resolvedParams.id, id: resolvedParams.id },
       }) as { data: SanityProduct | null };

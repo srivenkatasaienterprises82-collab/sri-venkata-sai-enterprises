@@ -11,26 +11,40 @@ HEADERS = {
     "Cache-Control": "no-cache",
 }
 
+# How many times to retry the requests/Playwright pass. Each pass already
+# has its own internal delay+jitter between attempts.
+REQUEST_RETRIES = 3
+PLAYWRIGHT_RETRIES = 2
+
 
 def get_flipkart_price(url: str) -> int | None:
     if not url:
         return None
 
-    # Try requests + BeautifulSoup first (faster, lighter)
-    price = _try_requests(url)
-    if price is not None:
-        return price
+    for attempt in range(1, REQUEST_RETRIES + 1):
+        price = _try_requests(url, attempt)
+        if price is not None:
+            return price
+        # Small exponential-ish backoff before re-trying requests, then later
+        # falling to Playwright. cap sleeps so we don't blow the 6h budget.
+        if attempt < REQUEST_RETRIES:
+            time.sleep(min(2 ** attempt, 8))
 
-    # Fall back to Playwright
-    price = _try_playwright(url)
-    return price
+    for attempt in range(1, PLAYWRIGHT_RETRIES + 1):
+        price = _try_playwright(url, attempt)
+        if price is not None:
+            return price
+        if attempt < PLAYWRIGHT_RETRIES:
+            time.sleep(2)
+    return None
 
 
-def _try_requests(url: str) -> int | None:
+def _try_requests(url: str, attempt: int = 1) -> int | None:
     try:
         time.sleep(random.uniform(1, 2))
         resp = requests.get(url, headers=HEADERS, timeout=30)
         if resp.status_code != 200:
+            print(f"  Flipkart requests: HTTP {resp.status_code} (attempt {attempt})")
             return None
 
         html = resp.text
@@ -51,7 +65,7 @@ def _try_requests(url: str) -> int | None:
         return None
 
     except requests.RequestException as e:
-        print(f"  Flipkart requests error: {e}")
+        print(f"  Flipkart requests error (attempt {attempt}): {e}")
         return None
 
 
@@ -120,7 +134,7 @@ def _extract_card_price(soup: BeautifulSoup) -> int | None:
     return None
 
 
-def _try_playwright(url: str) -> int | None:
+def _try_playwright(url: str, attempt: int = 1) -> int | None:
     try:
         from playwright.sync_api import sync_playwright, TimeoutError as PwTimeout
 
@@ -174,7 +188,7 @@ def _try_playwright(url: str) -> int | None:
                 return None
 
             except Exception as e:
-                print(f"  Flipkart Playwright error: {e}")
+                print(f"  Flipkart Playwright error (attempt {attempt}): {e}")
                 return None
             finally:
                 browser.close()

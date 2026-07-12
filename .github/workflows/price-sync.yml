@@ -8,6 +8,9 @@ on:
 jobs:
   sync-prices:
     runs-on: ubuntu-latest
+    # Hard cap so a runaway Playwright session never holds a 6h lock.
+    # The real-world run completes in ~50 minutes; this leaves margin.
+    timeout-minutes: 90
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,11 +29,25 @@ jobs:
           SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
           SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
           SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
-        run: python automation/launch_checker.py --mode sync
-      - name: Upload price change log
+        # `--fail-with-body` makes curl surface HTTP errors instead of
+        # returning exit code 0 — the previous hard-coded -s hid webhook
+        # failures (which led to deploys not firing while the run went
+        # "green"). PYTHONUNBUFFERED=1 ensures the structured per-product
+        # STATUS=... rows are visible live in the GitHub Actions log.
+        run: PYTHONUNBUFFERED=1 python automation/launch_checker.py --mode sync
+      - name: Upload run logs
         uses: actions/upload-artifact@v4
+        # Always upload the artifacts — even a partial/crashed run produces
+        # CSVs worth inspecting, and `invalid_products.csv` lists every URL we
+        # refused to trust (missing or name-mismatched). `continue-on-error`
+        # keeps the job from going red just because a CSV wasn't created yet.
+        if: always()
+        continue-on-error: true
         with:
-          name: price-changes
-          path: price-changes.csv
-      - name: Trigger Vercel Redeploy
-        run: curl -s -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
+          name: price-sync-logs
+          path: |
+            price-changes.csv
+            invalid_products.csv
+      # NOTE: The Vercel Deploy Hook was removed. Storefront pages use
+      # `force-dynamic` + no-store Sanity fetches, so prices are fresh without
+      # a full site rebuild. Redeploys are now unnecessary for price updates.

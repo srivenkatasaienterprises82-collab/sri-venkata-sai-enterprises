@@ -60,3 +60,45 @@ def test_create_full_product_skips_without_brand():
         res = sa.create_full_product("X", "UnknownBrand", "flipkart", "u", {})
         assert res is None
         c.assert_not_called()
+
+
+def test_update_price_only_sets_provided_marketplace():
+    # A single-source (Flipkart) scrape must NOT send amazonPrice: null,
+    # which would wipe the Amazon price we already store.
+    captured = {}
+
+    class _Resp:
+        status_code = 200
+        text = '{"results":[{"id":"p1"}]}'
+
+        def json(self):
+            return {"results": [{"id": "p1"}]}
+
+    def _post(url, headers=None, json=None):
+        captured["json"] = json
+        return _Resp()
+
+    with patch.object(sa.requests, "post", _post):
+        sa.update_price("p1", None, 19999, 19999)
+    set_fields = captured["json"]["mutations"][0]["patch"]["set"]
+    assert "flipkartPrice" in set_fields
+    assert set_fields["flipkartPrice"] == 19999
+    assert "amazonPrice" not in set_fields  # crucial: don't wipe it
+    assert set_fields["price"] == 19999
+
+
+def test_update_price_raises_on_error():
+    class _Resp:
+        status_code = 500
+        text = '{"error":"boom"}'
+
+        def json(self):
+            return {"error": "boom"}
+
+    with patch.object(sa.requests, "post", lambda *a, **k: _Resp()):
+        try:
+            sa.update_price("p1", 100, 200, 150)
+            assert False, "expected RuntimeError"
+        except RuntimeError:
+            pass
+

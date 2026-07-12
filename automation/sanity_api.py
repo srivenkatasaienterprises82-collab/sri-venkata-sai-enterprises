@@ -14,11 +14,26 @@ HEADERS = {
 
 
 def fetch_all_products():
-    query = '*[_type == "product"]{_id, name, slug, brand->{name}, amazonUrl, flipkartUrl, price, amazonPrice, flipkartPrice, priceLocked}'
+    # Include `brandSlug` and `enabled` so the price-sync orchestrator can
+    # route by brand slug (case-insensitive) and skip draft (`enabled:false`)
+    # products. Without this we routed by display name — that missed "POCO"
+    # (listed as "Poco" in the constant) entirely.
+    query = (
+        '*[_type == "product"]{'
+        '_id, name, slug, brand->{name, "slug": slug.current}, '
+        'amazonUrl, flipkartUrl, price, amazonPrice, flipkartPrice, '
+        'priceLocked, enabled, lastUpdated'
+        '}'
+    )
     url = f"{BASE_URL}/data/query/{DATASET}?query={requests.utils.quote(query)}"
     res = requests.get(url, headers=HEADERS)
     if res.status_code == 200:
-        return res.json().get("result", [])
+        rows = res.json().get("result", [])
+        # Normalize: presenter mostly needs `brand.name` and `brandSlug`.
+        for r in rows:
+            brand = r.get("brand") or {}
+            r["brandSlug"] = brand.get("slug")
+        return rows
     print("Error fetching products:", res.text)
     return []
 
@@ -133,21 +148,38 @@ def create_product(product_data: dict) -> dict:
 
 
 def update_price(product_id: str, amazon_price, flipkart_price, display_price) -> dict:
-    url = f"{BASE_URL}/data/mutate/{DATASET}"
-    mutations = {
-        "mutations": [
-            {
-                "patch": {
-                    "id": product_id,
-                    "set": {
-                        "amazonPrice": amazon_price,
-                        "flipkartPrice": flipkart_price,
-                        "price": display_price,
-                        "lastUpdated": datetime.now().isoformat(),
-                    },
-                }
-            }
-        ]
+    """Patch a product's prices in Sanity.
+
+    Only fields that carry a new, valid value are included in the mutation.
+    A single-source scrape (e.g. Flipkart only) must NOT send
+    `amazonPrice: null` — that would wipe the Amazon price we already store.
+    The unified `price` field is always set to the freshly scraped value.
+
+    Raises RuntimeError on a non-2xx Sanity response so the orchestrator can
+    count the failure and (in __main__) exit non-zero instead of reporting a
+    false green.
+    """
+    set_fields = {
+        "price": display_price,
+        "lastUpdated": datetime.now().isoformat(),
     }
+    if amazon_price is not None:
+        set_fields["amazonPrice"] = amazon_price
+    if flipkart_price is not None:
+        set_fields["flipkartPrice"] = flipkart_price
+
+    url = f"{BASE_URL}/data/mutate/{DATASET}"
+    mutations = {"mutations": [{"patch": {"id": product_id, "set": set_fields}}]}
     res = requests.post(url, headers=HEADERS, json=mutations)
-    return res.json()
+    if res.status_code not in (200, 201):
+        # Surface the failure loudly instead of swallowing it — the previous
+        # code returned res.json() even on a 4xx, hiding the error from the
+        # orchestrator's "matched/updated" counters.
+        raise RuntimeError(
+            f"Sanity price update failed for {product_id}: "
+            f"HTTP {res.status_code} {res.text[:200]}"
+        )
+    body = res.json() if res.text else {}
+    if not body.get("results"):
+        print(f"  WARNING: Sanity returned no mutation results for {product_id}: {body}")
+    return body

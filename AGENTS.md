@@ -1441,8 +1441,8 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - Uses Sanity HTTP API (not @sanity/client) for seed script
 - Pages fetch Sanity first; if Sanity returns empty/null, fall back to static data from `src/lib/data/`
 - Images stored as plain URL strings (not Sanity image assets)
-- Vercel redeploy triggered via Deploy Hook after price sync / launch check workflows
-- Brand-to-scraper mapping: Flipkart → Motorola/Oppo/Vivo/Realme/Poco/Nothing; Amazon → iQOO/Redmi; Both → Apple/Samsung/OnePlus
+- Storefront pages use `force-dynamic` + no-store Sanity fetches, so prices are always fresh WITHOUT a Vercel redeploy. The Vercel Deploy Hook was REMOVED from `price-sync.yml`/`launch-check.yml` (it was redundant once pages went force-dynamic).
+- Brand-to-scraper mapping: Flipkart → Motorola/Oppo/Vivo/Realme/Poco/Nothing/Narzo; Amazon → iQOO/Redmi; Both (scrape both, take lower) → Apple/Samsung/OnePlus
 
 ## Progress
 ### Done (July 5 cont.)
@@ -1517,4 +1517,4 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - `automation/sanity_api.py`: `update_price()` function that writes to Sanity
 - `src/sanity/lib/live.ts`: `safeSanityFetch` wrapper around `defineLive().sanityFetch()`
 - `.env.local`: Contains `SANITY_TOKEN` (Editor) and `SANITY_API_READ_TOKEN` (Viewer)
-- `.github/workflows/price-sync.yml`: Runs every 6 hours, uploads `price-changes.csv` artifact, triggers Vercel redeploy
+- `.github/workflows/price-sync.yml`: Runs every 6 hours, uploads `price-changes.csv` + `invalid_products.csv` artifacts (`if: always()`), NO Vercel deploy hook. `launch_checker.py --mode sync` exits non-zero if any mutation fails or any URL is invalid, so a broken run is never reported green.

@@ -1,4 +1,4 @@
-import { sanityFetch } from "@/sanity/lib/live";
+import { sanityFetchNoCache } from "@/sanity/lib/live";
 import { SITE_SETTINGS_QUERY } from "@/sanity/queries";
 import { siteConfig } from "@/lib/data/siteConfig";
 import type { SanitySiteSettings } from "@/sanity/types";
@@ -6,7 +6,7 @@ import { resolveImage } from "./image";
 
 export async function getSiteSettings(): Promise<SanitySiteSettings> {
   try {
-    const { data: settings } = await sanityFetch({ query: SITE_SETTINGS_QUERY }) as { data: SanitySiteSettings | null };
+    const { data: settings } = await sanityFetchNoCache({ query: SITE_SETTINGS_QUERY }) as { data: SanitySiteSettings | null };
     if (!settings || !settings.companyName) {
       throw new Error("No settings in Sanity");
     }

@@ -8,6 +8,9 @@ on:
 jobs:
   check-launches:
     runs-on: ubuntu-latest
+    # The launch scan walks every tracked brand's search page (~11 brands);
+    # even with retries it should complete well under 30 minutes.
+    timeout-minutes: 45
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,6 +30,23 @@ jobs:
           SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
           SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: python automation/launch_checker.py --mode launch
-      - name: Trigger Vercel Redeploy
-        run: curl -s -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
+        # PYTHONUNBUFFERED=1 so the live log shows the per-brand scan lines
+        # in real time. The launch_checker writes structured STATUS=...
+        # rows so anyone triaging can see exactly which brand listings were
+        # fetched, which new launches were matched, and which were skipped.
+        # We tee stdout to a file so the next step can grep for a non-zero
+        # added count and decide whether to redeploy.
+        run: |
+          PYTHONUNBUFFERED=1 python automation/launch_checker.py --mode launch 2>&1 | tee launch-check.log
+      - name: Upload launch-check log
+        uses: actions/upload-artifact@v4
+        # Always keep the scan log for triage, even if the scan errors out.
+        if: always()
+        continue-on-error: true
+        with:
+          name: launch-check-log
+          path: launch-check.log
+      # NOTE: The Vercel Deploy Hook was removed. New draft products are
+      # created with `enabled: false`; once an operator publishes one, the
+      # `force-dynamic` storefront generates its detail page on demand — no
+      # full rebuild required.
