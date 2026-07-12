@@ -52,18 +52,54 @@ def _try_requests(url: str, attempt: int = 1) -> int | None:
         if price:
             return price
 
-        # Strategy 2: Standard Amazon price selectors
-        price = _extract_card_price(soup)
-        if price:
-            return price
+        # Strategy 2: Standard Amazon price selectors — BUT only on a genuine
+        # product page. Amazon frequently serves a "Robot Check" / CAPTCHA
+        # interstitial (a tiny page, no #productTitle) to datacenter IPs such
+        # as GitHub Actions runners. That page still contains a stray
+        # `.a-price` widget, so blindly reading it returns a bogus price
+        # (e.g. ₹279 for a ₹37,999 phone). Refuse to trust card selectors
+        # unless the product title element is present.
+        if _is_amazon_product_page(soup):
+            price = _extract_card_price(soup)
+            if price:
+                return price
 
         # No reliable price found — DO NOT fall back to the first "₹" in the
-        # HTML, as that often captures a variant, accessory, or sponsored price.
+        # HTML, as that often captures a variant, accessory, sponsored, or
+        # bot-check page price.
         return None
 
     except requests.RequestException as e:
         print(f"  Amazon requests error (attempt {attempt}): {e}")
         return None
+
+
+def _is_amazon_product_page(soup: BeautifulSoup) -> bool:
+    """Return True only if `soup` looks like a real Amazon product page.
+
+    The strongest single signal is the product title element (#productTitle),
+    which is absent on "Robot Check" / CAPTCHA / redirect interstitials that
+    Amazon serves to bot-like traffic. Without this guard the card-price
+    extractor happily returns a stray sponsored/sidebar price.
+    """
+    if soup.find("span", id="productTitle") or soup.find(id="productTitle"):
+        return True
+    # Fallback: a product JSON-LD block already establishes a real page, but
+    # if we reach here it didn't yield a price — still accept a page that
+    # carries the offers microdata as product-shaped.
+    for script in soup.find_all("script", type="application/ld+json"):
+        try:
+            data = json.loads(script.string)
+        except (json.JSONDecodeError, AttributeError):
+            continue
+        items = data if isinstance(data, list) else [data]
+        if any(
+            isinstance(it, dict)
+            and (it.get("@type") in ("Product", "AggregateOffer") or "offers" in it)
+            for it in items
+        ):
+            return True
+    return False
 
 
 def _extract_jsonld_price(soup: BeautifulSoup) -> int | None:
@@ -106,22 +142,41 @@ def _get_offers_price(data: dict) -> int | None:
     return None
 
 
+# Containers that hold the MAIN buy-box price. We only ever read a price from
+# inside one of these. Matching ".a-price-whole" / ".a-offscreen" globally is
+# unsafe: those classes also decorate every "Sponsored" / "Similar products"
+# carousel widget on the page, so the first match is frequently a DIFFERENT
+# product's price (e.g. ₹279 for a ₹37,999 phone). Scoping to the buy box is
+# what keeps the storefront from displaying a wrong number.
+BUYBOX_SCOPES = [
+    "#corePrice_desktop",
+    "#desktop_unifiedPrice",
+    "#unifiedPrice_feature_div",
+    "#corePriceDisplay_feature_div",
+    "#corePriceDisplay_desktop_feature_div",
+    "#buybox",
+    "#desktop_buybox",
+]
+
+
 def _extract_card_price(soup: BeautifulSoup) -> int | None:
-    SELECTORS = [
-        "span.a-price-whole",
-        "span.a-price span.a-price-whole",
-        ".a-price .a-offscreen",
-        "#priceblock_ourprice",
-        "#priceblock_dealprice",
-        "span[class*='a-price'] span.a-price-whole",
-    ]
-    for sel in SELECTORS:
-        el = soup.select_one(sel)
-        if el:
-            text = el.get_text(strip=True)
-            digits = re.sub(r"[^\d]", "", text)
-            if digits:
-                return int(digits)
+    for scope in BUYBOX_SCOPES:
+        box = soup.select_one(scope)
+        if not box:
+            continue
+        for sel in (
+            "span.a-price-whole",
+            "span.a-offscreen",
+            ".a-price .a-offscreen",
+            "#priceblock_ourprice",
+            "#priceblock_dealprice",
+        ):
+            el = box.select_one(sel)
+            if el:
+                text = el.get_text(strip=True)
+                digits = re.sub(r"[^\d]", "", text)
+                if digits:
+                    return int(digits)
     return None
 
 
@@ -151,31 +206,33 @@ def _try_playwright(url: str, attempt: int = 1) -> int | None:
                     pass
 
                 # Prefer JSON-LD from the fully-rendered page
-                price = _extract_jsonld_price(
-                    BeautifulSoup(page.content(), "lxml")
-                )
+                pw_soup = BeautifulSoup(page.content(), "lxml")
+                price = _extract_jsonld_price(pw_soup)
                 if price:
                     return price
 
-                SELECTORS = [
-                    "span.a-price-whole",
-                    "span.a-price",
-                    "span[class*='a-price'] span.a-price-whole",
-                    "#priceblock_ourprice",
-                    "#priceblock_dealprice",
-                    ".a-price .a-offscreen",
-                ]
+                # Only trust card selectors on a genuine product page (see
+                # _is_amazon_product_page — bot-check interstitials would
+                # otherwise yield a bogus price).
+                if not _is_amazon_product_page(pw_soup):
+                    return None
 
-                for sel in SELECTORS:
-                    try:
-                        price_el = page.wait_for_selector(sel, timeout=8000)
-                        if price_el:
-                            text = price_el.inner_text()
-                            digits = re.sub(r"[^\d]", "", text)
-                            if digits:
-                                return int(digits)
-                    except PwTimeout:
-                        continue
+                # Give the buy-box price time to render, then read it ONLY from
+                # the scoped buy-box region (never a global ".a-price-whole",
+                # which matches sponsored/related carousels).
+                try:
+                    page.wait_for_selector(
+                        "#corePrice_desktop .a-price-whole, "
+                        "#desktop_unifiedPrice .a-price-whole, "
+                        "#unifiedPrice_feature_div .a-price-whole",
+                        timeout=15000,
+                    )
+                except PwTimeout:
+                    pass
+                pw_soup = BeautifulSoup(page.content(), "lxml")
+                price = _extract_card_price(pw_soup)
+                if price:
+                    return price
 
                 return None
 
@@ -191,17 +248,104 @@ def _try_playwright(url: str, attempt: int = 1) -> int | None:
 
 
 def get_amazon_details(url: str) -> dict:
+    """Fetch full product details (price, images, specs, colors, variants)
+    with the same retry+Playwright fallback as `get_amazon_price`.
+    """
     if not url:
         return {}
+
+    for attempt in range(1, REQUEST_RETRIES + 1):
+        details = _try_requests_details(url, attempt)
+        if details:
+            return details
+        if attempt < REQUEST_RETRIES:
+            time.sleep(min(2 ** attempt, 8))
+
+    for attempt in range(1, PLAYWRIGHT_RETRIES + 1):
+        details = _try_playwright_details(url, attempt)
+        if details:
+            return details
+        if attempt < PLAYWRIGHT_RETRIES:
+            time.sleep(2)
+    return {}
+
+
+def _try_requests_details(url: str, attempt: int = 1) -> dict | None:
+    """Single-request attempt to scrape full Amazon product details.
+
+    Returns a parsed details dict on a 200 response from a genuine
+    product page, or None on network errors, non-200 responses, or
+    bot-check/CAPTCHA interstitials so the caller retries or falls
+    through to Playwright.
+    """
     try:
         time.sleep(random.uniform(1.5, 3))
         resp = requests.get(url, headers=HEADERS, timeout=30)
         if resp.status_code != 200:
-            return {}
-        return _parse_amazon_details(resp.text)
+            print(f"  Amazon details requests: HTTP {resp.status_code} (attempt {attempt})")
+            return None
+
+        soup = BeautifulSoup(resp.text, "lxml")
+
+        # Reject bot-check / CAPTCHA interstitials that return HTTP 200
+        # but aren't real product pages. Without this guard the parser
+        # returns a truthy dict with empty fields and the retry loop
+        # bails out early — defeating the whole purpose of retries.
+        if not _is_amazon_product_page(soup):
+            print(f"  Amazon details: not a product page (attempt {attempt})")
+            return None
+
+        details = _parse_amazon_details(resp.text)
+        return details
     except requests.RequestException as e:
-        print(f"  Amazon detail error: {e}")
-        return {}
+        print(f"  Amazon details requests error (attempt {attempt}): {e}")
+        return None
+
+
+def _try_playwright_details(url: str, attempt: int = 1) -> dict | None:
+    """Playwright-based fallback to scrape full Amazon product details.
+
+    Renders the page in a headless Chromium, then parses the final HTML
+    so that JS-rendered content (common with Amazon's dynamic pages) is
+    captured.
+    """
+    try:
+        from playwright.sync_api import sync_playwright, TimeoutError as PwTimeout
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(
+                user_agent=HEADERS["User-Agent"],
+                viewport={"width": 1366, "height": 768},
+                locale="en-IN",
+            )
+            context.add_init_script(
+                "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+            )
+            page = context.new_page()
+            page.set_default_timeout(60000)
+
+            try:
+                page.goto(url, wait_until="commit", timeout=60000)
+                time.sleep(random.uniform(2, 3))
+                try:
+                    page.wait_for_load_state("networkidle", timeout=20000)
+                except PwTimeout:
+                    pass
+
+                pw_html = page.content()
+                details = _parse_amazon_details(pw_html)
+                return details
+
+            except Exception as e:
+                print(f"  Amazon details Playwright error (attempt {attempt}): {e}")
+                return None
+            finally:
+                browser.close()
+
+    except ImportError:
+        print("  Playwright not available, skipping details fallback")
+        return None
 
 
 def _parse_amazon_details(html: str) -> dict:

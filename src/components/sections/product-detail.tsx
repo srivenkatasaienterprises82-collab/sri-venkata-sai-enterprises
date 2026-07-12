@@ -16,9 +16,13 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const scrollRef = useRef<HTMLDivElement>(null);
   
   const enquiryOnly = isPriceOnEnquiry(product);
+  // Keep hasProductPrice for the JSON-LD structured data (schemaOffers).
+  // Some products have a single price (accessories/earbuds), others have per-variant pricing.
   const hasProductPrice = typeof product.price === "number" && Number.isFinite(product.price);
-  const displayPrice = hasProductPrice ? product.price : activeVariant?.price;
-  const displayOriginalPrice = hasProductPrice ? product.originalPrice : activeVariant?.originalPrice;
+  // Always prefer the selected variant's price over the product-level price.
+  // This ensures the price updates when the user clicks a different variant button.
+  const displayPrice = activeVariant?.price ?? product.price;
+  const displayOriginalPrice = activeVariant?.originalPrice ?? product.originalPrice;
 
   const images = galleryImages ?? [product.image];
 

@@ -41,7 +41,10 @@ next-dev-*.log
 # vercel
 .vercel
 
-# typescript
+# generated reports
+invalid_products.csv
+site_price_mismatch.csv
+price-changes.csv
 *.tsbuildinfo
 next-env.d.ts
 

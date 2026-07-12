@@ -81,10 +81,10 @@ def test_sync_skips_locked_product(monkeypatch, capsys):
     monkeypatch.setattr(LC, "fetch_all_products", lambda: locked)
     monkeypatch.setattr(LC, "log_change", lambda *a, **k: None)
     updated = []
-    monkeypatch.setattr(LC, "update_price",
+    monkeypatch.setattr(LC, "update_price_and_variants",
                         lambda *a, **k: updated.append(a) or {"results": [{"id": "p1"}]})
-    monkeypatch.setattr(LC, "get_amazon_price", lambda u: 22999)
-    monkeypatch.setattr(LC, "get_flipkart_price", lambda u: 22999)
+    monkeypatch.setattr(LC, "get_amazon_details", lambda u: {"price": 22999, "variants": []})
+    monkeypatch.setattr(LC, "get_flipkart_details", lambda u: {"price": 22999, "variants": []})
     # url_name_matches is called before scraping, so stub it as True for the
     # test product URL (the test URL is a fake ASIN path so the heuristic
     # can't infer a slug; let it through).
@@ -113,22 +113,25 @@ def test_get_assigned_source_routes_narzo():
 
 
 def test_get_assigned_source_returns_none_for_unsupported():
+    # HMD/Infinix are now tracked (routed to "both"); use a genuinely
+    # unsupported brand as the example instead.
     unsupported = {
-        "brand": {"name": "HMD"},
-        "brandSlug": "hmd",
+        "brand": {"name": "Nokia"},
+        "brandSlug": "nokia",
     }
     assert LC.get_assigned_source(unsupported) is None
 
 
 def test_get_assigned_source_routes_both_brands_to_both():
-    # Apple/Samsung/OnePlus are sold on both platforms — the documented
-    # behaviour is to scrape both and take the lower price. A regression
-    # once routed them to flipkart-only, hiding Amazon-only deals.
-    for slug, name in [
-        ("apple", "Apple"), ("samsung", "Samsung"), ("oneplus", "OnePlus"),
-    ]:
+    # OnePlus is sold on both platforms — the documented behaviour is to
+    # scrape both and take the lower price.
+    # Apple/Samsung are now routed to Flipkart-only (moved from "both" to
+    # "flipkart" brand slugs) to avoid cross-platform conflicts.
+    product = {"brand": {"name": "OnePlus"}, "brandSlug": "oneplus"}
+    assert LC.get_assigned_source(product) == "both", "oneplus"
+    for slug, name in [("apple", "Apple"), ("samsung", "Samsung")]:
         product = {"brand": {"name": name}, "brandSlug": slug}
-        assert LC.get_assigned_source(product) == "both", slug
+        assert LC.get_assigned_source(product) == "flipkart", slug
 
 
 def test_check_launches_scans_both_platforms_for_both_brand(monkeypatch, capsys):
@@ -180,10 +183,8 @@ def test_sync_skips_url_name_mismatch(monkeypatch, capsys):
     }]
     monkeypatch.setattr(LC, "fetch_all_products", lambda: products)
     updated = []
-    monkeypatch.setattr(LC, "update_price",
+    monkeypatch.setattr(LC, "update_price_and_variants",
                         lambda *a, **k: updated.append(a) or {"results": [{"id": "p1"}]})
-    monkeypatch.setattr(LC, "get_amazon_price",
-                        lambda u: 12999)  # price of the wrong product (A7 Pro)
     # Do NOT monkeypatch url_name_matches — we want the real heuristic.
     LC.sync_prices()
     assert updated == []
@@ -210,15 +211,16 @@ def test_sync_skips_implausible_delta(monkeypatch, capsys):
         "price": 17999,
         "priceLocked": False,
         "enabled": None,
+        "variants": [{"ram": "4GB", "storage": "64GB", "price": 17999}],
     }]
     monkeypatch.setattr(LC, "fetch_all_products", lambda: products)
     updated = []
-    monkeypatch.setattr(LC, "update_price",
+    monkeypatch.setattr(LC, "update_price_and_variants",
                         lambda *a, **k: updated.append(a) or {"results": [{"id": "p1"}]})
     # We stub url_name_matches=True to bypass the URL guard (the absolute
     # `price_out_of_band` guard would still trigger on 173 ≤ ₹1000).
     monkeypatch.setattr(LC, "url_name_matches", lambda n, u: True)
-    monkeypatch.setattr(LC, "get_flipkart_price", lambda u: 173)
+    monkeypatch.setattr(LC, "get_flipkart_details", lambda u: {"price": 173, "variants": []})
     LC.sync_prices()
     assert updated == []
     out = capsys.readouterr().out
@@ -238,15 +240,16 @@ def test_sync_rejects_implausible_relative_delta(monkeypatch, capsys):
         "price": 28999,
         "priceLocked": False,
         "enabled": None,
+        "variants": [{"ram": "8GB", "storage": "128GB", "price": 28999}],
     }]
     monkeypatch.setattr(LC, "fetch_all_products", lambda: products)
     updated = []
-    monkeypatch.setattr(LC, "update_price",
+    monkeypatch.setattr(LC, "update_price_and_variants",
                         lambda *a, **k: updated.append(a) or {"results": [{"id": "p1"}]})
     monkeypatch.setattr(LC, "url_name_matches", lambda n, u: True)
     # ₹8999 is well inside the band, but only 0.31x of ₹28999 → rejected
     # by the relative-delta guard.
-    monkeypatch.setattr(LC, "get_flipkart_price", lambda u: 8999)
+    monkeypatch.setattr(LC, "get_flipkart_details", lambda u: {"price": 8999, "variants": []})
     LC.sync_prices()
     assert updated == []
     out = capsys.readouterr().out
@@ -269,7 +272,7 @@ def test_sync_skips_draft(monkeypatch, capsys):
     }]
     monkeypatch.setattr(LC, "fetch_all_products", lambda: products)
     updated = []
-    monkeypatch.setattr(LC, "update_price",
+    monkeypatch.setattr(LC, "update_price_and_variants",
                         lambda *a, **k: updated.append(a) or {"results": [{"id": "p1"}]})
     LC.sync_prices()
     assert updated == []
@@ -287,24 +290,26 @@ def test_sync_counts_mutation_failure_without_crashing(monkeypatch, capsys):
             "brandSlug": "motorola",
             "flipkartUrl": "https://www.flipkart.com/good-phone/p/itm_ok",
             "price": 24999, "priceLocked": False, "enabled": None,
+            "variants": [{"ram": "8GB", "storage": "128GB", "price": 24999}],
         },
         {
             "_id": "p_bad", "name": "Doomed Phone", "brand": {"name": "Vivo"},
             "brandSlug": "vivo",
             "flipkartUrl": "https://www.flipkart.com/doomed-phone/p/itm_bad",
             "price": 18999, "priceLocked": False, "enabled": None,
+            "variants": [{"ram": "8GB", "storage": "256GB", "price": 18999}],
         },
     ]
     monkeypatch.setattr(LC, "fetch_all_products", lambda: products)
     monkeypatch.setattr(LC, "url_name_matches", lambda n, u: True)
-    monkeypatch.setattr(LC, "get_flipkart_price", lambda u: 19999)
+    monkeypatch.setattr(LC, "get_flipkart_details", lambda u: {"price": 19999, "variants": []})
 
     def _update(pid, *a, **k):
         if pid == "p_bad":
             raise RuntimeError("HTTP 500 boom")
         return {"results": [{"id": pid}]}
 
-    monkeypatch.setattr(LC, "update_price", _update)
+    monkeypatch.setattr(LC, "update_price_and_variants", _update)
     summary = LC.sync_prices()
     assert summary["failed_mutations"] == 1
     assert summary["updated"] == 1

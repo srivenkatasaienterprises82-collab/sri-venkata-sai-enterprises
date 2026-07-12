@@ -43,7 +43,7 @@ def test_create_full_product_builds_draft_doc():
                                "https://flipkart.com/p/moto-g", details)
         doc = c.call_args[0][0]
         assert doc["_type"] == "product"
-        assert doc["enabled"] is False
+        assert doc["enabled"] is True
         assert doc["type"] == "smartphone"
         assert doc["stock"] == "in-stock"
         assert doc["brand"] == {"_ref": "brand-moto", "_type": "reference"}

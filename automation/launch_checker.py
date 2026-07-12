@@ -35,7 +35,7 @@ import sys
 import time
 from datetime import datetime
 
-from sanity_api import fetch_all_products, update_price, create_full_product
+from sanity_api import fetch_all_products, update_price, update_price_and_variants, create_full_product
 from amazon import get_amazon_price, get_amazon_details
 from flipkart import get_flipkart_price, get_flipkart_details
 from listing import get_brand_listings
@@ -55,11 +55,21 @@ FLIPKART_BRAND_SLUGS = [
     "motorola", "oppo", "vivo", "realme", "poco", "nothing",
     # Narzo is a Realme sub-brand carried as its own brand in Sanity.
     "narzo",
+    # Apple/Samsung are routed to Flipkart-only to avoid cross-platform
+    # conflicts and bot-check issues on Amazon.
+    "apple", "samsung",
 ]
-AMAZON_BRAND_SLUGS = ["iqoo", "redmi"]
-# Apple/Samsung/OnePlus are sold on both platforms — scrape both and take the
-# lower price so the storefront always shows the best available deal.
-BOTH_BRAND_SLUGS = ["apple", "samsung", "oneplus"]
+# Amazon aggressively serves bot-check / price-less pages to automated browsers
+# (CI datacenter IPs), so an Amazon-only route almost never yields a price.
+# iQOO/Redmi DO have Flipkart listings, so they're routed to "both" — Flipkart
+# supplies the price when Amazon is blocked, and the lower of the two is used
+# when both succeed.
+AMAZON_BRAND_SLUGS = []
+# OnePlus/Pixel/iQOO/Redmi are sold on both platforms — scrape both and take
+# the lower price so the storefront always shows the best deal.
+BOTH_BRAND_SLUGS = [
+    "oneplus", "pixel", "google", "iqoo", "redmi", "hmd", "infinix",
+]
 
 # ── Public surface ──────────────────────────────────────────────────────────
 # `launch_checker.py` is also imported by `tests/test_launch_checker.py`. The
@@ -69,9 +79,10 @@ BOTH_BRAND_SLUGS = ["apple", "samsung", "oneplus"]
 # the slug maps. The NAME constants stay for backward compatibility only.
 FLIPKART_BRANDS = [
     "Motorola", "Oppo", "Vivo", "Realme", "Poco", "Nothing",
+    "Apple", "Samsung",
 ]
-AMAZON_BRANDS = ["iQOO", "Redmi"]
-BOTH_BRANDS = ["Apple", "Samsung", "OnePlus"]
+AMAZON_BRANDS = []
+BOTH_BRANDS = ["OnePlus", "Google", "iQOO", "Redmi"]
 
 # All supported brand slugs (used by the launch scanner to walk per-brand
 # listings).
@@ -218,21 +229,53 @@ def sync_prices():
         flipkart_url = product.get("flipkartUrl")
         amazon_url = product.get("amazonUrl")
         old_price = product.get("price")
+        existing_variants = product.get("variants") or []
         checked += 1
 
-        # Enforce URL↔name sanity before scraping. A bad URL silently returns
-        # the price of a *different* product. The C83 screen-protector case
-        # is what motivated this guard.
+        # ── URL Resolution with Auto-Search ────────────────────────────────
+        # Determine the primary URL for this source, auto-searching if missing.
         url_for_check = flipkart_url if source != "amazon" else amazon_url
         if source == "both":
             url_for_check = flipkart_url or amazon_url
+
+        if not url_for_check:
+            # Auto-search: try to find the URL dynamically from brand listings
+            brand_slug = (product.get("brandSlug") or brand).lower()
+            search_source = source if source != "both" else "flipkart"
+            try:
+                listings = get_brand_listings(brand_slug, search_source)
+                for name, url in listings:
+                    if is_match(product.get("name", ""), name):
+                        url_for_check = url
+                        # Patch the found URL into Sanity so we don't search
+                        # again on the next run.
+                        try:
+                            from sanity_api import update_url as _patch_url
+                            _patch_url(product["_id"], url_for_check)
+                        except RuntimeError:
+                            pass  # Non-critical; log and continue
+                        if search_source == "flipkart":
+                            flipkart_url = url_for_check
+                        else:
+                            amazon_url = url_for_check
+                        print(f"  -> Auto-found URL: {url_for_check}")
+                        break
+            except Exception as e:
+                print(f"  Auto-search failed for {product.get('name')}: {e}")
+
         if not url_for_check:
             skipped_no_url += 1
-            invalid_urls += 1
+            # Missing a marketplace URL is expected for most products (only a
+            # subset is tracked) — it is NOT a failure that should turn the run
+            # red. Log it for triage but don't count it as an invalid URL.
             _log_invalid(product, "no_url", url_for_check or "")
             _emit_row(product, "SKIP", source=source, old_price=old_price,
                       reason="no_url")
             continue
+
+        # Enforce URL↔name sanity before scraping. A bad URL silently returns
+        # the price of a *different* product. The C83 screen-protector case
+        # is what motivated this guard.
         if not url_name_matches(product.get("name", ""), url_for_check):
             skipped_url_mismatch += 1
             invalid_urls += 1
@@ -244,27 +287,35 @@ def sync_prices():
         amz_price = None
         flip_price = None
         display_price = None
+        scraped_variants = []
 
         scrape_start = time.time()
         retries_used = 0
 
         if source == "flipkart":
-            if not flipkart_url:
+            if not flipkart_url and not url_for_check:
                 skipped_no_url += 1
                 _emit_row(product, "SKIP", source=source, old_price=old_price,
                           reason="no_flipkartUrl")
                 continue
-            flip_price = get_flipkart_price(flipkart_url)
+            details = get_flipkart_details(flipkart_url or url_for_check)
+            flip_price = details.get("price")
+            scraped_variants = details.get("variants", [])
         elif source == "amazon":
-            if not amazon_url:
+            if not amazon_url and not url_for_check:
                 skipped_no_url += 1
                 _emit_row(product, "SKIP", source=source, old_price=old_price,
                           reason="no_amazonUrl")
                 continue
-            amz_price = get_amazon_price(amazon_url)
+            details = get_amazon_details(amazon_url or url_for_check)
+            amz_price = details.get("price")
+            scraped_variants = details.get("variants", [])
         elif source == "both":
-            flip_price = get_flipkart_price(flipkart_url) if flipkart_url else None
-            amz_price = get_amazon_price(amazon_url) if amazon_url else None
+            flip_details = get_flipkart_details(flipkart_url) if flipkart_url else {}
+            amz_details = get_amazon_details(amazon_url) if amazon_url else {}
+            flip_price = flip_details.get("price")
+            amz_price = amz_details.get("price")
+            scraped_variants = flip_details.get("variants") or amz_details.get("variants", [])
             prices = [p for p in [amz_price, flip_price] if p is not None]
             if not prices:
                 _emit_row(product, "SKIP", source=source, old_price=old_price,
@@ -309,11 +360,16 @@ def sync_prices():
                       retries=retries_used)
             continue
 
-        # Update Sanity. A non-2xx response raises RuntimeError, which we
-        # count as a hard failure (so the run can exit non-zero) rather than
-        # silently reporting a green run.
+        # Update Sanity (including per-variant prices). A non-2xx response
+        # raises RuntimeError, which we count as a hard failure.
         try:
-            mut = update_price(product["_id"], amz_price, flip_price, display_price)
+            mut = update_price_and_variants(
+                product["_id"],
+                product.get("name", ""),
+                amz_price, flip_price, display_price,
+                scraped_variants,
+                existing_variants,
+            )
         except RuntimeError as e:
             failed_mutations += 1
             _emit_row(product, "ERROR", source=source, old_price=old_price,

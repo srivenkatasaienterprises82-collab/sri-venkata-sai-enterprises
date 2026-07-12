@@ -18,11 +18,13 @@ def fetch_all_products():
     # route by brand slug (case-insensitive) and skip draft (`enabled:false`)
     # products. Without this we routed by display name — that missed "POCO"
     # (listed as "Poco" in the constant) entirely.
+    # Also fetch `variants` so the sync loop can match and update per-variant
+    # prices alongside the root price.
     query = (
         '*[_type == "product"]{'
         '_id, name, slug, brand->{name, "slug": slug.current}, '
         'amazonUrl, flipkartUrl, price, amazonPrice, flipkartPrice, '
-        'priceLocked, enabled, lastUpdated'
+        'priceLocked, enabled, lastUpdated, variants'
         '}'
     )
     url = f"{BASE_URL}/data/query/{DATASET}?query={requests.utils.quote(query)}"
@@ -103,7 +105,7 @@ def create_full_product(name, brand_name, source, url, details):
         "slug": {"_type": "slug", "current": slug},
         "brand": {"_ref": brand_id, "_type": "reference"},
         "category": {"_ref": category_id, "_type": "reference"} if category_id else None,
-        "enabled": False,
+        "enabled": True,
         "type": "smartphone",
         "stock": "in-stock",
         "description": details.get("description"),
@@ -136,7 +138,7 @@ def create_product(product_data: dict) -> dict:
                     "amazonPrice": product_data.get("amazonPrice"),
                     "flipkartPrice": product_data.get("flipkartPrice"),
                     "description": product_data.get("description"),
-                    "enabled": False,
+                    "enabled": True,
                     "lastUpdated": datetime.now().isoformat(),
                 }
             }
@@ -177,6 +179,74 @@ def update_price(product_id: str, amazon_price, flipkart_price, display_price) -
         # orchestrator's "matched/updated" counters.
         raise RuntimeError(
             f"Sanity price update failed for {product_id}: "
+            f"HTTP {res.status_code} {res.text[:200]}"
+        )
+    body = res.json() if res.text else {}
+    if not body.get("results"):
+        print(f"  WARNING: Sanity returned no mutation results for {product_id}: {body}")
+    return body
+
+
+def update_price_and_variants(product_id: str, product_name: str,
+                               amazon_price, flipkart_price, display_price,
+                               scraped_variants: list,
+                               existing_variants: list) -> dict:
+    """Patch a product's prices AND per-variant prices in Sanity.
+
+    Matches scraped variants to existing Sanity variants by RAM/Storage.
+    If a scraped variant has a specific price, it's applied; otherwise the
+    root `display_price` is used as a fallback so every variant/color gets
+    an up-to-date price rather than retaining a stale value.
+
+    Only Amazon/Flipkart prices that carry a new, valid value are included,
+    so a single-source scrape does NOT wipe the other marketplace price.
+    """
+    set_fields = {
+        "price": display_price,
+        "lastUpdated": datetime.now().isoformat(),
+    }
+    if amazon_price is not None:
+        set_fields["amazonPrice"] = amazon_price
+    if flipkart_price is not None:
+        set_fields["flipkartPrice"] = flipkart_price
+
+    # Update variants array with scraped prices (or fallback to display_price)
+    updated_variants = []
+    for v in existing_variants:
+        ram = str(v.get("ram", "")).lower().strip()
+        storage = str(v.get("storage", "")).lower().strip()
+
+        # Try to find a matching scraped variant
+        matched_scraped = None
+        for sv in scraped_variants:
+            sv_ram = str(sv.get("ram", "")).lower().strip()
+            sv_storage = str(sv.get("storage", "")).lower().strip()
+            if sv_ram == ram and sv_storage == storage:
+                matched_scraped = sv
+                break
+
+        new_variant_price = v.get("price")
+        if matched_scraped and matched_scraped.get("price") is not None:
+            new_variant_price = matched_scraped["price"]
+        elif display_price is not None:
+            # Fallback: apply main live price to ALL variants if specific
+            # scraped price is missing (common with Flipkart/Amazon variants)
+            new_variant_price = display_price
+
+        new_v = dict(v)
+        if new_variant_price is not None:
+            new_v["price"] = new_variant_price
+        updated_variants.append(new_v)
+
+    if updated_variants:
+        set_fields["variants"] = updated_variants
+
+    url = f"{BASE_URL}/data/mutate/{DATASET}"
+    mutations = {"mutations": [{"patch": {"id": product_id, "set": set_fields}}]}
+    res = requests.post(url, headers=HEADERS, json=mutations)
+    if res.status_code not in (200, 201):
+        raise RuntimeError(
+            f"Sanity price+variants update failed for {product_id}: "
             f"HTTP {res.status_code} {res.text[:200]}"
         )
     body = res.json() if res.text else {}
