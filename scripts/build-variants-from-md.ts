@@ -19,6 +19,7 @@ import path from 'path';
 const ROOT = path.resolve(__dirname, '..');
 const MD_PATH = 'C:\\Users\\ramak\\Downloads\\full_variants_list.md';
 const PRICES_PATH = 'C:\\Users\\ramak\\Downloads\\product_variants_with_prices.md';
+const CSV_PATH = 'C:\\Users\\ramak\\Downloads\\mobiles_colors_ram_storage_overview.csv';
 const PRODUCTS_PATH = path.join(ROOT, 'src', 'lib', 'data', 'products.ts');
 const BACKUP_PATH = path.join(ROOT, 'src', 'lib', 'data', 'products.ts.bak');
 
@@ -157,6 +158,60 @@ const priceByVariant = new Map<string, Map<string, number>>();
   }
 }
 
+// ── Parse COLOR + RAM/STORAGE overview CSV ──────────────────────────────────
+// Authoritative source for the COLOR list and the full RAM x STORAGE variant
+// matrix per product. PRICES in this file are IGNORED (unreliable) — prices
+// still come from product_variants_with_prices.md. Keyed by norm name + slug.
+interface CsvEntry { colors: string[]; ram: string[]; storage: string[] }
+function parseCsvLine(line: string): string[] {
+  const out: string[] = [];
+  let cur = '';
+  let q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') { cur += '"'; i++; } else q = false;
+      } else cur += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ',') { out.push(cur); cur = ''; }
+    else cur += ch;
+  }
+  out.push(cur);
+  return out;
+}
+
+const csvMap = new Map<string, CsvEntry>();
+{
+  const clines = fs.readFileSync(CSV_PATH, 'utf8').split('\n');
+  for (const raw of clines) {
+    const line = raw.trim();
+    if (!line || line.startsWith('brand,')) continue; // header / blank
+    const cols = parseCsvLine(line);
+    if (cols.length < 10) continue;
+    const name = cols[1].trim();
+    const entry: CsvEntry = {
+      colors: cols[4].split('|').map((s) => s.trim()).filter(Boolean),
+      ram: cols[6].split('|').map((s) => parseRamStorage(s)).filter(Boolean),
+      storage: cols[8].split('|').map((s) => parseRamStorage(s)).filter(Boolean),
+    };
+    csvMap.set(norm(name), entry);
+    csvMap.set(slugFromName(name), entry);
+  }
+}
+
+// Estimate a plausible price for a (ram,storage) combo not present in the
+// trusted price source: prefer the cheapest priced variant with the same
+// storage, else same RAM, else the cheapest variant overall.
+function estimatePrice(ram: string, storage: string, src: Map<string, number>): number | null {
+  if (src.size === 0) return null;
+  const sameStorage = [...src.entries()].filter(([k]) => k.endsWith(`|${storage}`)).map(([, p]) => p);
+  if (sameStorage.length) return Math.min(...sameStorage);
+  const sameRam = [...src.entries()].filter(([k]) => k.startsWith(`${ram}|`)).map(([, p]) => p);
+  if (sameRam.length) return Math.min(...sameRam);
+  return Math.min(...src.values());
+}
+
 // ── Match markdown products to site slugs by NORMALIZED NAME ─────────────────
 const ptsText = fs.readFileSync(PRODUCTS_PATH, 'utf8');
 const siteMap = new Map<string, { name: string; slug: string; brand: string }>();
@@ -196,17 +251,48 @@ for (const mp of mdProducts) {
 
   const report: string[] = [];
 
-  // Colors (canonical "Colors:" list)
-  const colorObjs = mp.colors.map((c) => `{ name: "${c}", hex: "${hexFor(c)}" }`);
+  // Colors: authoritative from the CSV overview; fall back to md colors.
+  const csvEntry = csvMap.get(norm(mp.name)) ?? csvMap.get(slugFromName(mp.name));
+  const colorsSrc = csvEntry && csvEntry.colors.length ? csvEntry.colors : mp.colors;
+  const colorObjs = colorsSrc.map((c) => `{ name: "${c}", hex: "${hexFor(c)}" }`);
   const colorsStr = `[${colorObjs.join(', ')}]`;
 
-  // Variants: prefer the REAL (ram,storage)->price tiers from the prices file
-  // (these are the only combos that actually exist and have distinct prices).
-  // Fall back to md combos when the prices file has no entry for this product.
+  // Price source: the REAL prices file when available (so unpriced matrix
+  // combos can be ESTIMATED from real tiers). Fall back to md combo prices only
+  // when the prices file has no entry for this product. We must NOT merge both,
+  // or the flat md prices would block estimation.
   const priceOverride = priceByVariant.get(norm(mp.name)) ?? priceByVariant.get(slugFromName(mp.name));
-  const seen = new Map<string, { ram: string; storage: string; price: number }>();
+  let priceSource: Map<string, number>;
   if (priceOverride && priceOverride.size > 0) {
     withOverrides++;
+    priceSource = priceOverride;
+  } else {
+    priceSource = new Map();
+    for (const c of mp.combos) {
+      const k = `${c.ram}|${c.storage}`;
+      if (Number.isFinite(c.price)) priceSource.set(k, c.price);
+    }
+  }
+
+  // Variants: the full RAM x STORAGE matrix from the CSV (so every selectable
+  // combo is present). Prices come from the trusted price source; any combo
+  // missing a price is estimated from the nearest priced tier (same storage,
+  // then same RAM, then cheapest). Accessories (no RAM/storage) keep their
+  // single priced variant from the price source.
+  const ramOpts = csvEntry ? csvEntry.ram.filter(Boolean) : [];
+  const stoOpts = csvEntry ? csvEntry.storage.filter(Boolean) : [];
+  const seen = new Map<string, { ram: string; storage: string; price: number }>();
+  if (ramOpts.length && stoOpts.length) {
+    for (const ram of ramOpts) {
+      for (const sto of stoOpts) {
+        const key = `${ram}|${sto}`;
+        if (seen.has(key)) continue;
+        let price = priceSource.get(key);
+        if (price === undefined) price = estimatePrice(ram, sto, priceSource) ?? NaN;
+        seen.set(key, { ram, storage: sto, price });
+      }
+    }
+  } else if (priceOverride && priceOverride.size > 0) {
     for (const [key, price] of priceOverride) {
       const [ram, storage] = key.split('|');
       seen.set(key, { ram, storage, price });
