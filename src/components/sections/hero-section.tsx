@@ -60,8 +60,8 @@ export function HeroSection({
   const featured = products.filter((p) => p.featured && POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase())).slice(0, 16);
   const carouselProducts = featured.length > 0 ? featured : products.filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase())).slice(0, 16);
   const safeCarouselProducts = carouselProducts.filter((p) => p.slug);
-  const displayTitle =
-    title ?? "Ongole's Best Mobile Deals";
+const displayTitle =
+  title ?? "Ongole's Best Mobile Deal";
   const displaySubtitle = subtitle || "Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo, Motorola, OnePlus & more.";
   const hasValidSlug = (product: Product) => product.slug && product.slug.trim().length > 0;
 
@@ -105,7 +105,7 @@ export function HeroSection({
 initial={{ opacity: 0, scale: 0.95, y: 20 }}
 animate={{ opacity: 1, scale: 1, y: 0 }}
 transition={{ duration: 0.8, delay: 0.2, type: "spring", bounce: 0.4 }}
-className="mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-slate-900 whitespace-nowrap max-w-full px-4"
+className="mb-6 text-balance text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-slate-900 max-w-full px-4"
 >
 {displayTitle}
 </motion.h1>
