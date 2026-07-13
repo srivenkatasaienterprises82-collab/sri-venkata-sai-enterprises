@@ -194,9 +194,11 @@ def update_price_and_variants(product_id: str, product_name: str,
     """Patch a product's prices AND per-variant prices in Sanity.
 
     Matches scraped variants to existing Sanity variants by RAM/Storage.
-    If a scraped variant has a specific price, it's applied; otherwise the
-    root `display_price` is used as a fallback so every variant/color gets
-    an up-to-date price rather than retaining a stale value.
+    If a scraped variant has a specific price, it's applied. An existing
+    per-variant price is NEVER overwritten with the single product-level
+    `display_price` — doing so would collapse every variant to one value and
+    the storefront would show no price change when the user switches variants.
+    The root `price` field (always set below) is what receives display_price.
 
     Only Amazon/Flipkart prices that carry a new, valid value are included,
     so a single-source scrape does NOT wipe the other marketplace price.
@@ -228,9 +230,10 @@ def update_price_and_variants(product_id: str, product_name: str,
         new_variant_price = v.get("price")
         if matched_scraped and matched_scraped.get("price") is not None:
             new_variant_price = matched_scraped["price"]
-        elif display_price is not None:
-            # Fallback: apply main live price to ALL variants if specific
-            # scraped price is missing (common with Flipkart/Amazon variants)
+        elif new_variant_price is None and display_price is not None:
+            # Only fill in a price for a variant that has NONE at all
+            # (e.g. a freshly created launch). Never overwrite an existing
+            # per-variant price with the single product-level price.
             new_variant_price = display_price
 
         new_v = dict(v)
