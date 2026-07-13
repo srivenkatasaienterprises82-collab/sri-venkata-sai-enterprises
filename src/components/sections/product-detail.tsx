@@ -10,7 +10,7 @@ import { siteConfig } from "@/lib/data/siteConfig";
 import { Button } from "@/components/ui/button";
 
 export function ProductDetail({ product, galleryImages }: { product: Product; galleryImages?: string[] }) {
-  const [activeVariant, setActiveVariant] = useState(product.variants[0] ?? null);
+  const [activeVariant] = useState(product.variants[0] ?? null);
   const [activeColor, setActiveColor] = useState(product.colors[0] ?? null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
