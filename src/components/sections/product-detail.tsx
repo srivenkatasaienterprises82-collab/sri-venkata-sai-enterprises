@@ -14,6 +14,8 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const [activeColor, setActiveColor] = useState(product.colors[0] ?? null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeRam, setActiveRam] = useState(product.ramOptions?.[0] ?? product.variants[0]?.ram ?? "");
+  const [activeStorage, setActiveStorage] = useState(product.storageOptions?.[0] ?? product.variants[0]?.storage ?? "");
   
   const enquiryOnly = isPriceOnEnquiry(product);
   // Keep hasProductPrice for the JSON-LD structured data (schemaOffers).
@@ -21,8 +23,9 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const hasProductPrice = typeof product.price === "number" && Number.isFinite(product.price);
   // Always prefer the selected variant's price over the product-level price.
   // This ensures the price updates when the user clicks a different variant button.
-  const displayPrice = activeVariant?.price ?? product.price;
-  const displayOriginalPrice = activeVariant?.originalPrice ?? product.originalPrice;
+  const matchingVariant = product.variants.find((variant) => variant.ram === activeRam && variant.storage === activeStorage);
+  const displayPrice = matchingVariant?.price ?? activeVariant?.price ?? product.price;
+  const displayOriginalPrice = matchingVariant?.originalPrice ?? activeVariant?.originalPrice ?? product.originalPrice;
 
   const images = galleryImages ?? [product.image];
 
@@ -273,26 +276,43 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                 </div>
               </div>
 
-              {/* Storage Selector */}
-              <div className="mb-10">
-                <p className="mb-4 text-sm font-bold text-slate-900 uppercase tracking-wider">Storage & RAM</p>
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  {product.variants.map((variant, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setActiveVariant(variant)}
-                      className={`rounded-2xl border-2 py-4 text-center transition-all shadow-sm ${
-                        activeVariant === variant 
-                          ? "border-blue-600 bg-blue-50 text-blue-700" 
-                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 hover:shadow-md"
-                      }`}
-                    >
-                      <div className="text-lg font-bold">{variant.storage}</div>
-                      <div className="text-sm font-medium opacity-80 mt-1">{variant.ram} RAM</div>
-                    </button>
-                  ))}
+              {(product.ramOptions?.length || product.storageOptions?.length || product.variants.length) ? (
+                <div className="mb-10 space-y-6">
+                  {product.ramOptions?.length ? (
+                    <div>
+                      <p className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-900">RAM</p>
+                      <div className="flex flex-wrap gap-3">
+                        {product.ramOptions.map((ram) => (
+                          <button
+                            key={ram}
+                            onClick={() => setActiveRam(ram)}
+                            className={`rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all ${activeRam === ram ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+                          >
+                            {ram}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {product.storageOptions?.length ? (
+                    <div>
+                      <p className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-900">Storage</p>
+                      <div className="flex flex-wrap gap-3">
+                        {product.storageOptions.map((storage) => (
+                          <button
+                            key={storage}
+                            onClick={() => setActiveStorage(storage)}
+                            className={`rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all ${activeStorage === storage ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+                          >
+                            {storage}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              </div>
+              ) : null}
 
               {/* Bank Offers */}
               <div className="mb-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -375,9 +395,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                         variant="primary"
                         size="xl"
                         as={Link}
-                        href={`/checkout?product=${product.slug}&variant=${encodeURIComponent(
-                          `${activeVariant?.ram}-${activeVariant?.storage}`
-                        )}`}
+                        href={`/checkout?product=${product.slug}&ram=${encodeURIComponent(activeRam)}&storage=${encodeURIComponent(activeStorage)}&color=${encodeURIComponent(activeColor?.name ?? "")}`}
                         className="flex-1 rounded-2xl"
                       >
                         <ShoppingCart className="h-5 w-5 mr-2" />
