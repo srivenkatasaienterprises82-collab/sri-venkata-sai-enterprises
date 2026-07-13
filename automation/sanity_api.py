@@ -12,6 +12,14 @@ HEADERS = {
     "Content-Type": "application/json",
 }
 
+# When the scraper only returns a single product-level price (no per-variant
+# break-down), we still want variant prices to track the market. We scale the
+# existing per-variant tiers proportionally so the CHEAPEST variant lands on the
+# scraped price and the other tiers keep their relative spread. The band below
+# blocks corrupting prices when a scrape returns an outlier / wrong config.
+VARIANT_SCALE_MIN = 0.6
+VARIANT_SCALE_MAX = 1.6
+
 
 def fetch_all_products():
     # Include `brandSlug` and `enabled` so the price-sync orchestrator can
@@ -214,6 +222,7 @@ def update_price_and_variants(product_id: str, product_name: str,
 
     # Update variants array with scraped prices (or fallback to display_price)
     updated_variants = []
+    applied_scraped = False
     for v in existing_variants:
         ram = str(v.get("ram", "")).lower().strip()
         storage = str(v.get("storage", "")).lower().strip()
@@ -230,6 +239,7 @@ def update_price_and_variants(product_id: str, product_name: str,
         new_variant_price = v.get("price")
         if matched_scraped and matched_scraped.get("price") is not None:
             new_variant_price = matched_scraped["price"]
+            applied_scraped = True
         elif new_variant_price is None and display_price is not None:
             # Only fill in a price for a variant that has NONE at all
             # (e.g. a freshly created launch). Never overwrite an existing
@@ -240,6 +250,26 @@ def update_price_and_variants(product_id: str, product_name: str,
         if new_variant_price is not None:
             new_v["price"] = new_variant_price
         updated_variants.append(new_v)
+
+    # No real per-variant scrape available -> proportionally scale the existing
+    # tiers so variant prices also track the live (single) scraped price. The
+    # cheapest variant lands on display_price; other tiers keep their spread.
+    if not applied_scraped and display_price is not None and updated_variants:
+        priced = [v for v in updated_variants if isinstance(v.get("price"), (int, float))]
+        if priced:
+            base = min(v["price"] for v in priced)
+            if base > 0:
+                scale = display_price / base
+                if VARIANT_SCALE_MIN <= scale <= VARIANT_SCALE_MAX:
+                    for v in updated_variants:
+                        if isinstance(v.get("price"), (int, float)):
+                            v["price"] = round(v["price"] * scale)
+                else:
+                    print(
+                        f"  WARNING: variant scale {scale:.2f} out of "
+                        f"[{VARIANT_SCALE_MIN},{VARIANT_SCALE_MAX}] for "
+                        f"{product_name}; keeping existing variant prices"
+                    )
 
     if updated_variants:
         set_fields["variants"] = updated_variants
