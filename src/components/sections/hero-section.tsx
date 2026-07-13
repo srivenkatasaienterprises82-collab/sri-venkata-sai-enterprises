@@ -61,7 +61,7 @@ export function HeroSection({
   const carouselProducts = featured.length > 0 ? featured : products.filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase())).slice(0, 16);
   const safeCarouselProducts = carouselProducts.filter((p) => p.slug);
 const displayTitle =
-  title ?? "Ongole's Best Mobile Deal";
+  title ?? "Sri Venkata Sai enterprises — Ongole's Best Mobile Deals";
   const displaySubtitle = subtitle || "Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo, Motorola, OnePlus & more.";
   const hasValidSlug = (product: Product) => product.slug && product.slug.trim().length > 0;
 
