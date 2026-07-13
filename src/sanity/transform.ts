@@ -33,6 +33,8 @@ export function toProduct(s: SanityProduct): Product {
     description: s.description || "",
     price: s.price,
     originalPrice: s.originalPrice,
+    amazonUrl: s.amazonUrl,
+    flipkartUrl: s.flipkartUrl,
     colors: (s.colors || []) as ProductColor[],
     ramOptions: s.ramOptions || [],
     storageOptions: s.storageOptions || [],
