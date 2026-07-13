@@ -87,6 +87,8 @@ export const product = defineType({
         },
       ],
     }),
+    defineField({ name: "ramOptions", title: "RAM Options", type: "array", of: [{ type: "string" }] }),
+    defineField({ name: "storageOptions", title: "Storage Options", type: "array", of: [{ type: "string" }] }),
     defineField({
       name: "variants",
       title: "Variants",

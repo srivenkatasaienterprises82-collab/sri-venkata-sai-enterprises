@@ -21,6 +21,8 @@ export type SanityProduct = {
   featured?: boolean;
   description?: string;
   colors: { name: string; hex: string }[];
+  ramOptions?: string[];
+  storageOptions?: string[];
   variants: { ram: string; storage: string; price?: number; originalPrice?: number }[];
   specifications?: { label: string; value: string }[];
 };

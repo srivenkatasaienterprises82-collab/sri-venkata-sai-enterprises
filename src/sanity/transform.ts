@@ -16,8 +16,8 @@ import { resolveImage } from "./lib/image";
 export function toProduct(s: SanityProduct): Product {
   // Map stock status value safely
   let stockStatus: StockStatus = "inStock";
-  if (s.stock === "limited") stockStatus = "limited";
-  else if (s.stock === "outOfStock") stockStatus = "outOfStock";
+  if (s.stock === "limited" || s.stock === "pre-order") stockStatus = "limited";
+  else if (s.stock === "outOfStock" || s.stock === "out-of-stock") stockStatus = "outOfStock";
 
   return {
     id: s._id,
@@ -34,6 +34,8 @@ export function toProduct(s: SanityProduct): Product {
     price: s.price,
     originalPrice: s.originalPrice,
     colors: (s.colors || []) as ProductColor[],
+    ramOptions: s.ramOptions || [],
+    storageOptions: s.storageOptions || [],
     variants: (s.variants || []) as ProductVariant[],
     specifications: s.specifications || [],
     featured: s.featured || false,

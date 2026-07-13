@@ -21,7 +21,7 @@ export const HOME_PAGE_QUERY = defineQuery(`*[_type == "homePage"][0]{
     "brandSlug": brand->slug.current,
     coverImage,
     featured, description,
-    colors, variants, specifications
+    colors, ramOptions, storageOptions, variants, specifications
   },
   "topRatedPerformance": topRatedPerformance[]->{
     _id, name, slug, type, stock, price, originalPrice, priceOnEnquiry,
@@ -29,7 +29,7 @@ export const HOME_PAGE_QUERY = defineQuery(`*[_type == "homePage"][0]{
     "brandSlug": brand->slug.current,
     coverImage,
     featured, description,
-    colors, variants, specifications
+    colors, ramOptions, storageOptions, variants, specifications
   },
   "bentoDeals": bentoDeals[]->{
     _id, title, badge, subtitle, discountText, image, link, cta, expiryDate, type
@@ -45,7 +45,7 @@ export const PRODUCTS_QUERY = defineQuery(`*[_type == "product" && enabled != fa
   "categorySlug": category->slug.current,
   coverImage,
   featured, description,
-  colors, variants, specifications, images
+  colors, ramOptions, storageOptions, variants, specifications, images
 }`);
 
 export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[_type == "product" && featured == true && enabled != false] | order(order asc){
@@ -57,7 +57,7 @@ export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[_type == "product" && feat
   "categorySlug": category->slug.current,
   "coverImage": coverImage,
   featured, description,
-  colors, variants, specifications
+  colors, ramOptions, storageOptions, variants, specifications
 }`);
 
 export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[_type == "product" && (slug.current == $slug || _id == $id) && enabled != false][0]{
@@ -70,7 +70,7 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[_type == "product" && (slug.
   coverImage,
   images,
   featured, description,
-  colors, variants, specifications
+  colors, ramOptions, storageOptions, variants, specifications
 }`);
 
 export const PRODUCTS_BY_BRAND_QUERY = defineQuery(`*[_type == "product" && brand->slug.current == $brandSlug && enabled != false] | order(order asc){

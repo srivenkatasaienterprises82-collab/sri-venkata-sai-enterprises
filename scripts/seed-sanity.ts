@@ -19,9 +19,10 @@ const DATASET = "production";
 const API_VERSION = "v2024-01-01";
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/${API_VERSION}`;
 
-function getToken(): string | null {
-  const token = process.env.SANITY_TOKEN || process.env.SANITY_API_READ_TOKEN;
-  return token ?? null;
+function getToken(): string {
+  const token = process.env.SANITY_TOKEN;
+  if (!token) throw new Error("SANITY_TOKEN is required for Sanity mutations");
+  return token;
 }
 
 async function sanityFetch(query: string): Promise<any> {
@@ -84,6 +85,8 @@ function productToSanityDoc(product: Product): SanityDoc {
       name: c.name,
       hex: c.hex,
     })),
+    ramOptions: product.ramOptions ?? [],
+    storageOptions: product.storageOptions ?? [],
     variants: product.variants.map((v, i) => ({
       _key: `v-${i}-${v.ram || "na"}-${v.storage || "na"}`,
       ram: v.ram,
