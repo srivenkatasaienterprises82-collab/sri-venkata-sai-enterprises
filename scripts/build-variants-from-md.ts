@@ -18,6 +18,7 @@ import path from 'path';
 
 const ROOT = path.resolve(__dirname, '..');
 const MD_PATH = 'C:\\Users\\ramak\\Downloads\\full_variants_list.md';
+const PRICES_PATH = 'C:\\Users\\ramak\\Downloads\\product_variants_with_prices.md';
 const PRODUCTS_PATH = path.join(ROOT, 'src', 'lib', 'data', 'products.ts');
 const BACKUP_PATH = path.join(ROOT, 'src', 'lib', 'data', 'products.ts.bak');
 
@@ -117,6 +118,45 @@ for (const line of mdLines) {
   }
 }
 
+// ── Parse REAL per-variant prices from product_variants_with_prices.md ─────
+// full_variants_list.md collapsed every variant to one flat price. This file
+// keeps the real RAM+Storage -> price tiers, which is what makes the price
+// change when a variant is clicked. Keyed by both normalized name and slug.
+function parseVariantDescriptor(desc: string): { ram: string; storage: string } {
+  let ram = '', storage = '';
+  for (const t of desc.split('+').map((s) => s.trim()).filter(Boolean)) {
+    const m = t.match(/(\d+)\s*(GB|TB)/i);
+    if (!m) continue;
+    const val = parseInt(m[1], 10);
+    const unit = m[2].toUpperCase();
+    if (unit === 'TB') storage = `${val}TB`;
+    else if (val <= 24) ram = `${val}GB`;
+    else storage = `${val}GB`;
+  }
+  return { ram, storage };
+}
+
+const priceByVariant = new Map<string, Map<string, number>>();
+{
+  const ptext = fs.readFileSync(PRICES_PATH, 'utf8');
+  let cur: Map<string, number> | null = null;
+  for (const line of ptext.split('\n')) {
+    const h = line.match(/^###\s+(.+)$/);
+    if (h) {
+      cur = new Map<string, number>();
+      priceByVariant.set(norm(h[1].trim()), cur);
+      priceByVariant.set(slugFromName(h[1].trim()), cur);
+      continue;
+    }
+    if (!cur) continue;
+    const row = line.match(/^\|\s*([^|]+?)\s*\|\s*Rs\s*([\d,]+)\s*\|\s*$/);
+    if (!row) continue;
+    const { ram, storage } = parseVariantDescriptor(row[1]);
+    const price = parseInt(row[2].replace(/,/g, ''), 10);
+    if (Number.isFinite(price)) cur.set(`${ram}|${storage}`, price);
+  }
+}
+
 // ── Match markdown products to site slugs by NORMALIZED NAME ─────────────────
 const ptsText = fs.readFileSync(PRODUCTS_PATH, 'utf8');
 const siteMap = new Map<string, { name: string; slug: string; brand: string }>();
@@ -148,6 +188,7 @@ function matchSlug(mp: MdProduct): string | null {
 // ── Build replacement maps ────────────────────────────────────────────────────
 interface Replacement { colors: string; variants: string; removeEnquiry: boolean; report: string[] }
 const replacements = new Map<string, Replacement>();
+let withOverrides = 0;
 
 for (const mp of mdProducts) {
   const slug = matchSlug(mp);
@@ -159,11 +200,22 @@ for (const mp of mdProducts) {
   const colorObjs = mp.colors.map((c) => `{ name: "${c}", hex: "${hexFor(c)}" }`);
   const colorsStr = `[${colorObjs.join(', ')}]`;
 
-  // Variants: unique (ram, storage) with first-seen price
+  // Variants: prefer the REAL (ram,storage)->price tiers from the prices file
+  // (these are the only combos that actually exist and have distinct prices).
+  // Fall back to md combos when the prices file has no entry for this product.
+  const priceOverride = priceByVariant.get(norm(mp.name)) ?? priceByVariant.get(slugFromName(mp.name));
   const seen = new Map<string, { ram: string; storage: string; price: number }>();
-  for (const c of mp.combos) {
-    const key = `${c.ram}|${c.storage}`;
-    if (!seen.has(key)) seen.set(key, { ram: c.ram, storage: c.storage, price: c.price });
+  if (priceOverride && priceOverride.size > 0) {
+    withOverrides++;
+    for (const [key, price] of priceOverride) {
+      const [ram, storage] = key.split('|');
+      seen.set(key, { ram, storage, price });
+    }
+  } else {
+    for (const c of mp.combos) {
+      const key = `${c.ram}|${c.storage}`;
+      if (!seen.has(key)) seen.set(key, { ram: c.ram, storage: c.storage, price: c.price });
+    }
   }
   const variantArr = [...seen.values()].map(
     (v) => `{ ram: "${v.ram}", storage: "${v.storage}", price: ${v.price} }`
@@ -205,3 +257,4 @@ for (let i = 0; i < lines.length; i++) {
 
 fs.writeFileSync(PRODUCTS_PATH, lines.join('\n'));
 console.log(`\nDONE. Products updated: ${changed} / ${replacements.size} matched. Backup: products.ts.bak`);
+console.log(`Products using real per-variant prices from ${PRICES_PATH.split('\\').pop()}: ${withOverrides}`);
