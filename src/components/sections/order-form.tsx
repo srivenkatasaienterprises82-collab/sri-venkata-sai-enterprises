@@ -18,7 +18,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export function OrderForm({ productId, variant }: { productId: string; variant?: string }) {
+export function OrderForm({ productId, variant, color, ram, storage }: { productId: string; variant?: string; color?: string; ram?: string; storage?: string }) {
   const product = getProductBySlug(productId);
   
   // Default values if product isn't found
@@ -48,8 +48,9 @@ export function OrderForm({ productId, variant }: { productId: string; variant?:
       ...data,
       productName,
       productSlug: productId,
-      selectedColor: productColor,
-      selectedStorage: storageStr,
+      selectedColor: color ?? "",
+      selectedRam: ram ?? "",
+      selectedStorage: storage ?? variant ?? "",
       productPrice: priceDisplay,
       customerName: data.name,
     };

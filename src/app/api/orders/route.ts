@@ -54,6 +54,7 @@ interface OrderItem {
   productName: string;
   productSlug: string;
   selectedStorage: string;
+  selectedRam?: string;
   selectedColor: string;
   quantity: number;
   price: number;
@@ -64,6 +65,7 @@ interface OrderPayload {
   productName?: string;
   productSlug?: string;
   selectedStorage?: string;
+  selectedRam?: string;
   selectedColor?: string;
   productPrice?: string;
   cartItems?: OrderItem[];
@@ -101,6 +103,7 @@ function validateOrder(data: unknown): data is OrderPayload {
       return (
         typeof entry.productName === "string" &&
         typeof entry.productSlug === "string" &&
+        (entry.selectedRam === undefined || typeof entry.selectedRam === "string") &&
         typeof entry.selectedStorage === "string" &&
         typeof entry.selectedColor === "string" &&
         typeof entry.quantity === "number" &&
@@ -123,6 +126,7 @@ function buildWhatsAppMessage(order: OrderPayload): string {
         `${index + 1}. ${item.productName}`,
         ` Variant: ${item.selectedStorage}`,
         ` Color: ${item.selectedColor}`,
+        ...(item.selectedRam ? [` RAM: ${item.selectedRam}`] : []),
         ` Qty: ${item.quantity}`,
         ` Price: ₹${item.price.toLocaleString("en-IN")}`,
         ` Line Total: ₹${item.lineTotal.toLocaleString("en-IN")}`
@@ -134,6 +138,7 @@ function buildWhatsAppMessage(order: OrderPayload): string {
   } else if (order.productName) {
     lines.push(`Product: ${order.productName}`);
     if (order.selectedStorage) lines.push(`Storage: ${order.selectedStorage}`);
+    if (order.selectedRam) lines.push(`RAM: ${order.selectedRam}`);
     if (order.selectedColor) lines.push(`Color: ${order.selectedColor}`);
     if (order.productPrice) lines.push(`Price: ${order.productPrice}`);
   }

@@ -17,6 +17,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   colorName: string;
+  variantMeta?: { color?: string; ram?: string; storage?: string };
 }
 
 interface CartState {

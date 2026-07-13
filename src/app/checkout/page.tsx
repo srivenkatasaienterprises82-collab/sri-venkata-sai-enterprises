@@ -18,6 +18,9 @@ export default async function CheckoutPage({
   const params = await searchParams;
   const rawProduct = typeof params.product === "string" ? params.product : undefined;
   const variant = typeof params.variant === "string" ? params.variant : undefined;
+  const color = typeof params.color === "string" ? params.color : undefined;
+  const ram = typeof params.ram === "string" ? params.ram : undefined;
+  const storage = typeof params.storage === "string" ? params.storage : undefined;
 
   const productId = rawProduct && getAllProducts().some((item) => item.slug === rawProduct)
     ? rawProduct
@@ -30,7 +33,7 @@ export default async function CheckoutPage({
   return (
     <>
       <main>
-        <OrderForm productId={productId} variant={variant} />
+        <OrderForm productId={productId} variant={variant} color={color} ram={ram} storage={storage} />
       </main>
       <Footer />
     </>
