@@ -197,7 +197,7 @@ export function parseVariantMetadataMarkdown(markdown: string): ParsedVariantMet
 
 Run: `npm test -- --run src/lib/data/variant-metadata.test.ts`
 
-Expected: PASS, 2 tests.
+Expected: PASS. The project `npm test` script still discovers all `src/**/*.test.ts` files, so the output includes the existing product and Sanity transform tests plus these 2 parser tests.
 
 - [ ] **Step 3: Commit parser**
 
@@ -339,7 +339,7 @@ Expected: `applied_count=108`. If lower, inspect unknown/missing slugs.
 
 Run: `npm test -- --run src/lib/data/products.test.ts src/lib/data/variant-metadata.test.ts`
 
-Expected: PASS.
+Expected: PASS. The project `npm test` script still discovers all `src/**/*.test.ts` files, so output includes the existing suites as well as the targeted parser file.
 
 - [ ] **Step 5: Commit static data changes**
 
