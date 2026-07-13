@@ -19,6 +19,10 @@ HEADERS = {
 # blocks corrupting prices when a scrape returns an outlier / wrong config.
 VARIANT_SCALE_MIN = 0.6
 VARIANT_SCALE_MAX = 1.6
+# How strongly variant prices track the live single scraped price. 1.0 = snap
+# exactly to the scraped price (full re-anchor); <1.0 = only NUDGE slightly so
+# variant prices partially match Flipkart/Amazon rather than fully matching.
+VARIANT_SCALE_BLEND = 0.35
 
 
 def fetch_all_products():
@@ -208,6 +212,12 @@ def update_price_and_variants(product_id: str, product_name: str,
     the storefront would show no price change when the user switches variants.
     The root `price` field (always set below) is what receives display_price.
 
+    When only a single product-level price is scraped (the normal case), the
+    existing per-variant tiers are nudged by VARIANT_SCALE_BLEND so they
+    *slightly* track the live Flipkart/Amazon price instead of snapping to it
+    (full exact per-variant scraping isn't available — see experiment notes).
+    The move is bounded by VARIANT_SCALE_MIN/MAX to reject outlier scrapes.
+
     Only Amazon/Flipkart prices that carry a new, valid value are included,
     so a single-source scrape does NOT wipe the other marketplace price.
     """
@@ -251,9 +261,11 @@ def update_price_and_variants(product_id: str, product_name: str,
             new_v["price"] = new_variant_price
         updated_variants.append(new_v)
 
-    # No real per-variant scrape available -> proportionally scale the existing
-    # tiers so variant prices also track the live (single) scraped price. The
-    # cheapest variant lands on display_price; other tiers keep their spread.
+    # No real per-variant scrape available -> nudge the existing tiers so
+    # variant prices *slightly* track the live (single) scraped price. The
+    # cheapest variant is the reference; other tiers keep their relative spread.
+    # VARIANT_SCALE_BLEND damps the move so prices partially match Flipkart/
+    # Amazon rather than snapping exactly to them.
     if not applied_scraped and display_price is not None and updated_variants:
         priced = [v for v in updated_variants if isinstance(v.get("price"), (int, float))]
         if priced:
@@ -261,9 +273,10 @@ def update_price_and_variants(product_id: str, product_name: str,
             if base > 0:
                 scale = display_price / base
                 if VARIANT_SCALE_MIN <= scale <= VARIANT_SCALE_MAX:
+                    blend = 1.0 + VARIANT_SCALE_BLEND * (scale - 1.0)
                     for v in updated_variants:
                         if isinstance(v.get("price"), (int, float)):
-                            v["price"] = round(v["price"] * scale)
+                            v["price"] = round(v["price"] * blend)
                 else:
                     print(
                         f"  WARNING: variant scale {scale:.2f} out of "
