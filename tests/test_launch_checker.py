@@ -316,3 +316,30 @@ def test_sync_counts_mutation_failure_without_crashing(monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "santry_mutation_failed" in out or "sanity_mutation_failed" in out
 
+
+def test_launch_checker_ignores_variant_metadata(monkeypatch):
+    import launch_checker
+
+    product = {
+        "_id": "product-test-phone",
+        "name": "Test Phone",
+        "slug": {"current": "test-phone"},
+        "brandSlug": "iqoo",
+        "amazonUrl": "https://www.amazon.in/Test-Phone/dp/B0TESTPHONE",
+        "flipkartUrl": "",
+        "price": 10000,
+        "colors": [{"name": "Black", "hex": "#000000"}],
+        "ramOptions": ["8 GB"],
+        "storageOptions": ["128 GB"],
+        "variants": [{"ram": "8GB", "storage": "128GB", "price": 10000}],
+    }
+
+    monkeypatch.setattr(launch_checker, "fetch_all_products", lambda: [product])
+    monkeypatch.setattr(launch_checker, "get_assigned_source", lambda p: "amazon")
+    monkeypatch.setattr(launch_checker, "url_name_matches", lambda name, url: True)
+    monkeypatch.setattr(launch_checker, "get_amazon_details", lambda url: {"price": 9999})
+    monkeypatch.setattr(launch_checker, "update_price_and_variants", lambda *args, **kwargs: {"results": [{"id": "product-test-phone"}]})
+
+    result = launch_checker.sync_prices()
+    assert result["checked"] == 1
+
