@@ -13,7 +13,8 @@
     "variants:apply": "tsx scripts/apply-variant-metadata.ts",
     "variants:patch:sanity": "tsx scripts/patch-product-variant-fields.ts",
     "direct-urls:build": "tsx scripts/build-direct-urls-data.ts",
-    "direct-urls:check": "tsx scripts/check-direct-urls.ts"
+    "direct-urls:check": "tsx scripts/check-direct-urls.ts",
+    "direct-urls:patch:sanity": "tsx scripts/patch-direct-urls.ts"
   },
   "dependencies": {
     "@portabletext/react": "^6.2.0",

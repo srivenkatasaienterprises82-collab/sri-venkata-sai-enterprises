@@ -93,6 +93,8 @@ function productToSanityDoc(product: Product): SanityDoc {
       storage: v.storage,
       price: v.price,
       originalPrice: v.originalPrice,
+      amazonUrl: v.amazonUrl,
+      flipkartUrl: v.flipkartUrl,
     })),
     specifications: (product.specifications ?? []).map((s, i) => ({
       _key: `spec-${i}-${s.label?.toLowerCase().replace(/[^a-z0-9]+/g, "-") || i}`,
