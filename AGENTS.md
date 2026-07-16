@@ -1512,11 +1512,19 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - AUTOMATION CHECK: price-sync workflow (`.github/workflows/price-sync.yml`, cron `0 */6 * * *`, `launch_checker.py --mode sync`, uploads price-changes.csv/invalid_products.csv, no deploy hook) is healthy. Sanity: 135 products, 106 have amazon/flipkart URLs (sync will update those), only 1 null-price product = `infinix-gaming-kit` which is correctly `priceOnEnquiry:true`. Python tests: 64 passed.
 - `npx tsc --noEmit` clean; `npm run test` 32/32 pass; pytest 64 passed.
 
+## Done (July 16) — Add store URLs for real products (PUSHED)
+- User asked to web-search and add Flipkart/Amazon URLs for the real sellable products missing them (skipped the cheap/hidden brands: AI+, Coolpad, Itel, Jio, Lava, Peace, Snexian).
+- Found via web search and added to BOTH `src/lib/data/products.ts` (flipkartUrl field, survives re-seeds) and Sanity:
+  - POCO M7 Plus → flipkart.com/poco-m7-plus-5g-carbon-black-128-gb/p/itmb4301b9afe80c (8GB/128GB ₹17,999)
+  - Realme 16T → flipkart.com/realme-16t-5g/p/itm604f2af610fd0 (8GB/128GB ₹31,999)
+  - CMF Phone 4A → flipkart.com/cmf-nothing-phone-1-black-128-gb/p/itmeef68c7ce70bf (note: catalog name "CMF Phone 4A" is a mislabel; real CMF Flipkart phone is "CMF by Nothing Phone 1". Sync may name-reject it → harmless.)
+- Infinix Gaming Kit left without URL (it's `priceOnEnquiry:true`, so the sync skips it by design).
+- Products with a store URL rose 106 → 109 / 135, so the 6-hour price-sync automation now keeps these three fresh too.
+- `npx tsc --noEmit` clean; `npm run test` 32/32 pass.
+
 ## Next Steps
 1. Commit and push all changes to trigger Vercel redeploy
 2. Verify all pages display correctly with Sanity data (homepage bento deals, testimonials, FAQs, banners, gallery, info pages)
-3. Add real Flipkart/Amazon URLs for remaining products (currently only 15 of ~96 have real URLs)
-4. Re-run price sync workflow to scrape updated prices for the 15 products with real URLs
 
 ## Critical Context
 - ALL 132 products have `price: null` in Sanity — NOT caused by price sync, but by the seed script never writing top-level prices (all prices are only in `variants[]`)
