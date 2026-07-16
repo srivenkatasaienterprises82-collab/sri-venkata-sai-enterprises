@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
     { protocol: "https", hostname: "cdn.sanity.io" },
     { protocol: "https", hostname: "i.ibb.co", pathname: "/**" },
     { protocol: "https", hostname: "cdn.ibbfile.com", pathname: "/**" },
+    { protocol: "https", hostname: "via.placeholder.com", pathname: "/**" },
+    { protocol: "https", hostname: "placehold.co", pathname: "/**" },
   ],
   },
   turbopack: {
