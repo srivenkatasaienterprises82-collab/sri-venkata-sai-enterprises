@@ -7,18 +7,16 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     "brand": "Apple",
     "name": "Apple AirPods 4",
     "colorNames": [
-      "White"
+      "White (Standard)"
     ],
     "variants": [
       {
         "ram": "",
         "storage": "",
-        "price": 12900,
-        "flipkartUrl": "https://www.flipkart.com/apple-airpods-4-wireless-earbuds-personalised-spatial-audio-sweat-water-resistant-bluetooth/p/itmdf102348be4b9",
+        "price": 17900,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/apple-airpods-4-wireless-earbuds-personalised-spatial-audio-sweat-water-resistant-bluetooth/p/itmdf102348be4b9"
+    ]
   },
   "iphone-17": {
     "brand": "Apple",
@@ -32,21 +30,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 79900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 82900,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 6000,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-deep-blue-512-gb/p/itmce30d684c921a",
+        "ram": "8GB",
+        "storage": "512GB",
+        "price": 92900,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd"
+    ]
   },
   "iphone-17-air": {
     "brand": "Apple",
@@ -59,28 +54,24 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 75905,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 99900,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 113900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-air-sky-blue-512-gb/p/itmcedc5bee26cc9",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 109900,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "1 TB",
-        "price": 135900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-air-space-black-1-tb/p/itm5f6f4dba722bd",
+        "ram": "12GB",
+        "storage": "1TB",
+        "price": 129900,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd"
+    ]
   },
   "iphone-17-pro": {
     "brand": "Apple",
@@ -92,28 +83,24 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 119900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-cosmic-orange-256-gb/p/itm76fe37ca9ea8c",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 132900,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 119900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-cosmic-orange-512-gb/p/itm999d978f08430",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 142900,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "1 TB",
-        "price": 178900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-max-silver-1-tb/p/itm769146f0d9528",
+        "ram": "12GB",
+        "storage": "1TB",
+        "price": 162900,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-cosmic-orange-256-gb/p/itm76fe37ca9ea8c"
+    ]
   },
   "iphone-17-pro-max": {
     "brand": "Apple",
@@ -125,35 +112,30 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 138900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-max-cosmic-orange-256-gb/p/itmd38e30731883a",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 101900,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 138900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-deep-blue-512-gb/p/itmce30d684c921a",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 111900,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "1 TB",
-        "price": 178900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-max-silver-1-tb/p/itm769146f0d9528",
+        "ram": "12GB",
+        "storage": "1TB",
+        "price": 131900,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "2 TB",
-        "price": 218900,
-        "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-max-deep-blue-2-tb/p/itm5ca66177b1b9e",
+        "ram": "12GB",
+        "storage": "2TB",
+        "price": 151900,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/apple-iphone-17-pro-max-cosmic-orange-256-gb/p/itmd38e30731883a"
+    ]
   },
   "pixel-10": {
     "brand": "Google",
@@ -166,21 +148,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "12 GB",
-        "storage": "128 GB",
-        "price": 69999,
-        "flipkartUrl": "https://www.flipkart.com/google-pixel-10-frost-256-gb/p/itm180af25bcc197",
-        "verified": false
+        "ram": "12GB",
+        "storage": "128GB",
+        "price": 74999,
+        "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 69999,
-        "flipkartUrl": "https://www.flipkart.com/google-pixel-10-frost-256-gb/p/itm180af25bcc197",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 84999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/google-pixel-10-frost-256-gb/p/itm180af25bcc197"
+    ]
   },
   "pixel-10a": {
     "brand": "Google",
@@ -193,21 +172,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
+        "ram": "8GB",
+        "storage": "128GB",
         "price": 49999,
-        "flipkartUrl": "https://www.flipkart.com/google-pixel-10a-lavender-256-gb/p/itmba3073a0f391e",
-        "verified": false
+        "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 49999,
-        "flipkartUrl": "https://www.flipkart.com/google-pixel-10a-lavender-256-gb/p/itmba3073a0f391e",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 59999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/google-pixel-10a-lavender-256-gb/p/itmba3073a0f391e"
+    ]
   },
   "hmd-vibe-2": {
     "brand": "HMD",
@@ -219,35 +195,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 17099,
-        "flipkartUrl": "https://www.flipkart.com/hmd-vibe2-5g-cosmic-lavender-64-gb/p/itm71c3ae6df2a26",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 12999,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 8074,
-        "flipkartUrl": "https://www.flipkart.com/hmd-vibe-5g-black-128-gb/p/itm3279bb5058357",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 17099,
-        "flipkartUrl": "https://www.flipkart.com/hmd-vibe2-5g-cosmic-lavender-64-gb/p/itm71c3ae6df2a26",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 8074,
-        "flipkartUrl": "https://www.flipkart.com/hmd-vibe-5g-black-128-gb/p/itm3279bb5058357",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 14999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/hmd-vibe2-5g-cosmic-lavender-64-gb/p/itm71c3ae6df2a26"
+    ]
   },
   "infinix-gt-30": {
     "brand": "Infinix",
@@ -259,21 +218,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 17999,
-        "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-5g-cyber-blue-128-cyber-blue-gb/p/itmcda81613113c6",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 18999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 1055,
-        "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-pro-5g-blade-white-256-gb/p/itmd4bc1852572b9",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 20999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-5g-cyber-blue-128-cyber-blue-gb/p/itmcda81613113c6"
+    ]
   },
   "infinix-gt-30-pro": {
     "brand": "Infinix",
@@ -285,35 +241,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 1055,
-        "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-pro-5g-dark-flare-256-gb/p/itmd4bc1852572b9",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 22999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 21999,
-        "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-pro-5g-dark-flare-256-gb/p/itmd4bc1852572b9",
-        "verified": false
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 1055,
-        "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-pro-5g-dark-flare-256-gb/p/itmd4bc1852572b9",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 26999,
         "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 21999,
-        "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-pro-5g-dark-flare-256-gb/p/itmd4bc1852572b9",
-        "verified": false
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-pro-5g-dark-flare-256-gb/p/itmd4bc1852572b9"
+    ]
   },
   "infinix-note-edge": {
     "brand": "Infinix",
@@ -327,21 +266,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 13999,
-        "flipkartUrl": "https://www.flipkart.com/infinix-note-edge-silk-green-128-gb/p/itmab2876405a1ab",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 14999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 13999,
-        "flipkartUrl": "https://www.flipkart.com/infinix-note-edge-solar-orange-256-gb/p/itm7720c4dde19f1",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 16999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/infinix-note-edge-silk-green-128-gb/p/itmab2876405a1ab"
+    ]
   },
   "infinix-smart-10": {
     "brand": "Infinix",
@@ -353,35 +289,41 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "3 GB",
-        "storage": "64 GB",
-        "price": 5999,
-        "flipkartUrl": "https://www.flipkart.com/infinix-smart-10-titanium-silver-64-gb/p/itm0bde9cee1963a",
+        "ram": "3GB",
+        "storage": "64GB",
+        "price": 6499,
         "verified": true
       },
       {
-        "ram": "3 GB",
-        "storage": "128 GB",
-        "price": 7799,
-        "flipkartUrl": "https://www.flipkart.com/infinix-smart-8-plus-timber-black-128-gb/p/itmb71da75c376e1",
-        "verified": true
-      },
-      {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 5999,
-        "flipkartUrl": "https://www.flipkart.com/infinix-smart-10-titanium-silver-64-gb/p/itm0bde9cee1963a",
-        "verified": true
-      },
-      {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 11999,
-        "flipkartUrl": "https://www.flipkart.com/infinix-hot-10-ocean-wave-128-gb/p/itm80ea670ef0bfc",
+        "ram": "4GB",
+        "storage": "128GB",
+        "price": 7499,
         "verified": true
       }
+    ]
+  },
+  "infinix-smart-20": {
+    "brand": "Infinix",
+    "name": "Infinix Smart 20",
+    "colorNames": [
+      "Sunlit Orange",
+      "Black",
+      "Blue"
     ],
-    "flipkartUrl": "https://www.flipkart.com/infinix-smart-10-titanium-silver-64-gb/p/itm0bde9cee1963a"
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 6999,
+        "verified": true
+      },
+      {
+        "ram": "4GB",
+        "storage": "128GB",
+        "price": 7999,
+        "verified": true
+      }
+    ]
   },
   "moto-60-fusion": {
     "brand": "Motorola",
@@ -392,21 +334,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 21849,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-fusion-5g-pantone-slipstream-128-gb/p/itm3ddb7e06211f1",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 24999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 24999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-fusion-5g-pantone-amazonite-256-gb/p/itm9218b12ff853f",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 27999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-fusion-5g-pantone-slipstream-128-gb/p/itm3ddb7e06211f1"
+    ]
   },
   "moto-70-fusion": {
     "brand": "Motorola",
@@ -417,35 +356,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 30399,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-fusion-pantone-blue-surf-256-gb/p/itm8617d6ad959da",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 33999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 29499,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-fusion-pantone-blue-surf-512-gb/p/itm87b81fff91d44",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 29499,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-fusion-pantone-blue-surf-256-gb/p/itm6383107cab140",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 31999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-fusion-pantone-blue-surf-512-gb/p/itm87b81fff91d44",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 38999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-fusion-pantone-blue-surf-256-gb/p/itm8617d6ad959da"
+    ]
   },
   "moto-edge-60": {
     "brand": "Motorola",
@@ -457,35 +379,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 27999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-pantone-dazzling-blue-256-gb/p/itmbe844b03e063b",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 29999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 36099,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-512-gb/p/itm106024b11b487",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 27999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-5g-pantone-gibraltar-sea-256-gb/p/itmc7ab8f1263d42",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 36099,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-pantone-dazzling-blue-512-gb/p/itmdc36ec357d827",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 34999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-pantone-dazzling-blue-256-gb/p/itmbe844b03e063b"
+    ]
   },
   "moto-edge-60-pro": {
     "brand": "Motorola",
@@ -496,35 +401,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 25999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-pantone-dazzling-blue-256-gb/p/itmbe844b03e063b",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 29999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 36099,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-512-gb/p/itm106024b11b487",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 32299,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-pantone-walnut-256-gb/p/itm77d7138c41207",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 36099,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-512-gb/p/itm106024b11b487",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 34999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-pantone-dazzling-blue-256-gb/p/itmbe844b03e063b"
+    ]
   },
   "moto-edge-70-pro": {
     "brand": "Motorola",
@@ -538,35 +426,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 37999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-pro-pantone-tea-256-gb/p/itm8e1524c8da543",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 39999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 31999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-fusion/p/itm0119095a14fb0",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 44999,
         "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 37999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-pro-pantone-zinfandel-256-gb/p/itm70caeee0ca941",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 37999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-pro-pantone-tea-256-gb/p/itm8e1524c8da543",
-        "verified": false
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-pro-pantone-tea-256-gb/p/itm8e1524c8da543"
+    ]
   },
   "moto-g06-power": {
     "brand": "Motorola",
@@ -577,35 +448,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 13299,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g06-power-pantone-tendril-64-gb/p/itm2f1ca967879c9",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 13999,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 12999,
-        "flipkartUrl": "https://www.flipkart.com/arya-design-gallery-back-cover-motorola-moto-g06-power-4g/p/itmaddc0a43b3c35",
-        "verified": false
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 13299,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g06-power-pantone-tapestry-64-gb/p/itm29390fa68401d",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 15999,
         "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 12999,
-        "flipkartUrl": "https://www.flipkart.com/arya-design-gallery-back-cover-motorola-moto-g06-power-4g/p/itmaddc0a43b3c35",
-        "verified": false
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-g06-power-pantone-tendril-64-gb/p/itm2f1ca967879c9"
+    ]
   },
   "moto-g37": {
     "brand": "Motorola",
@@ -616,35 +470,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 13299,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g37-pantone-nautical-blue-64-gb/p/itm5d235b295291f",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 10000,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 15199,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g37-power-pantone-nautical-blue-128-gb/p/itmf752f4981d932",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 13299,
-        "flipkartUrl": "https://www.flipkart.com/motorala-g37-pantone-nautical-blue-64-gb/p/itm2afe0a88dbd9f",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 15199,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g37-power-pantone-nautical-blue-128-gb/p/itmf752f4981d932",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 11999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-g37-pantone-nautical-blue-64-gb/p/itm5d235b295291f"
+    ]
   },
   "moto-g37-power": {
     "brand": "Motorola",
@@ -655,35 +492,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 15999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
         "price": 18999,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g37-power-pantone-capri-128-gb/p/itm5dc5774d4d5e9",
         "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 14999,
-        "flipkartUrl": "https://www.flipkart.com/gdbuy-back-cover-realme-13-5g-5g/p/itm7923842486e34",
-        "verified": false
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 15199,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g37-power-pantone-nautical-blue-128-gb/p/itmf752f4981d932",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 14999,
-        "flipkartUrl": "https://www.flipkart.com/gdbuy-back-cover-realme-13-5g-5g/p/itm7923842486e34",
-        "verified": false
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-g37-power-pantone-capri-128-gb/p/itm5dc5774d4d5e9"
+    ]
   },
   "moto-g57-power": {
     "brand": "Motorola",
@@ -694,35 +514,40 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 19949,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g57-power-5g-snapdragon-pantone-corsair-128-gb/p/itm8332e9aa80c32",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 20999,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 18999,
-        "flipkartUrl": "https://www.flipkart.com/smartcase-back-cover-moto-g57-power-5g-motorola-5g/p/itm2f3c2b594fe12",
-        "verified": false
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 19949,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g57-power-5g-snapdragon-pantone-corsair-128-gb/p/itm8332e9aa80c32",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 23999,
         "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 18999,
-        "flipkartUrl": "https://www.flipkart.com/smartcase-back-cover-moto-g57-power-5g-motorola-5g/p/itm2f3c2b594fe12",
-        "verified": false
       }
+    ]
+  },
+  "moto-g67-power": {
+    "brand": "Motorola",
+    "name": "Motorola Moto G67 Power",
+    "colorNames": [
+      "Ocean Blue",
+      "Charcoal Black"
     ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-g57-power-5g-snapdragon-pantone-corsair-128-gb/p/itm8332e9aa80c32"
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 10000,
+        "verified": true
+      },
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 11999,
+        "verified": true
+      }
+    ]
   },
   "moto-g96": {
     "brand": "Motorola",
@@ -734,35 +559,40 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 21849,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g96-5g-pantone-ashleigh-blue-256-gb/p/itmda6d829eead4b",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 20999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 19999,
-        "flipkartUrl": "https://www.flipkart.com/vmt-stock-back-cover-motorola-moto-g96-5g/p/itmb07c5a9c783cc",
-        "verified": false
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 21849,
-        "flipkartUrl": "https://www.flipkart.com/motorola-g96-5g-pantone-ashleigh-blue-256-gb/p/itmda6d829eead4b",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 24999,
         "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 19999,
-        "flipkartUrl": "https://www.flipkart.com/vmt-stock-back-cover-motorola-moto-g96-5g/p/itmb07c5a9c783cc",
-        "verified": false
       }
+    ]
+  },
+  "narzo-100-lite": {
+    "brand": "Narzo",
+    "name": "Realme Narzo 100 Lite",
+    "colorNames": [
+      "Frost Silver",
+      "Thunder Black"
     ],
-    "flipkartUrl": "https://www.flipkart.com/motorola-g96-5g-pantone-ashleigh-blue-256-gb/p/itmda6d829eead4b"
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 18320,
+        "verified": true
+      },
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 20320,
+        "verified": true
+      }
+    ]
   },
   "narzo-80-lite": {
     "brand": "Narzo",
@@ -774,35 +604,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 10999,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-80-lite-beach-gold-64-gb/p/itmda40eecbc001f",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 12999,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 10999,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-80-lite-5g-onyx-black-128-gb/p/itm47ab7fdec3924",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 10999,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-80-lite-beach-gold-64-gb/p/itmda40eecbc001f",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 10999,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-80-lite-4g-obsidian-black-128-gb/p/itm2890cac28063f",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 14999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/realme-narzo-80-lite-beach-gold-64-gb/p/itmda40eecbc001f"
+    ]
   },
   "narzo-90": {
     "brand": "Narzo",
@@ -813,21 +626,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 15999,
-        "flipkartUrl": "https://www.flipkart.com/realme-90x-5g-flash-blue-128-gb/p/itm6d58bc292ef4d",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 16999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 15999,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-90-5g-victory-gold-128-gb/p/itm6464e1056a2e4",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 18999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/realme-90x-5g-flash-blue-128-gb/p/itm6d58bc292ef4d"
+    ]
   },
   "narzo-90x": {
     "brand": "Narzo",
@@ -838,21 +648,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 17999,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-90x-5g-flash-blue-128-gb/p/itma63c5c5ce781a",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 19998,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 17999,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-90x-5g-flash-blue-128-gb/p/itma63c5c5ce781a",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 21998,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/realme-narzo-90x-5g-flash-blue-128-gb/p/itma63c5c5ce781a"
+    ]
   },
   "narzo-n53": {
     "brand": "Narzo",
@@ -863,35 +670,69 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
+        "ram": "4GB",
+        "storage": "64GB",
         "price": 9887,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-n53-feather-black-64-gb/p/itm3061a0a591574",
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 9887,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-n53-feather-black-128-gb/p/itm3061a0a591574",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 9887,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-n61-marble-black-64-gb/p/itm4a7b7f6160ff8",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 9887,
-        "flipkartUrl": "https://www.flipkart.com/realme-narzo-n53-feather-black-128-gb/p/itm3061a0a591574",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 11887,
         "verified": true
       }
+    ]
+  },
+  "narzo-power": {
+    "brand": "Narzo",
+    "name": "Realme Narzo Power",
+    "colorNames": [
+      "Titan Silver",
+      "Titan Blue"
     ],
-    "flipkartUrl": "https://www.flipkart.com/realme-narzo-n53-feather-black-64-gb/p/itm3061a0a591574"
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 37998,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 41998,
+        "verified": true
+      }
+    ]
+  },
+  "oneplus-13": {
+    "brand": "OnePlus",
+    "name": "OnePlus 13",
+    "colorNames": [
+      "Midnight Ocean",
+      "Arctic Dawn",
+      "Black Eclipse"
+    ],
+    "variants": [
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 57999,
+        "verified": true
+      },
+      {
+        "ram": "16GB",
+        "storage": "512GB",
+        "price": 67999,
+        "verified": true
+      },
+      {
+        "ram": "24GB",
+        "storage": "1TB",
+        "price": 82999,
+        "verified": true
+      }
+    ]
   },
   "oneplus-z2-anc": {
     "brand": "OnePlus",
@@ -905,7 +746,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
         "ram": "",
         "storage": "",
         "price": 999,
-        "verified": false
+        "verified": true
       }
     ]
   },
@@ -921,12 +762,61 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
       {
         "ram": "",
         "storage": "",
-        "price": 1499,
-        "amazonUrl": "https://www.amazon.in/AirDapp-Silicone-Protective-OnePlus-Earphone/dp/B0B6T5DB2X",
+        "price": 1749,
         "verified": true
       }
+    ]
+  },
+  "oneplus-nord-5": {
+    "brand": "OnePlus",
+    "name": "OnePlus Nord 5",
+    "colorNames": [
+      "Marble Sands",
+      "Phantom Grey",
+      "Dry Ice"
     ],
-    "amazonUrl": "https://www.amazon.in/AirDapp-Silicone-Protective-OnePlus-Earphone/dp/B0B6T5DB2X"
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 29999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 34999,
+        "verified": true
+      }
+    ]
+  },
+  "oneplus-nord-6": {
+    "brand": "OnePlus",
+    "name": "OnePlus Nord 6",
+    "colorNames": [
+      "Stormy Black",
+      "Misty Green"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 49472,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 54472,
+        "verified": true
+      },
+      {
+        "ram": "16GB",
+        "storage": "512GB",
+        "price": 59472,
+        "verified": true
+      }
+    ]
   },
   "oneplus-nord-ce6": {
     "brand": "OnePlus",
@@ -937,35 +827,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 33985,
-        "amazonUrl": "https://www.amazon.in/OnePlus-Snapdragon-Segments-Fastest-Response/dp/B0GWLHVJRH",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 35850,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 33985,
-        "amazonUrl": "https://www.amazon.in/OnePlus-Snapdragon-Segments-Fastest-Response/dp/B0GWLDWKF3",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 40850,
         "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "128 GB",
-        "price": 33985,
-        "amazonUrl": "https://www.amazon.in/OnePlus-Snapdragon-Segments-Fastest-Response/dp/B0GWLHVJRH",
-        "verified": false
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 33985,
-        "amazonUrl": "https://www.amazon.in/OnePlus-Snapdragon-Segments-Fastest-Response/dp/B0GWLHVJRH",
-        "verified": false
       }
-    ],
-    "amazonUrl": "https://www.amazon.in/OnePlus-Snapdragon-Segments-Fastest-Response/dp/B0GWLHVJRH"
+    ]
   },
   "oneplus-nord-ce6-lite": {
     "brand": "OnePlus",
@@ -976,35 +849,131 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 29499,
-        "amazonUrl": "https://www.amazon.in/OnePlus-Segments-Dimensity-Processor-Recording/dp/B0GVYDLJJQ",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 31927,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 29499,
-        "amazonUrl": "https://www.amazon.in/OnePlus-Segments-Dimensity-Processor-Recording/dp/B0GVYF57G9",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 29499,
-        "amazonUrl": "https://www.amazon.in/OnePlus-Segments-Dimensity-Processor-Recording/dp/B0GVYDLJJQ",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 29499,
-        "amazonUrl": "https://www.amazon.in/OnePlus-Segments-Dimensity-Processor-Recording/dp/B0GVYF57G9",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 35927,
         "verified": true
       }
+    ]
+  },
+  "oneplus-pad-go-2": {
+    "brand": "OnePlus",
+    "name": "OnePlus Pad Go 2",
+    "colorNames": [
+      "Mint Green",
+      "Space Grey"
     ],
-    "amazonUrl": "https://www.amazon.in/OnePlus-Segments-Dimensity-Processor-Recording/dp/B0GVYDLJJQ"
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 31499,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 36499,
+        "verified": true
+      }
+    ]
+  },
+  "oppo-a6x": {
+    "brand": "Oppo",
+    "name": "Oppo A6x",
+    "colorNames": [
+      "Starlight White",
+      "Midnight Black",
+      "Ocean Blue"
+    ],
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 17999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 20999,
+        "verified": true
+      }
+    ]
+  },
+  "oppo-f31-pro-plus": {
+    "brand": "Oppo",
+    "name": "Oppo F31 Pro Plus",
+    "colorNames": [
+      "Astral Blue",
+      "Stellar Black"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 34999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 39999,
+        "verified": true
+      }
+    ]
+  },
+  "oppo-f33": {
+    "brand": "Oppo",
+    "name": "Oppo F33",
+    "colorNames": [
+      "Misty Forest",
+      "Passion Red",
+      "Starry Blue"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 36999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 39999,
+        "verified": true
+      }
+    ]
+  },
+  "oppo-f33-pro": {
+    "brand": "Oppo",
+    "name": "Oppo F33 Pro",
+    "colorNames": [
+      "Misty Forest",
+      "Passion Red",
+      "Starry Blue"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 43999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 46999,
+        "verified": true
+      }
+    ]
   },
   "oppo-k13": {
     "brand": "Oppo",
@@ -1015,35 +984,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 17499,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k13-turbo-5g-white-knight-128-gb/p/itm3692362cd3df3",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 23999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 17499,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k13-turbo-pro-5g-silver-knight-256-gb/p/itmeefeb718f01fe",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "128 GB",
-        "price": 17499,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k13-turbo-5g-white-knight-128-gb/p/itm3692362cd3df3",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 17499,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k13-turbo-pro-5g-silver-knight-256-gb/p/itmeefeb718f01fe",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 27999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/oppo-k13-turbo-5g-white-knight-128-gb/p/itm3692362cd3df3"
+    ]
   },
   "oppo-k13x": {
     "brand": "Oppo",
@@ -1054,35 +1006,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 13999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k13x-5g-6000mah-45w-supervooc-charger-ai-midnight-violet-128-gb/p/itm62b2e62fbb43e",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 15999,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 15199,
-        "flipkartUrl": "https://www.flipkart.com/oppo-playzone/p/itm71373f05250b0",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 13999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k13x-5g-6000mah-45w-supervooc-charger-ai-midnight-violet-128-gb/p/itm62b2e62fbb43e",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 15199,
-        "flipkartUrl": "https://www.flipkart.com/oppo-playzone/p/itm71373f05250b0",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 18999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/oppo-k13x-5g-6000mah-45w-supervooc-charger-ai-midnight-violet-128-gb/p/itm62b2e62fbb43e"
+    ]
   },
   "oppo-k14": {
     "brand": "Oppo",
@@ -1094,35 +1029,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
+        "ram": "8GB",
+        "storage": "128GB",
         "price": 21999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k14-5g-prism-violet-128-gb/p/itm2a5cc1d23c2af",
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 19999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k14-5g-prism-violet-256-gb/p/itm2a5cc1d23c2af",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "128 GB",
-        "price": 21999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k14-5g-prism-violet-128-gb/p/itm2a5cc1d23c2af",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 41480,
-        "flipkartUrl": "https://www.flipkart.com/oppo-reno14-5g/p/itm4d9e853eee6cf",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 25999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/oppo-k14-5g-prism-violet-128-gb/p/itm2a5cc1d23c2af"
+    ]
   },
   "oppo-k14x": {
     "brand": "Oppo",
@@ -1133,35 +1051,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 17999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k14x-5g-prism-violet-128-gb/p/itmdcac5ae642971",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "256 GB",
+        "ram": "6GB",
+        "storage": "128GB",
         "price": 19999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k14-5g-prism-violet-256-gb/p/itm2a5cc1d23c2af",
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 17999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k14x-5g-prism-violet-128-gb/p/itmdcac5ae642971",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 19999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-k14-5g-prism-violet-256-gb/p/itm2a5cc1d23c2af",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 22999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/oppo-k14x-5g-prism-violet-128-gb/p/itmdcac5ae642971"
+    ]
   },
   "oppo-reno-15": {
     "brand": "Oppo",
@@ -1173,49 +1074,52 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 39999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-reno15-5g-aurora-blue-256-gb/p/itm37cc91d1c2807",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 47999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 39999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-reno15-5g-aurora-blue-512-gb/p/itm37cc91d1c2807",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 54999,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 39999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-reno15-5g-aurora-blue-256-gb/p/itm37cc91d1c2807",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 39999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-reno15-5g-aurora-blue-512-gb/p/itm37cc91d1c2807",
-        "verified": true
-      },
-      {
-        "ram": "16 GB",
-        "storage": "256 GB",
-        "price": 39999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-reno15-5g-aurora-blue-256-gb/p/itm37cc91d1c2807",
-        "verified": true
-      },
-      {
-        "ram": "16 GB",
-        "storage": "512 GB",
-        "price": 39999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-reno15-5g-aurora-blue-512-gb/p/itm37cc91d1c2807",
+        "ram": "16GB",
+        "storage": "512GB",
+        "price": 59999,
         "verified": true
       }
+    ]
+  },
+  "oppo-reno-15-pro-mini": {
+    "brand": "Oppo",
+    "name": "Oppo Reno 15 Pro Mini",
+    "colorNames": [
+      "Space Silver",
+      "Cosmic Black"
     ],
-    "flipkartUrl": "https://www.flipkart.com/oppo-reno15-5g-aurora-blue-256-gb/p/itm37cc91d1c2807"
+    "variants": [
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 64999,
+        "verified": true
+      },
+      {
+        "ram": "16GB",
+        "storage": "512GB",
+        "price": 74999,
+        "verified": true
+      },
+      {
+        "ram": "16GB",
+        "storage": "1TB",
+        "price": 89999,
+        "verified": true
+      }
+    ]
   },
   "oppo-reno-15c": {
     "brand": "Oppo",
@@ -1226,35 +1130,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 20999,
-        "flipkartUrl": "https://www.flipkart.com/redmi-15c-5g-moonlight-blue-128-gb/p/itmc1345bb45eef3",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 41999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 31349,
-        "flipkartUrl": "https://www.flipkart.com/oppo-reno15c-5g-twilight-blue-256-gb/p/itmc54a5df4d2236",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "128 GB",
-        "price": 36999,
-        "flipkartUrl": "https://www.flipkart.com/7printzone-back-cover-oppo-reno-15c-5g/p/itme96cc35f14277",
-        "verified": false
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 36999,
-        "flipkartUrl": "https://www.flipkart.com/oppo-reno15c-5g-twilight-blue-256-gb/p/itmc54a5df4d2236",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 46999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/redmi-15c-5g-moonlight-blue-128-gb/p/itmc1345bb45eef3"
+    ]
   },
   "poco-c71": {
     "brand": "POCO",
@@ -1266,35 +1153,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 6999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c71-desert-gold-64-gb/p/itme3dc58af6a04b",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 9999,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 6999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c71-power-black-128-gb/p/itm8096ee52d7013",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 6999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c71-desert-gold-64-gb/p/itme3dc58af6a04b",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 6999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c71-power-black-128-gb/p/itm8096ee52d7013",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 11999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/poco-c71-desert-gold-64-gb/p/itme3dc58af6a04b"
+    ]
   },
   "poco-c85": {
     "brand": "POCO",
@@ -1305,35 +1175,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 13999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c85-5g-charger-box-power-black-128-gb/p/itm00a5a3f301b9c",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 16499,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 13999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c85-5g-mystic-purple-128-gb/p/itm74e2143a5de24",
-        "verified": false
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 13999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c85-5g-mystic-purple-128-gb/p/itm74e2143a5de24",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 19499,
         "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 13999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c85-5g-mystic-purple-128-gb/p/itm74e2143a5de24",
-        "verified": false
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/poco-c85-5g-charger-box-power-black-128-gb/p/itm00a5a3f301b9c"
+    ]
   },
   "poco-c85x": {
     "brand": "POCO",
@@ -1345,35 +1198,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 11999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c85x-green-64-gb/p/itm96bce2b7909b7",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 13999,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 11999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c85x-black-128-gb/p/itm7e422d0bdc317",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 11999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c85x-green-64-gb/p/itm96bce2b7909b7",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 11999,
-        "flipkartUrl": "https://www.flipkart.com/poco-c85x-black-128-gb/p/itm7e422d0bdc317",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 15999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/poco-c85x-green-64-gb/p/itm96bce2b7909b7"
+    ]
   },
   "poco-m7": {
     "brand": "POCO",
@@ -1385,35 +1221,40 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 12349,
-        "flipkartUrl": "https://www.flipkart.com/poco-m7-pro-5g-lunar-dust-128-gb/p/itm59a079d57519a",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 13499,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 16149,
-        "flipkartUrl": "https://www.flipkart.com/poco-m7-pro-5g-lunar-dust-256-gb/p/itmf2e9e7e09f237",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 12349,
-        "flipkartUrl": "https://www.flipkart.com/poco-m7-pro-5g-lunar-dust-128-gb/p/itm59a079d57519a",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 12999,
-        "flipkartUrl": "https://www.flipkart.com/poco-m7-pro-5g-lunar-dust-256-gb/p/itmf2e9e7e09f237",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 16499,
         "verified": true
       }
+    ]
+  },
+  "poco-m7-plus": {
+    "brand": "POCO",
+    "name": "POCO M7 Plus",
+    "colorNames": [
+      "Graphite Black",
+      "Aurora Green"
     ],
-    "flipkartUrl": "https://www.flipkart.com/poco-m7-pro-5g-lunar-dust-128-gb/p/itm59a079d57519a"
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 16999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 21999,
+        "verified": true
+      }
+    ]
   },
   "realme-15": {
     "brand": "Realme",
@@ -1424,35 +1265,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 24999,
-        "flipkartUrl": "https://www.flipkart.com/realme-15-5g-flowing-silver-128-gb/p/itme9581fbd0e97a",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 32499,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 24999,
-        "flipkartUrl": "https://www.flipkart.com/realme-15-pro-5g-flowing-silver-256-gb/p/itm216cdbf4baea0",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "128 GB",
-        "price": 24999,
-        "flipkartUrl": "https://www.flipkart.com/realme-15-5g-flowing-silver-128-gb/p/itme9581fbd0e97a",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 24999,
-        "flipkartUrl": "https://www.flipkart.com/realme-15-pro-5g-flowing-silver-256-gb/p/itm216cdbf4baea0",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 37499,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/realme-15-5g-flowing-silver-128-gb/p/itme9581fbd0e97a"
+    ]
   },
   "realme-15t": {
     "brand": "Realme",
@@ -1463,35 +1287,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 25999,
-        "flipkartUrl": "https://www.flipkart.com/realme-15t-5g-flowing-silver-128-gb/p/itm3f28d98da183c",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 27999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 25999,
-        "flipkartUrl": "https://www.flipkart.com/product/p/itme",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "128 GB",
-        "price": 25999,
-        "flipkartUrl": "https://www.flipkart.com/realme-15t-5g-flowing-silver-128-gb/p/itm3f28d98da183c",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 25999,
-        "flipkartUrl": "https://www.flipkart.com/realme-15t-5g-flowing-silver-128-gb/p/itm3f28d98da183c",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 32999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/realme-15t-5g-flowing-silver-128-gb/p/itm3f28d98da183c"
+    ]
   },
   "realme-15x": {
     "brand": "Realme",
@@ -1503,35 +1310,98 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 24699,
-        "flipkartUrl": "https://www.flipkart.com/realme-15x-5g-aqua-blue-128-gb/p/itmcf22f2a57724f",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 25999,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 23999,
-        "flipkartUrl": "https://www.flipkart.com/realme-15x-aqua-blue-128-gb/p/itmd7ef70dbda3a0",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 24699,
-        "flipkartUrl": "https://www.flipkart.com/realme-15x-5g-aqua-blue-128-gb/p/itmcf22f2a57724f",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 23999,
-        "flipkartUrl": "https://www.flipkart.com/realme-15x-aqua-blue-128-gb/p/itmd7ef70dbda3a0",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 28999,
         "verified": true
       }
+    ]
+  },
+  "realme-16": {
+    "brand": "Realme",
+    "name": "Realme 16",
+    "colorNames": [
+      "Pebble Grey",
+      "Master Gold",
+      "Orchid Purple"
     ],
-    "flipkartUrl": "https://www.flipkart.com/realme-15x-5g-aqua-blue-128-gb/p/itmcf22f2a57724f"
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 35999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 40999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 45999,
+        "verified": true
+      }
+    ]
+  },
+  "realme-16-pro": {
+    "brand": "Realme",
+    "name": "Realme 16 Pro+",
+    "colorNames": [
+      "Master Grey",
+      "Master Gold",
+      "Camellia Pink"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 55999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 60999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 65999,
+        "verified": true
+      }
+    ]
+  },
+  "realme-16t": {
+    "brand": "Realme",
+    "name": "Realme 16T",
+    "colorNames": [
+      "Speed Green",
+      "Racing Black"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 27999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 32999,
+        "verified": true
+      }
+    ]
   },
   "realme-c71": {
     "brand": "Realme",
@@ -1542,35 +1412,85 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 11499,
-        "flipkartUrl": "https://www.flipkart.com/realme-c71-dune-gold-64-gb/p/itm81ab68c80d75d",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 12869,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 11499,
-        "flipkartUrl": "https://www.flipkart.com/realme-c71-sea-blue-128-gb/p/itm920c5c8761871",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 11499,
-        "flipkartUrl": "https://www.flipkart.com/realme-c71-dune-gold-64-gb/p/itm81ab68c80d75d",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 11499,
-        "flipkartUrl": "https://www.flipkart.com/realme-c71-sea-blue-128-gb/p/itm920c5c8761871",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 14869,
         "verified": true
       }
+    ]
+  },
+  "realme-c83": {
+    "brand": "Realme",
+    "name": "Realme C83",
+    "colorNames": [
+      "Meadow Green",
+      "Twilight Purple"
     ],
-    "flipkartUrl": "https://www.flipkart.com/realme-c71-dune-gold-64-gb/p/itm81ab68c80d75d"
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 173,
+        "verified": true
+      }
+    ]
+  },
+  "realme-p3x": {
+    "brand": "Realme",
+    "name": "Realme P3x",
+    "colorNames": [
+      "Nebula Purple",
+      "Cosmic Black"
+    ],
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 15999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 18999,
+        "verified": true
+      }
+    ]
+  },
+  "realme-p4": {
+    "brand": "Realme",
+    "name": "Realme P4",
+    "colorNames": [
+      "Nebula Purple",
+      "Cosmic Black",
+      "Starlight Silver"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 24999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 29999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 34999,
+        "verified": true
+      }
+    ]
   },
   "realme-p4-lite": {
     "brand": "Realme",
@@ -1581,35 +1501,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 11399,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4-lite-5g-mosaic-blue-64-gb/p/itm90c243961f214",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 12999,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 15999,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4-lite-sea-blue-128-gb/p/itm029fbc88fdc91",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 11399,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4-lite-5g-mosaic-blue-64-gb/p/itm90c243961f214",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 15561,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4-5g-iwit-steel-grey-128-gb/p/itme87f580f5b4fd",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 14999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/realme-p4-lite-5g-mosaic-blue-64-gb/p/itm90c243961f214"
+    ]
   },
   "realme-p4-power": {
     "brand": "Realme",
@@ -1620,35 +1523,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 28499,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4-power-5g-transsilver-128-gb/p/itm49784b322aad0",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 27999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 25999,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4-power-5g-transsilver-128-gb/p/itm49784b322aad0",
-        "verified": false
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 30999,
-        "flipkartUrl": "https://www.flipkart.com/product/p/itme",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 32999,
         "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 25999,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4-power-5g-transsilver-128-gb/p/itm49784b322aad0",
-        "verified": false
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/realme-p4-power-5g-transsilver-128-gb/p/itm49784b322aad0"
+    ]
   },
   "realme-p4x": {
     "brand": "Realme",
@@ -1659,35 +1545,92 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 19499,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4x-5g-lake-green-128-gb/p/itm575b1540859e4",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 20499,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 19499,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4x-5g-lake-green-128-gb/p/itm575b1540859e4",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 19499,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4x-5g-lake-green-128-gb/p/itm575b1540859e4",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 19499,
-        "flipkartUrl": "https://www.flipkart.com/realme-p4x-5g-lake-green-128-gb/p/itm575b1540859e4",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 23499,
         "verified": true
       }
+    ]
+  },
+  "realme-pad-2-lite": {
+    "brand": "Realme",
+    "name": "Realme Pad 2 Lite",
+    "colorNames": [
+      "Green",
+      "Grey"
     ],
-    "flipkartUrl": "https://www.flipkart.com/realme-p4x-5g-lake-green-128-gb/p/itm575b1540859e4"
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 18999,
+        "verified": true
+      },
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 21999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 25999,
+        "verified": true
+      }
+    ]
+  },
+  "redmi-15a": {
+    "brand": "Redmi",
+    "name": "Redmi 15A",
+    "colorNames": [
+      "Light Blue",
+      "Black",
+      "Green"
+    ],
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 14859,
+        "verified": true
+      },
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 16859,
+        "verified": true
+      }
+    ]
+  },
+  "redmi-15c": {
+    "brand": "Redmi",
+    "name": "Redmi 15C",
+    "colorNames": [
+      "Stardust Purple",
+      "Midnight Black",
+      "Forest Green"
+    ],
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 18999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 22999,
+        "verified": true
+      }
+    ]
   },
   "redmi-a4": {
     "brand": "Redmi",
@@ -1699,35 +1642,177 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 12999,
-        "amazonUrl": "https://www.amazon.in/Redmi-A4-5G-Sparkle-Charging/dp/B0DLW427YG",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 14999,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 12999,
-        "amazonUrl": "https://www.amazon.in/Redmi-Sparkle-Storage-Segment-Charging/dp/B0DLW44CGS",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 12999,
-        "amazonUrl": "https://www.amazon.in/Redmi-A4-5G-Storage-Charging/dp/B0FBRM15FH",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 12999,
-        "amazonUrl": "https://www.amazon.in/Redmi-A4-5G-Storage-Charging/dp/B0FBRM15FH",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 16999,
         "verified": true
       }
+    ]
+  },
+  "redmi-a5": {
+    "brand": "Redmi",
+    "name": "Redmi A5",
+    "colorNames": [
+      "Midnight Black",
+      "Lake Blue",
+      "Olive Green"
     ],
-    "amazonUrl": "https://www.amazon.in/Redmi-A4-5G-Sparkle-Charging/dp/B0DLW427YG"
+    "variants": [
+      {
+        "ram": "3GB",
+        "storage": "64GB",
+        "price": 8699,
+        "verified": true
+      },
+      {
+        "ram": "4GB",
+        "storage": "128GB",
+        "price": 10699,
+        "verified": true
+      }
+    ]
+  },
+  "redmi-a7-pro": {
+    "brand": "Redmi",
+    "name": "Redmi A7 Pro",
+    "colorNames": [
+      "Midnight Black",
+      "Starlight Blue"
+    ],
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 14999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 17999,
+        "verified": true
+      }
+    ]
+  },
+  "samsung-a06": {
+    "brand": "Samsung",
+    "name": "Samsung Galaxy A06",
+    "colorNames": [
+      "Black",
+      "Light Blue",
+      "Gold"
+    ],
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 10738,
+        "verified": true
+      },
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 12738,
+        "verified": true
+      }
+    ]
+  },
+  "samsung-f06": {
+    "brand": "Samsung",
+    "name": "Samsung Galaxy F06",
+    "colorNames": [
+      "Black",
+      "Light Blue",
+      "Gold"
+    ],
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 13999,
+        "verified": true
+      },
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 15999,
+        "verified": true
+      }
+    ]
+  },
+  "samsung-f07": {
+    "brand": "Samsung",
+    "name": "Samsung Galaxy F07",
+    "colorNames": [
+      "Black",
+      "Light Blue",
+      "Gold"
+    ],
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 11999,
+        "verified": true
+      },
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 13999,
+        "verified": true
+      }
+    ]
+  },
+  "samsung-f36": {
+    "brand": "Samsung",
+    "name": "Samsung Galaxy F36",
+    "colorNames": [
+      "Awesome Graphite",
+      "Awesome Silver",
+      "Awesome Violet"
+    ],
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 25499,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 28499,
+        "verified": true
+      }
+    ]
+  },
+  "samsung-f70e": {
+    "brand": "Samsung",
+    "name": "Samsung Galaxy F70e",
+    "colorNames": [
+      "Awesome Graphite",
+      "Awesome Silver"
+    ],
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 17499,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 20499,
+        "verified": true
+      }
+    ]
   },
   "samsung-m06": {
     "brand": "Samsung",
@@ -1739,35 +1824,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "4 GB",
-        "storage": "64 GB",
-        "price": 11499,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-m06-5g-blazing-black-64-gb/p/itm0c7e356cd6ad6",
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 13470,
         "verified": true
       },
       {
-        "ram": "4 GB",
-        "storage": "128 GB",
-        "price": 11499,
-        "flipkartUrl": "https://www.flipkart.com/samsung-m06-5g-blazing-black-128-gb/p/itmcafa42dadc15c",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "64 GB",
-        "price": 11499,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-m06-5g-blazing-black-64-gb/p/itm0c7e356cd6ad6",
-        "verified": true
-      },
-      {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 11499,
-        "flipkartUrl": "https://www.flipkart.com/samsung-m06-5g-blazing-black-128-gb/p/itmcafa42dadc15c",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 15470,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-m06-5g-blazing-black-64-gb/p/itm0c7e356cd6ad6"
+    ]
   },
   "samsung-m36": {
     "brand": "Samsung",
@@ -1779,35 +1847,41 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 17499,
-        "flipkartUrl": "https://www.flipkart.com/samsung-m36-5g-light-green-128-gb/p/itm4cf1eae54334f",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 19647,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 17499,
-        "flipkartUrl": "https://www.flipkart.com/samsung-m36-5g-black-256-gb/p/itm74130a5a313b6",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 17499,
-        "flipkartUrl": "https://www.flipkart.com/samsung-m36-5g-light-green-128-gb/p/itm4cf1eae54334f",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 17499,
-        "flipkartUrl": "https://www.flipkart.com/samsung-m36-5g-black-256-gb/p/itm74130a5a313b6",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 22647,
         "verified": true
       }
+    ]
+  },
+  "samsung-m56": {
+    "brand": "Samsung",
+    "name": "Samsung Galaxy M56",
+    "colorNames": [
+      "Awesome Graphite",
+      "Awesome Silver",
+      "Awesome Violet"
     ],
-    "flipkartUrl": "https://www.flipkart.com/samsung-m36-5g-light-green-128-gb/p/itm4cf1eae54334f"
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 25925,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 30925,
+        "verified": true
+      }
+    ]
   },
   "samsung-s25-fe": {
     "brand": "Samsung",
@@ -1820,28 +1894,24 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 64999,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-fe-5g-navy-128-gb/p/itm7c78f4eee8160",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 77999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 65999,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-fe-5g-white-256-gb/p/itm686ea83612e85",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 84999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "512 GB",
-        "price": 64999,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-fe-5g-white-128-gb/p/itm686ea83612e85",
+        "ram": "8GB",
+        "storage": "512GB",
+        "price": 94999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-fe-5g-navy-128-gb/p/itm7c78f4eee8160"
+    ]
   },
   "samsung-s25-ultra": {
     "brand": "Samsung",
@@ -1854,49 +1924,24 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 84739,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-ultra-5g-titanium-silverblue-256-gb/p/itm413a5c3f30151",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 129990,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 125990,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-ultra-5g-titanium-black-512-gb/p/itmc5f14b041aa5b",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 139990,
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "1 TB",
-        "price": 88739,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-ultra-5g-titanium-silverblue-1024-gb/p/itm7d0e1ef71672e",
-        "verified": false
-      },
-      {
-        "ram": "16 GB",
-        "storage": "256 GB",
-        "price": 84739,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-ultra-5g-titanium-silverblue-256-gb/p/itm413a5c3f30151",
+        "ram": "16GB",
+        "storage": "1TB",
+        "price": 159990,
         "verified": true
-      },
-      {
-        "ram": "16 GB",
-        "storage": "512 GB",
-        "price": 125990,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-ultra-5g-titanium-black-512-gb/p/itmc5f14b041aa5b",
-        "verified": true
-      },
-      {
-        "ram": "16 GB",
-        "storage": "1 TB",
-        "price": 88739,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-ultra-5g-titanium-silverblue-1024-gb/p/itm7d0e1ef71672e",
-        "verified": false
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-ultra-5g-titanium-silverblue-256-gb/p/itm413a5c3f30151"
+    ]
   },
   "samsung-s26-plus": {
     "brand": "Samsung",
@@ -1906,26 +1951,68 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
       "Cobalt Violet",
       "Sky Blue",
       "White",
-      "Pink Gold",
-      "Silver Shadow"
+      "Pink Gold (Online Exclusive)",
+      "Silver Shadow (Online Exclusive)"
     ],
     "variants": [
       {
-        "ram": "12 GB",
-        "storage": "256 GB",
+        "ram": "12GB",
+        "storage": "256GB",
         "price": 114999,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s26-5g-black-256-gb/p/itmf5ed5d08eef13",
         "verified": true
       },
       {
-        "ram": "12 GB",
-        "storage": "512 GB",
-        "price": 114999,
-        "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s26-5g-black-512-gb/p/itmf5ed5d08eef13",
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 124999,
         "verified": true
       }
+    ]
+  },
+  "samsung-tab-s10-lite": {
+    "brand": "Samsung",
+    "name": "Samsung Galaxy Tab S10 Lite",
+    "colorNames": [
+      "Graphite",
+      "Silver",
+      "Pink Gold"
     ],
-    "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s26-5g-black-256-gb/p/itmf5ed5d08eef13"
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 30140,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 35140,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-t4": {
+    "brand": "Vivo",
+    "name": "Vivo T4",
+    "colorNames": [
+      "Emerald Blaze",
+      "Phantom Grey"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 28999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 33999,
+        "verified": true
+      }
+    ]
   },
   "vivo-t4-lite": {
     "brand": "Vivo",
@@ -1936,35 +2023,18 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 19999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4-lite-5g-2026-titanium-gold-128-gb/p/itm08f41580b36a4",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 23999,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 19999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4-lite-5g-prism-blue-2026-8gb-256gb/p/itm49fb53d099f3c",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 19999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4-lite-5g-2026-titanium-gold-128-gb/p/itm08f41580b36a4",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 19999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4-lite-5g-prism-blue-2026-8gb-256gb/p/itm49fb53d099f3c",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 27999,
         "verified": true
       }
-    ],
-    "flipkartUrl": "https://www.flipkart.com/vivo-t4-lite-5g-2026-titanium-gold-128-gb/p/itm08f41580b36a4"
+    ]
   },
   "vivo-t4-pro": {
     "brand": "Vivo",
@@ -1975,35 +2045,40 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 27999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4-pro-5g-nitro-blue-128-gb/p/itm4da1824b696d9",
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 29999,
         "verified": true
       },
       {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 27999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4-pro-5g-blaze-gold-256-gb/p/itm4da1824b696d9",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "128 GB",
-        "price": 27999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4-pro-5g-nitro-blue-128-gb/p/itm4da1824b696d9",
-        "verified": true
-      },
-      {
-        "ram": "12 GB",
-        "storage": "256 GB",
-        "price": 27999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4-pro-5g-blaze-gold-256-gb/p/itm4da1824b696d9",
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 34999,
         "verified": true
       }
+    ]
+  },
+  "vivo-t4-ultra": {
+    "brand": "Vivo",
+    "name": "Vivo T4 Ultra",
+    "colorNames": [
+      "Phoenix Gold",
+      "Meteor Grey"
     ],
-    "flipkartUrl": "https://www.flipkart.com/vivo-t4-pro-5g-nitro-blue-128-gb/p/itm4da1824b696d9"
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 39999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 46999,
+        "verified": true
+      }
+    ]
   },
   "vivo-t4r": {
     "brand": "Vivo",
@@ -2014,43 +2089,397 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     ],
     "variants": [
       {
-        "ram": "6 GB",
-        "storage": "128 GB",
-        "price": 21999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4r-5g-twilight-blue-128-gb/p/itm3a5653667cb9c",
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 24999,
         "verified": true
       },
       {
-        "ram": "6 GB",
-        "storage": "256 GB",
-        "price": 21999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4r-5g-twilight-blue-128-gb/p/itm3a5653667cb9c",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "128 GB",
-        "price": 21999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4r-5g-twilight-blue-128-gb/p/itm3a5653667cb9c",
-        "verified": true
-      },
-      {
-        "ram": "8 GB",
-        "storage": "256 GB",
-        "price": 21999,
-        "flipkartUrl": "https://www.flipkart.com/vivo-t4r-5g-twilight-blue-128-gb/p/itm3a5653667cb9c",
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 28999,
         "verified": true
       }
+    ]
+  },
+  "vivo-t4x": {
+    "brand": "Vivo",
+    "name": "Vivo T4x",
+    "colorNames": [
+      "Glacier Blue",
+      "Starry Black"
     ],
-    "flipkartUrl": "https://www.flipkart.com/vivo-t4r-5g-twilight-blue-128-gb/p/itm3a5653667cb9c"
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 18999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 22999,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-t5-pro": {
+    "brand": "Vivo",
+    "name": "Vivo T5 Pro",
+    "colorNames": [
+      "Glacier Blue",
+      "Starry Black",
+      "Champagne Gold"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 39999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 46999,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-t5x": {
+    "brand": "Vivo",
+    "name": "Vivo T5x",
+    "colorNames": [
+      "Glacier Blue",
+      "Starry Black"
+    ],
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 24999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 28999,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-v70": {
+    "brand": "Vivo",
+    "name": "Vivo V70",
+    "colorNames": [
+      "Starry Black",
+      "Titanium Silver",
+      "Ocean Blue"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 53999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 60999,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-v70-elite": {
+    "brand": "Vivo",
+    "name": "Vivo V70 Elite",
+    "colorNames": [
+      "Starry Black",
+      "Titanium Silver",
+      "Ocean Blue"
+    ],
+    "variants": [
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 58999,
+        "verified": true
+      },
+      {
+        "ram": "16GB",
+        "storage": "512GB",
+        "price": 66999,
+        "verified": true
+      },
+      {
+        "ram": "16GB",
+        "storage": "1TB",
+        "price": 78999,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-v70-fe": {
+    "brand": "Vivo",
+    "name": "Vivo V70 FE",
+    "colorNames": [
+      "Jade Green",
+      "Coral Red"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 46999,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-y05": {
+    "brand": "Vivo",
+    "name": "Vivo Y05",
+    "colorNames": [
+      "Midnight Black",
+      "Ocean Blue"
+    ],
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 14999,
+        "verified": true
+      },
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 16999,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-y11": {
+    "brand": "Vivo",
+    "name": "Vivo Y11",
+    "colorNames": [
+      "Midnight Black",
+      "Ocean Blue",
+      "Sunset Orange"
+    ],
+    "variants": [
+      {
+        "ram": "4GB",
+        "storage": "64GB",
+        "price": 16999,
+        "verified": true
+      },
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 18999,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-y31": {
+    "brand": "Vivo",
+    "name": "Vivo Y31",
+    "colorNames": [
+      "Starry Black",
+      "Champagne Gold"
+    ],
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 25999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 29999,
+        "verified": true
+      }
+    ]
+  },
+  "vivo-y51-pro": {
+    "brand": "Vivo",
+    "name": "Vivo Y51 Pro",
+    "colorNames": [
+      "Starry Black",
+      "Champagne Gold",
+      "Ocean Blue"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 33999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 39999,
+        "verified": true
+      }
+    ]
+  },
+  "iqoo-15": {
+    "brand": "iQOO",
+    "name": "iQOO 15",
+    "colorNames": [
+      "Alpha",
+      "Legend",
+      "Gray",
+      "Green",
+      "Blue",
+      "Apex"
+    ],
+    "variants": [
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 76999,
+        "verified": true
+      },
+      {
+        "ram": "16GB",
+        "storage": "512GB",
+        "price": 86999,
+        "verified": true
+      },
+      {
+        "ram": "16GB",
+        "storage": "1TB",
+        "price": 101999,
+        "verified": true
+      }
+    ]
+  },
+  "iqoo-15r": {
+    "brand": "iQOO",
+    "name": "iQOO 15R",
+    "colorNames": [
+      "Raging Blue",
+      "MoonKnight",
+      "Titanium"
+    ],
+    "variants": [
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 49999,
+        "verified": true
+      }
+    ]
+  },
+  "iqoo-neo-10": {
+    "brand": "iQOO",
+    "name": "iQOO Neo 10",
+    "colorNames": [
+      "Inferno Red",
+      "Titanium Chrome",
+      "Blaze Orange",
+      "Onyx Black"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 41999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 46999,
+        "verified": true
+      },
+      {
+        "ram": "16GB",
+        "storage": "512GB",
+        "price": 54999,
+        "verified": true
+      }
+    ]
+  },
+  "iqoo-z10-lite": {
+    "brand": "iQOO",
+    "name": "iQOO Z10 Lite",
+    "colorNames": [
+      "Storm Black",
+      "Cyber Blue"
+    ],
+    "variants": [
+      {
+        "ram": "6GB",
+        "storage": "128GB",
+        "price": 16999,
+        "verified": true
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 19999,
+        "verified": true
+      }
+    ]
+  },
+  "iqoo-z10r": {
+    "brand": "iQOO",
+    "name": "iQOO Z10R",
+    "colorNames": [
+      "Storm Black",
+      "Cyber Blue"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 22999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 26999,
+        "verified": true
+      }
+    ]
+  },
+  "iqoo-z11x": {
+    "brand": "iQOO",
+    "name": "iQOO Z11x",
+    "colorNames": [
+      "Storm Black",
+      "Cyber Blue",
+      "Neon Green"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 27999,
+        "verified": true
+      },
+      {
+        "ram": "12GB",
+        "storage": "512GB",
+        "price": 32999,
+        "verified": true
+      }
+    ]
   }
 };
 
 export const DIRECT_URLS_META = {
-  "generatedAt": "2026-07-13T08:33:39.446Z",
+  "generatedAt": "2026-07-16T10:41:38.997Z",
   "source": "C:\\Users\\ramak\\Downloads\\products_with_direct_urls.csv",
-  "matched": 56,
+  "matched": 107,
   "unknown": [],
   "searchUrls": [],
-  "totalVariants": 198
+  "totalVariants": 225
 };

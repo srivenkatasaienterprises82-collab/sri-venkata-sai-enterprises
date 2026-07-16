@@ -50,13 +50,11 @@ export async function sanityFetchNoCache<T>({
       // Bypass the Next.js Data Cache and the full request cache.
       // This makes every render hit the Sanity Content Lake.
       next: { revalidate: 0 },
-      cache: "no-store" as any,
-      perspective: "published",
       // Pull from the API, not the CDN edge. The Sanity CDN can lag the
       // Content Lake by a few seconds after a `mutation`, which matters
       // right after the price-sync GitHub Action runs.
       useCdn: false,
-    } as any);
+    });
     // Defensive unwrap in case a future client version returns the envelope.
     const data =
       result && typeof result === "object" && "result" in (result as any)

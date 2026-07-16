@@ -27,4 +27,5 @@ export const C = {
   brown: { name: "Brown", hex: "#8B5A2B" },
   yellow: { name: "Yellow", hex: "#EAB308" },
   emerald: { name: "Emerald", hex: "#10B981" },
+  sage: { name: "Sage", hex: "#BCB88A" },
 } as const;

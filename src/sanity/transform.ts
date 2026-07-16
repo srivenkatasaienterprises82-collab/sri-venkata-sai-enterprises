@@ -70,7 +70,7 @@ export function toBrand(s: SanityBrand): Brand {
     google: "/images/brand-logos/google pixel logo.webp",
     infinix: "/images/brand-logos/infinix logo.png",
     motorola: "/images/brand-logos/moto logo.png",
-    oneplus: "/images/brand-logos/onplus logo.jpg",
+    oneplus: "/images/brand-logos/oneplus logo.jpg",
     redmi: "/images/brand-logos/redmi logo.png",
   };
   const localLogo = logoFallbacks[slug] || `/images/brand-logos/${slug} logo.png`;

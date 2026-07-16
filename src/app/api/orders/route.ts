@@ -190,7 +190,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const rawBody = await request.text();
+    if (rawBody.length > 50_000) {
+      return NextResponse.json(
+        { error: "Payload too large." },
+        { status: 413 }
+      );
+    }
+
+    let body: unknown;
+    try {
+      body = JSON.parse(rawBody);
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON body." },
+        { status: 400 }
+      );
+    }
 
     if (!validateOrder(body)) {
       return NextResponse.json(

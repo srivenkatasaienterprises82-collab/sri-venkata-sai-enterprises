@@ -14,8 +14,11 @@ import type { Product } from "../src/lib/data/products";
 import { brands } from "../src/lib/data/brands";
 import { siteConfig } from "../src/lib/data/siteConfig";
 
-const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "homvjne9";
-const DATASET = "production";
+const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+if (!PROJECT_ID) {
+  throw new Error("NEXT_PUBLIC_SANITY_PROJECT_ID is required to seed (refusing to target a default project).");
+}
+const DATASET = process.env.SANITY_DATASET || "production";
 const API_VERSION = "v2024-01-01";
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/${API_VERSION}`;
 

@@ -29,7 +29,9 @@ it("calculates the lowest variant price", () => {
   const product = getProductBySlug("vivo-t4r");
 
   assert.ok(product);
-  assert.equal(getStartingPrice(product), 22999);
+  // Lowest variant price comes from the merged research data overlay
+  // (direct-urls-data.ts): vivo-t4r 8GB+128GB / 8GB+256GB = Rs 24,999.
+  assert.equal(getStartingPrice(product), 24999);
 });
 
 it("prefers top-level product price when present", () => {

@@ -23,7 +23,7 @@ export const brands: Brand[] = [
   { name: "Google", slug: "google", featured: true, logo: "/images/brand-logos/google pixel logo.webp" },
   { name: "Redmi", slug: "redmi", featured: true, logo: "/images/brand-logos/redmi logo.png" },
   { name: "Infinix", slug: "infinix", featured: true, logo: "/images/brand-logos/infinix logo.png" },
-  { name: "OnePlus", slug: "oneplus", featured: true, logo: "/images/brand-logos/onplus logo.jpg" },
+  { name: "OnePlus", slug: "oneplus", featured: true, logo: "/images/brand-logos/oneplus logo.jpg" },
   { name: "POCO", slug: "poco", featured: true, logo: "/images/brand-logos/poco logo.png" },
   { name: "Narzo", slug: "narzo", featured: true, logo: "/images/brand-logos/narzo logo.png" },
   { name: "HMD", slug: "hmd", featured: false },
