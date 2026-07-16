@@ -19,8 +19,8 @@ type SetDoc = {
   colors: { _key: string; name: string; hex: string }[];
   variants: {
     _key: string;
-    ram: string;
-    storage: string;
+    ram?: string;
+    storage?: string;
     price?: number;
     originalPrice?: number;
     amazonUrl?: string;

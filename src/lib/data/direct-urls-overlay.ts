@@ -113,8 +113,8 @@ export function mapColorName(name: string): ProductColor {
 }
 
 
-function variantKey(ram: string, storage: string): string {
-  return `${ram.replace(/\s+/g, "").toLowerCase()}|${storage.replace(/\s+/g, "").toLowerCase()}`;
+function variantKey(ram: string | undefined, storage: string | undefined): string {
+  return `${String(ram ?? "").replace(/\s+/g, "").toLowerCase()}|${String(storage ?? "").replace(/\s+/g, "").toLowerCase()}`;
 }
 
 function isSanePrice(price: number | undefined): price is number {
@@ -126,6 +126,10 @@ export function buildMergedVariants(
   csv: DirectUrlProduct,
 ): ProductVariant[] {
   const existingByKey = new Map<string, ProductVariant>();
+  const hasKeyedVariants = existing.every(
+    (v) => typeof v.ram === "string" && typeof v.storage === "string",
+  );
+  if (!hasKeyedVariants) return csv.variants.map((cv) => ({ ram: cv.ram, storage: cv.storage, ...(isSanePrice(cv.price) ? { price: cv.price } : {}) }));
   for (const v of existing) existingByKey.set(variantKey(v.ram, v.storage), v);
 
   return csv.variants.map((cv) => {

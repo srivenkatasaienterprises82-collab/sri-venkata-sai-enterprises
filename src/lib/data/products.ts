@@ -28,8 +28,8 @@ export type ProductType =
 export type StockStatus = "inStock" | "limited" | "outOfStock";
 
 export interface ProductVariant {
-  ram: string;
-  storage: string;
+  ram?: string;
+  storage?: string;
   /** Price in INR. Omit (undefined) when price is on enquiry only. */
   price?: number;
   originalPrice?: number;
