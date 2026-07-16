@@ -1506,6 +1506,12 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - Re-seeded Sanity; `scripts/verify-seed.ts` confirms corrected prices + exact scraped color names live (vivo-v70-elite ₹51999, samsung-s25-ultra ₹90000, moto-edge-60 ₹24699, moto-70-fusion ₹28499, realme-16-pro ₹31999, jio-v4 ₹844).
 - `npx tsc --noEmit` clean; `npm run test` 32/32 pass. Committed & pushed (triggers Vercel redeploy).
 
+## Done (July 16 later) — Variant price-on-click + brand carousel cleanup (PUSHED)
+- BUG FIX: product detail variant selector didn't render / price didn't change on click for scraped-overlay products. Root cause: `scraped-prices-overlay.ts` set `colors`/`variants`/`price` but NOT `ramOptions`/`storageOptions`, so `product-detail.tsx` (line 283 `ramOptions?.length ?`) rendered no RAM/Storage buttons and only showed the min price. Fix: overlay now derives `ramOptions`/`storageOptions` from variants (mirrors `applyDirectUrlOverrides`). Price already updates on click via `matchingVariant` (product-detail.tsx:26). Verified vivo-v70-elite/samsung-s25-ultra/realme-16-pro now expose ramOptions+storageOptions and per-variant prices.
+- BRAND CAROUSEL CLEANUP: "Trusted Brands We Carry" (BRANDS_QUERY = `*[_type=="brand" && hidden != true]`) was showing all 22 Sanity brand docs incl. cheap/no-logo ones (AI+, CMF, Coolpad, Itel, Jio, Lava, Peace, HMD, Snexian). Set `hidden:true` + `featured:false` on those 9 in Sanity via `scripts/hide-brands.ts`. Carousel now shows the 13 brands with real logo files (Apple, Google, Infinix, iQOO, Motorola, Narzo, OnePlus, Oppo, POCO, Realme, Redmi, Samsung, Vivo). cmf/jio kept in `brands.ts` (featured:false) so their products still seed; just hidden from carousel.
+- AUTOMATION CHECK: price-sync workflow (`.github/workflows/price-sync.yml`, cron `0 */6 * * *`, `launch_checker.py --mode sync`, uploads price-changes.csv/invalid_products.csv, no deploy hook) is healthy. Sanity: 135 products, 106 have amazon/flipkart URLs (sync will update those), only 1 null-price product = `infinix-gaming-kit` which is correctly `priceOnEnquiry:true`. Python tests: 64 passed.
+- `npx tsc --noEmit` clean; `npm run test` 32/32 pass; pytest 64 passed.
+
 ## Next Steps
 1. Commit and push all changes to trigger Vercel redeploy
 2. Verify all pages display correctly with Sanity data (homepage bento deals, testimonials, FAQs, banners, gallery, info pages)

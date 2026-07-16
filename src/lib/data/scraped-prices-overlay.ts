@@ -39,11 +39,31 @@ export function applyScrapedPriceOverrides(products: Product[]): Product[] {
 
     if (variants.length === 0) return product;
 
+    // Derive RAM / Storage option lists so the product page renders the
+    // variant selector buttons (clicking them updates the displayed price via
+    // matchingVariant in product-detail.tsx).
+    const ramSeen = new Set<string>();
+    const storageSeen = new Set<string>();
+    const ramOptions: string[] = [];
+    const storageOptions: string[] = [];
+    for (const v of variants) {
+      if (v.ram && !ramSeen.has(v.ram)) {
+        ramSeen.add(v.ram);
+        ramOptions.push(v.ram);
+      }
+      if (v.storage && !storageSeen.has(v.storage)) {
+        storageSeen.add(v.storage);
+        storageOptions.push(v.storage);
+      }
+    }
+
     const minPrice = Math.min(...variants.map((v) => v.price ?? Number.MAX_SAFE_INTEGER));
 
     return {
       ...product,
       colors,
+      ramOptions: ramOptions.length ? ramOptions : product.ramOptions,
+      storageOptions: storageOptions.length ? storageOptions : product.storageOptions,
       variants,
       price: minPrice,
     };
