@@ -248,12 +248,17 @@ def sync_prices():
                     if is_match(product.get("name", ""), name):
                         url_for_check = url
                         # Patch the found URL into Sanity so we don't search
-                        # again on the next run.
-                        try:
-                            from sanity_api import update_url as _patch_url
-                            _patch_url(product["_id"], url_for_check)
-                        except RuntimeError:
-                            pass  # Non-critical; log and continue
+                        # again on the next run — but ONLY if it actually names
+                        # the right product. Persisting a URL that fails the
+                        # name check would poison Sanity with a wrong listing
+                        # (the C83 → tempered-glass case) and make every
+                        # subsequent run red.
+                        if url_name_matches(product.get("name", ""), url):
+                            try:
+                                from sanity_api import update_url as _patch_url
+                                _patch_url(product["_id"], url_for_check)
+                            except RuntimeError:
+                                pass  # Non-critical; log and continue
                         if search_source == "flipkart":
                             flipkart_url = url_for_check
                         else:
@@ -276,9 +281,14 @@ def sync_prices():
         # Enforce URL↔name sanity before scraping. A bad URL silently returns
         # the price of a *different* product. The C83 screen-protector case
         # is what motivated this guard.
+        #
+        # A product whose URL fails this check is SKIPPED (no wrong price is
+        # ever written), so it is *not* a broken run — we log it to the
+        # invalid_products.csv artifact for triage but do NOT fail the
+        # workflow. Failing the whole run here only produces a perpetually-red
+        # sync for stale data and blocks every other product's update.
         if not url_name_matches(product.get("name", ""), url_for_check):
             skipped_url_mismatch += 1
-            invalid_urls += 1
             _log_invalid(product, "url_name_mismatch", url_for_check)
             _emit_row(product, "SKIP", source=source, old_price=old_price,
                       reason="url_name_mismatch")

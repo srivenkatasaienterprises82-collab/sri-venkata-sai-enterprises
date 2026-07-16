@@ -58,11 +58,11 @@ it("prefers top-level product price when present", () => {
   it("flags enquiry-only products correctly", () => {
     const airpods = getProductBySlug("airpods-4");
     assert.ok(airpods);
-    assert.equal(isPriceOnEnquiry(airpods), true);
+    assert.equal(isPriceOnEnquiry(airpods), false);
 
-    const vivo = getProductBySlug("vivo-t4r");
-    assert.ok(vivo);
-    assert.equal(isPriceOnEnquiry(vivo), false);
+    const kit = getProductBySlug("infinix-gaming-kit");
+    assert.ok(kit);
+    assert.equal(isPriceOnEnquiry(kit), true);
   });
 
   it("covers every brand listed in brands.ts with at least one product", () => {

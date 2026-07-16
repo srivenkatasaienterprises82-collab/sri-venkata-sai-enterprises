@@ -102,3 +102,77 @@ def test_update_price_raises_on_error():
         except RuntimeError:
             pass
 
+
+def _capture_post():
+    captured = {}
+
+    class _Resp:
+        status_code = 200
+        text = '{"results":[{"id":"p1"}]}'
+
+        def json(self):
+            return {"results": [{"id": "p1"}]}
+
+    def _post(url, headers=None, json=None):
+        captured["json"] = json
+        return _Resp()
+
+    return captured, _post
+
+
+def test_update_variants_scales_to_scraped_price():
+    # Single scraped price (no per-variant break-down) should NUDGE the existing
+    # tiers so variant prices slightly track the market, not snap exactly.
+    captured, _post = _capture_post()
+    existing = [
+        {"ram": "12GB", "storage": "256GB", "price": 57999},
+        {"ram": "16GB", "storage": "512GB", "price": 67999},
+        {"ram": "24GB", "storage": "1TB", "price": 82999},
+    ]
+    with patch.object(sa.requests, "post", _post):
+        sa.update_price_and_variants("p1", "OnePlus 13", 65000, None, 65000, [], existing)
+    set_fields = captured["json"]["mutations"][0]["patch"]["set"]
+    variants = set_fields["variants"]
+    by_ram = {v["ram"]: v["price"] for v in variants}
+    scale = 65000 / 57999
+    blend = 1.0 + sa.VARIANT_SCALE_BLEND * (scale - 1.0)
+    # Blended (slight) move, strictly between the old price and the full scale.
+    for ram, old in (("12GB", 57999), ("16GB", 67999), ("24GB", 82999)):
+        expected = round(old * blend)
+        assert by_ram[ram] == expected
+        full = round(old * scale)
+        assert by_ram[ram] != full  # proves it's a SLIGHT match, not exact
+        assert min(old, full) < by_ram[ram] < max(old, full)
+    assert set_fields["price"] == 65000
+
+
+def test_update_variants_blocks_outlier_scale():
+    # An absurd scraped price must NOT corrupt the per-variant tiers.
+    captured, _post = _capture_post()
+    existing = [
+        {"ram": "12GB", "storage": "256GB", "price": 57999},
+        {"ram": "16GB", "storage": "512GB", "price": 67999},
+    ]
+    with patch.object(sa.requests, "post", _post):
+        sa.update_price_and_variants("p1", "OnePlus 13", 999999, None, 999999, [], existing)
+    variants = captured["json"]["mutations"][0]["patch"]["set"]["variants"]
+    by_ram = {v["ram"]: v["price"] for v in variants}
+    assert by_ram["12GB"] == 57999
+    assert by_ram["16GB"] == 67999
+
+
+def test_update_variants_exact_scrape_wins():
+    # A matching scraped variant price is applied directly (no scaling).
+    captured, _post = _capture_post()
+    existing = [
+        {"ram": "12GB", "storage": "256GB", "price": 57999},
+        {"ram": "16GB", "storage": "512GB", "price": 67999},
+    ]
+    scraped = [{"ram": "16GB", "storage": "512GB", "price": 70000}]
+    with patch.object(sa.requests, "post", _post):
+        sa.update_price_and_variants("p1", "OnePlus 13", 65000, None, 65000, scraped, existing)
+    variants = captured["json"]["mutations"][0]["patch"]["set"]["variants"]
+    by_ram = {v["ram"]: v["price"] for v in variants}
+    assert by_ram["16GB"] == 70000
+    assert by_ram["12GB"] == 57999
+
