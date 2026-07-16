@@ -45,6 +45,15 @@ next-dev-*.log
 invalid_products.csv
 site_price_mismatch.csv
 price-changes.csv
+direct-urls-applied.csv
+variant-fields-applied.csv
+
+# scratch / one-off audit scripts
+scripts/audit-*.mjs
+scripts/audit-*.ts
+scripts/patch-realme-c83-price.ts
+.github/workflows/url-audit.yml
+
 *.tsbuildinfo
 next-env.d.ts
 
