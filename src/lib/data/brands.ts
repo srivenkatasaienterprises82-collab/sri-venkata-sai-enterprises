@@ -27,6 +27,8 @@ export const brands: Brand[] = [
   { name: "POCO", slug: "poco", featured: true, logo: "/images/brand-logos/poco logo.png" },
   { name: "Narzo", slug: "narzo", featured: true, logo: "/images/brand-logos/narzo logo.png" },
   { name: "HMD", slug: "hmd", featured: false },
+  { name: "CMF", slug: "cmf", featured: false },
+  { name: "Jio", slug: "jio", featured: false },
 ];
 
 export function getAllBrands(): Brand[] {

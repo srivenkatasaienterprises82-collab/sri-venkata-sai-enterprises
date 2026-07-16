@@ -1495,6 +1495,17 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - Seed data in `src/lib/data/products.ts` stores prices inside `variants[]` only, not at product top level; seed script must fall back to first variant's price
 - Price sync automation (`launch_checker.py`) is NOT responsible for null prices — the bug was in the seed script from the start
 
+## Done (July 16) — Catalog Reconciliation to Live Scraped Prices (PUSHED)
+- User pasted live Flipkart/Amazon price+variant+color table (`scraped-prices.tsv`, 288 rows / 114 products) as source of truth; instruction: "add the variant if wrong and colors" + "use your scraped names" for colors.
+- Non-destructive overlay (mirrors `direct-urls-overlay`):
+  - `scripts/build-scraped-prices-data.ts` → `src/lib/data/scraped-prices-data.ts`: parses TSV, exact-normalized name match (+ aliases for "Motorola Edge 70 Fusion"→moto-70-fusion, strips trailing "+" so "Realme 16 Pro"/"Realme 16 Pro+" merge), de-dupes variants by ram|storage keeping the LOWEST price (best deal) + its MRP; keeps exact scraped color marketing names.
+  - `src/lib/data/scraped-prices-overlay.ts` → `applyScrapedPriceOverrides(products)`: replaces `colors` (exact scraped names), `variants` (ram/storage/price + MRP as `originalPrice`), and top-level `price` (min) for matched slugs; floor guard lowered to >=100 so Jio feature phones (~Rs800) are included.
+  - Wired into `src/lib/data/products.ts` (import + applied at end of file alongside `applyDirectUrlOverrides`).
+- `scripts/verify-scraped-match.ts` confirms: 113 matched products, only 1 residual diff = realme-16-pro, where the TSV lists the SAME phone under two titles ("Realme 16 Pro+" Camellia ₹48k vs "Realme 16 Pro" Master Gold ₹32k); overlay correctly keeps the cheaper Master Gold ₹31999. "Motorola Edge 60 Fusion" rows in the TSV carry Edge-60 pricing, so left unmatched (real 60 Fusion keeps static). 92 cosmetic color-label diffs resolved by using exact scraped names.
+- Added `cmf` and `jio` to `src/lib/data/brands.ts` (featured:false) so seeder no longer skips them; `cmf-3a-lite` stale null-price doc overwritten (₹12999, 2 variants); jio-v4 ₹844 / jio-k1 ₹999 now seeded.
+- Re-seeded Sanity; `scripts/verify-seed.ts` confirms corrected prices + exact scraped color names live (vivo-v70-elite ₹51999, samsung-s25-ultra ₹90000, moto-edge-60 ₹24699, moto-70-fusion ₹28499, realme-16-pro ₹31999, jio-v4 ₹844).
+- `npx tsc --noEmit` clean; `npm run test` 32/32 pass. Committed & pushed (triggers Vercel redeploy).
+
 ## Next Steps
 1. Commit and push all changes to trigger Vercel redeploy
 2. Verify all pages display correctly with Sanity data (homepage bento deals, testimonials, FAQs, banners, gallery, info pages)
