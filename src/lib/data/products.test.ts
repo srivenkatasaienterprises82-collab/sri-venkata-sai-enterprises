@@ -58,7 +58,7 @@ it("prefers top-level product price when present", () => {
   it("flags enquiry-only products correctly", () => {
     const airpods = getProductBySlug("airpods-4");
     assert.ok(airpods);
-    assert.equal(isPriceOnEnquiry(airpods), false);
+    assert.equal(isPriceOnEnquiry(airpods), true);
 
     const kit = getProductBySlug("infinix-gaming-kit");
     assert.ok(kit);

@@ -1,0 +1,82 @@
+# Weekly product URL audit
+# Runs every Monday at 6:00 AM UTC to check for:
+#   - Accessory URLs (covers, cases, etc.) in product data
+#   - Generic search URLs instead of product pages  
+#   - Missing marketplace URLs for smartphones
+#   - Model name mismatches between product and URL
+
+name: URL Audit
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Every Monday 6 AM UTC
+  workflow_dispatch:       # Allow manual trigger
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: sri-venkata-sai-enterprises-main/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd sri-venkata-sai-enterprises-main
+          npm ci
+
+      - name: Run URL and variant audit
+        id: audit
+        run: |
+          cd sri-venkata-sai-enterprises-main
+          npx tsx scripts/audit-variant-gaps.ts 2>&1 | tee audit-report.txt
+          
+          # Count issues by severity
+          ACCESSORY_COUNT=$(grep -c "🚫" audit-report.txt || true)
+          MISSING_URL_COUNT=$(grep -c "❌" audit-report.txt || true)
+          SEARCH_URL_COUNT=$(grep -c "🔍" audit-report.txt || true)
+          GENERIC_URL_COUNT=$(grep -c "🔗" audit-report.txt || true)
+          TOTAL=$(grep -c "💰\|🚫\|❌\|🔍\|🔗\|🎨\|⚠️\|📝" audit-report.txt || true)
+          
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "accessory=$ACCESSORY_COUNT" >> $GITHUB_OUTPUT
+          echo "missing_urls=$MISSING_URL_COUNT" >> $GITHUB_OUTPUT
+          echo "search_urls=$SEARCH_URL_COUNT" >> $GITHUB_OUTPUT
+          echo "generic_urls=$GENERIC_URL_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: url-audit-report
+          path: sri-venkata-sai-enterprises-main/audit-report.txt
+
+      - name: Check for critical URL issues
+        run: |
+          cd sri-venkata-sai-enterprises-main
+          
+          CRITICAL=$(( $(grep -c "🚫\|🔍" audit-report.txt || true) ))
+          
+          if [ "$CRITICAL" -gt 0 ]; then
+            echo "⚠️  Found $CRITICAL critical URL issues (accessory URLs or search URLs)!"
+            echo ""
+            echo "Products with accessory/wrong URLs:"
+            grep "🚫" audit-report.txt || echo "  None"
+            echo ""
+            echo "Products with search URLs:"
+            grep "🔍" audit-report.txt || echo "  None"
+            echo ""
+            echo "Products with generic Amazon URLs:"
+            grep "🔗" audit-report.txt || echo "  None"
+            echo ""
+            echo "📋 Full report uploaded as artifact"
+            exit 0  # Don't fail the workflow, just notify
+          else
+            echo "✅ No critical URL issues found!"
+          fi
