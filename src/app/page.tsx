@@ -91,10 +91,6 @@ export default async function Home() {
     ? toProducts(sanityHomePage.featuredCarousel).filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase()))
     : products;
 
-  const topRatedProducts = sanityHomePage?.topRatedPerformance?.length
-    ? toProducts(sanityHomePage.topRatedPerformance).filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase()))
-    : undefined;
-
   const bentoDeals = sanityHomePage?.bentoDeals?.length ? toOffers(sanityHomePage.bentoDeals) : undefined;
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://srivenkatasaienterprises.com";

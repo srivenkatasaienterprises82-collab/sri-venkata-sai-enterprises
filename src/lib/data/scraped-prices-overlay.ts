@@ -6,10 +6,6 @@ import type { Product, ProductColor, ProductVariant } from "./products";
 import { mapColorName } from "./direct-urls-overlay";
 import { SCRAPED_PRICES_BY_SLUG } from "./scraped-prices-data";
 
-function variantKey(ram: string, storage: string): string {
-  return `${ram.replace(/\s+/g, "").toLowerCase()}|${storage.replace(/\s+/g, "").toLowerCase()}`;
-}
-
 export function applyScrapedPriceOverrides(products: Product[]): Product[] {
   return products.map((product) => {
     const entry = SCRAPED_PRICES_BY_SLUG[product.slug];

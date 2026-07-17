@@ -18,8 +18,10 @@ export function GlassCard({
     <div
       className={cn(
         "rounded-[24px] border border-slate-200 bg-white/70 px-5 py-4 backdrop-blur-[40px] shadow-sm",
+        float && "animate-[float_6s_ease-in-out_infinite]",
         className
       )}
+      style={floatDelay ? { animationDelay: `${floatDelay}s` } : undefined}
       {...props}
     >
       {children}

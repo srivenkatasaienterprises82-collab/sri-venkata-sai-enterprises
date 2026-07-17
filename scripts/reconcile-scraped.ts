@@ -10,7 +10,8 @@
  *
  * Run: npx tsx scripts/reconcile-scraped.ts
  */
-import { products, getAllProducts } from "../src/lib/data/products";
+import { readFileSync } from "node:fs";
+import { getAllProducts } from "../src/lib/data/products";
 
 type ScrapedVariant = {
   ram: string;
@@ -23,8 +24,7 @@ type ScrapedVariant = {
 
 // ── Parse TSV ───────────────────────────────────────────────────────────────
 function parseTsv(path: string): Record<string, ScrapedVariant[]> {
-  const fs = require("fs");
-  const text = fs.readFileSync(path, "utf8");
+  const text = readFileSync(path, "utf8");
   const lines = text.split("\n").filter((l: string) => l.trim().length > 0);
   const header = lines[0].split("\t").map((s: string) => s.trim());
   const col = (name: string) => header.indexOf(name);

@@ -43,9 +43,13 @@ function Section({
   as: Component = "section",
   children,
   // Consume (and discard) legacy motion props so callers don't break
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   initial: _initial,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   whileInView: _whileInView,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   viewport: _viewport,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transition: _transition,
   ...props
 }: SectionProps) {

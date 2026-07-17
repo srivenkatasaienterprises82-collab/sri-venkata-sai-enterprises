@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import { getAllProducts } from "../src/lib/data/products";
-import { SCRAPED_PRICES_BY_SLUG } from "../src/lib/data/scraped-prices-data";
 
 function norm(s: string): string {
   return s.toLowerCase().replace(/\+/g, " ").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();

@@ -80,36 +80,6 @@ function p(input: Omit<Product, "image"> & { image?: string }): Product {
   };
 }
 
-// ── Colour shortcuts ──
-const C = {
-  black: { name: "Black", hex: "#1A1A1A" },
-  blue: { name: "Blue", hex: "#2563EB" },
-  green: { name: "Green", hex: "#16A34A" },
-  red: { name: "Red", hex: "#DC2626" },
-  white: { name: "White", hex: "#F5F5F5" },
-  gold: { name: "Gold", hex: "#D4AF37" },
-  silver: { name: "Silver", hex: "#C0C0C0" },
-  grey: { name: "Grey", hex: "#6B7280" },
-  gray: { name: "Gray", hex: "#6B7280" },
-  purple: { name: "Purple", hex: "#7C3AED" },
-  violet: { name: "Violet", hex: "#7C3AED" },
-  pink: { name: "Pink", hex: "#EC4899" },
-  navy: { name: "Navy", hex: "#1E3A8A" },
-  orange: { name: "Orange", hex: "#F97316" },
-  indigo: { name: "Indigo", hex: "#4F46E5" },
-  frost: { name: "Frost", hex: "#E0E7E9" },
-  mint: { name: "Mint", hex: "#A7F3D0" },
-  legend: { name: "Legend", hex: "#0F172A" },
-  alpha: { name: "Alpha", hex: "#111827" },
-  gibraltar: { name: "Gibraltar Sea", hex: "#1E40AF" },
-  dryice: { name: "Dry Ice", hex: "#BAE6FD" },
-  teal: { name: "Teal", hex: "#14B8A6" },
-  lavender: { name: "Lavender", hex: "#C4B5FD" },
-  brown: { name: "Brown", hex: "#8B5A2B" },
-  yellow: { name: "Yellow", hex: "#EAB308" },
-  emerald: { name: "Emerald", hex: "#10B981" },
-} as const;
-
 export const products: Product[] = [
   // ════════════════ VIVO ════════════════
   p({ id: "vivo-v70-elite", name: "Vivo V70 Elite", slug: "vivo-v70-elite", brand: "Vivo", brandSlug: "vivo", imageFolder: "vivo-v70-elite", image: "/images/products/vivo-v70-elite/2.webp", type: "smartphone", category: "new-arrival", stock: "inStock", description: "The Elite edition of the V70 series with enhanced styling and performance.", colors: [{ name: "Black", hex: "#1A1A1A" }, { name: "Blue", hex: "#2563EB" }, { name: "Gold", hex: "#D4AF37" }, { name: "Lavender", hex: "#C4B5FD" }, { name: "Orange", hex: "#F97316" }, { name: "Purple", hex: "#7C3AED" }, { name: "Red", hex: "#DC2626" }, { name: "Silver", hex: "#C0C0C0" }, { name: "White", hex: "#F5F5F5" }], variants: [{ram: "8GB", storage: "256GB", price: 51999, originalPrice: 89999}, {ram: "12GB", storage: "256GB", price: 56999, originalPrice: 89999}, {ram: "12GB", storage: "512GB", price: 61999, originalPrice: 89999}], specifications: [{ label: "Display", value: '6.78" AMOLED, 120Hz' }, { label: "Processor", value: "Snapdragon 8s Gen 4" }, { label: "Camera", value: "50MP ZEISS Triple Camera" }, { label: "Battery", value: "6000mAh" }, { label: "Charging", value: "90W" }, { label: "OS", value: "Android, Funtouch OS" }], featured: false, tags: ["5G", "AMOLED", "EMI Available"],

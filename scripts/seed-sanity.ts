@@ -143,8 +143,6 @@ const CATEGORIES = [
 
 function productToSanityDoc(product: Product): SanityDoc {
   const categorySlug = product.category;
-  const brandDoc = brands.find((b) => b.slug === product.brandSlug);
-  const brandName = brandDoc?.name ?? product.brand;
 
   return {
     _type: "product",
@@ -314,19 +312,6 @@ async function seedSiteSettings(): Promise<void> {
 // ──────────────────────────────────────
 //  Home Page
 // ──────────────────────────────────────
-function ptBlock(style: string, text: string): any {
-  return {
-    _type: "block",
-    style,
-    children: [{ _type: "span", text }],
-    markDefs: [],
-  };
-}
-
-function makePT(blocks: { style: string; text: string }[]): any[] {
-  return blocks.map((b) => ptBlock(b.style, b.text));
-}
-
 async function seedHomePage(): Promise<void> {
   console.log("\n--- Seeding Home Page ---");
 
