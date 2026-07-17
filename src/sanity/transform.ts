@@ -19,6 +19,20 @@ export function toProduct(s: SanityProduct): Product {
   if (s.stock === "limited" || s.stock === "pre-order") stockStatus = "limited";
   else if (s.stock === "outOfStock" || s.stock === "out-of-stock") stockStatus = "outOfStock";
 
+  const variants = (s.variants || []) as ProductVariant[];
+  const ramSet = new Set<string>();
+  const storageSet = new Set<string>();
+  for (const v of variants) {
+    if (v.ram) ramSet.add(v.ram);
+    if (v.storage) storageSet.add(v.storage);
+  }
+  const ramOptions = s.ramOptions?.length
+    ? s.ramOptions
+    : Array.from(ramSet);
+  const storageOptions = s.storageOptions?.length
+    ? s.storageOptions
+    : Array.from(storageSet);
+
   return {
     id: s._id,
     name: s.name,
@@ -36,9 +50,9 @@ export function toProduct(s: SanityProduct): Product {
     amazonUrl: s.amazonUrl,
     flipkartUrl: s.flipkartUrl,
     colors: (s.colors || []) as ProductColor[],
-    ramOptions: s.ramOptions || [],
-    storageOptions: s.storageOptions || [],
-    variants: (s.variants || []) as ProductVariant[],
+    ramOptions,
+    storageOptions,
+    variants,
     specifications: s.specifications || [],
     featured: s.featured || false,
     tags: [],

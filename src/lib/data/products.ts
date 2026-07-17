@@ -477,6 +477,24 @@ export const products: Product[] = [
   p({ id: "snexian-t17p", name: "Snexian T17P", slug: "snexian-t17p", brand: "Snexian", brandSlug: "snexian", imageFolder: "snexian-t17p", image: "/images/products/snexian-t17p/1.png", type: "smartphone", category: "budget", stock: "inStock", description: "A budget Snexian smartphone with 4G.", colors: [{ name: "Blue", hex: "#2563EB" }, { name: "Gold", hex: "#D4AF37" }, { name: "Grey", hex: "#6B7280" }], variants: [{ ram: "4 GB", storage: "64 GB", price: 5999 }], specifications: [{ label: "Display", value: '6.5" HD+' }, { label: "Camera", value: "8MP Rear Camera" }, { label: "Battery", value: "5000 mAh" }], featured: false, tags: ["Budget", "4G"] }),
 ];
 
+// Derive ramOptions/storageOptions from variant ram/storage so the product
+// detail variant selector renders even when a product has no explicit option
+// arrays (e.g. storage-only iPhone variants, or static fallback products).
+for (const product of products) {
+  if (!product.ramOptions || product.ramOptions.length === 0) {
+    const ram = Array.from(
+      new Set(product.variants.map((v) => v.ram).filter((r): r is string => !!r)),
+    );
+    if (ram.length) product.ramOptions = ram;
+  }
+  if (!product.storageOptions || product.storageOptions.length === 0) {
+    const storage = Array.from(
+      new Set(product.variants.map((v) => v.storage).filter((s): s is string => !!s)),
+    );
+    if (storage.length) product.storageOptions = storage;
+  }
+}
+
 // ── Helper functions ──
 
 export function getAllProducts(): Product[] {
