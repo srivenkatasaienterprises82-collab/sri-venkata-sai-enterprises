@@ -28,11 +28,13 @@ export type ProductType =
 export type StockStatus = "inStock" | "limited" | "outOfStock";
 
 export interface ProductVariant {
-  ram: string;
-  storage: string;
+  ram?: string;
+  storage?: string;
   /** Price in INR. Omit (undefined) when price is on enquiry only. */
   price?: number;
   originalPrice?: number;
+  amazonUrl?: string;
+  flipkartUrl?: string;
 }
 
 export interface ProductColor {
@@ -65,6 +67,8 @@ export interface Product {
   priceOnEnquiry?: boolean;
   amazonUrl?: string;
   flipkartUrl?: string;
+  ramOptions?: string[];
+  storageOptions?: string[];
 }
 
 /** Build a product entry; resolves `image` from the imageFolder automatically. */

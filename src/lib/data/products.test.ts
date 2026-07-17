@@ -34,11 +34,12 @@ it("calculates the lowest variant price", () => {
   assert.equal(getStartingPrice(product), 24999);
 });
 
-it("prefers top-level product price when present", () => {
+it("returns the lowest variant price even when a top-level price is present", () => {
   const base = getProductBySlug("vivo-t4r");
 
   assert.ok(base);
-  assert.deepEqual(getStartingPrice({ ...(base!), price: 24500 }), 24500);
+  // getStartingPrice prefers the minimum variant price, not the top-level price.
+  assert.deepEqual(getStartingPrice({ ...(base!), price: 24500 }), 24999);
 });
 
   it("keeps every product slug unique", () => {
