@@ -72,8 +72,8 @@ export default async function Home() {
   // Filter to only popular brands for home page
   const products = allProducts.filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase()));
   const allBrands = sanityBrands?.length ? toBrands(sanityBrands) : getFeaturedBrands();
-  // Filter out HMD brand from home page
-  const brands = allBrands.filter((b) => b.slug !== "hmd");
+  // Filter out HMD, CMF and Jio brands from home page
+  const brands = allBrands.filter((b) => !["hmd", "cmf", "jio"].includes(b.slug));
   const testimonials = sanityTestimonials?.length ? toTestimonials(sanityTestimonials) : getAllTestimonials();
   const faqs = sanityFaqs?.length ? toFaqs(sanityFaqs) : defaultFaqs;
   const banners = sanityBanners?.length ? toBanners(sanityBanners) : undefined;
