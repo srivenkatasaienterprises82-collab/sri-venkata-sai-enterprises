@@ -1522,6 +1522,13 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - Products with a store URL rose 106 → 109 / 135, so the 6-hour price-sync automation now keeps these three fresh too.
 - `npx tsc --noEmit` clean; `npm run test` 32/32 pass.
 
+## Done (July 16) — Fix image loading, iPhone variants, stock integrity (PUSHED)
+- User reported: (1) "all products in stock", (2) some products missing ram/storage variants, (3) iPhone & Moto photos not loading.
+- IMAGES: root cause — `p()` helper defaulted every product image to `/images/products/<folder>/1.webp`, but real files are `.jpeg`/`.jpg`/`.png` (or product-specific like `k13x.jpg`), so 14 products pointed at non-existent files. FIX: `seed-sanity.ts` `resolvePrimaryImage()` now probes the public folder for the real `1.*` file (or first image) and writes that URL to Sanity `coverImage`/`images`. For 8 products with NO image folder at all (cmf-4a, cmf-3a-lite, infinix-gaming-kit, jio-blue, jio-super-4g-router, snexian-t17p, snexian-tab-t1000, + moto-edge-60-pro mislabeled folder) it generates a solid-color placeholder PNG (`1.png`) so they still render. Also fixed `moto-edge-60-pro` static `imageFolder` ("moto-edge-60" → "moto-edge-60-pro") and pointed its `1.png` at the real `edge-60-pro.png`.
+- VARIANTS: iPhones (iphone-17/17-pro/17-pro-max/17-air) had storage-only variants (no ram) → product detail variant selector had no RAM row. Added `ram` to each (iPhone 17 = 8GB; Pro/Pro Max/Air = 12GB). Accessories (airpods, oneplus buds) and Jio/Snexian feature phones legitimately have no ram/storage; `product-detail.tsx` already guards the selector on `ramOptions?.length` and falls back to single variant price, so they render fine.
+- STOCK: Sanity already matched static (24 outOfStock, 111 inStock) — NOT all inStock. Left as-is (consistent with source). Note: a targeted patch script initially used `createOrReplace` with only image fields and wiped name/price/stock for 14 docs; immediately re-seeded those 14 from `products.ts` (full `productToSanityDoc`) to restore them. Verified: 0 broken docs, stock back to 111/24, 135 total products.
+- NOTE: full `seed-sanity.ts` run intermittently hangs on Sanity API (network); used a targeted full-doc re-seed for the 14 affected products instead. `tsc` still fails at HEAD due to pre-existing `1d6215a` schema removal (ramOptions/amazonUrl etc.) — unrelated to this fix.
+
 ## Next Steps
 1. Commit and push all changes to trigger Vercel redeploy
 2. Verify all pages display correctly with Sanity data (homepage bento deals, testimonials, FAQs, banners, gallery, info pages)

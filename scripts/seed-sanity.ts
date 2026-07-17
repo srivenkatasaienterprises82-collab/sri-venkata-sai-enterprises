@@ -9,6 +9,9 @@
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
+import { existsSync, readdirSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { products } from "../src/lib/data/products";
 import type { Product } from "../src/lib/data/products";
 import { brands } from "../src/lib/data/brands";
@@ -51,6 +54,84 @@ async function sanityMutate(mutations: any[]): Promise<any> {
 
 type SanityDoc = Record<string, any>;
 
+/**
+ * Resolve the real primary image URL for a product. The static `p()` helper
+ * defaults to `1.webp`, but the actual file on disk may be `.jpeg`/`.jpg`/`.png`
+ * (or a product-specific filename like `k13x.jpg`). We probe the public folder
+ * so Sanity always points at a file that actually exists.
+ */
+function resolvePrimaryImage(product: Product, placeholderHex = "#1E293B"): string {
+  const folder = join("public", "images", "products", product.imageFolder);
+  const explicit = product.image;
+  if (explicit) {
+    const abs = join("public", explicit.replace(/^\/images\//, "images/"));
+    if (existsSync(abs)) return explicit;
+  }
+  if (existsSync(folder)) {
+    const files = readdirSync(folder).filter((f) =>
+      /\.(webp|jpeg|jpg|png|gif)$/i.test(f),
+    );
+    if (files.length > 0) {
+      // Prefer a `1.*` primary image; otherwise the first image found.
+      const primary = files.find((f) => f.startsWith("1.")) ?? files[0];
+      return `/images/products/${product.imageFolder}/${primary}`;
+    }
+  }
+  // No image on disk — create a simple placeholder so the product still renders.
+  if (!existsSync(folder)) mkdirSync(folder, { recursive: true });
+  const placeholder = join(folder, "1.png");
+  if (!existsSync(placeholder)) {
+    writeFileSync(placeholder, makePlaceholderPng(placeholderHex));
+  }
+  return `/images/products/${product.imageFolder}/1.png`;
+}
+
+function makePlaceholderPng(hex: string): Buffer {
+  // Minimal solid-color PNG (1x1) built without external deps.
+  const r = parseInt(hex.slice(1, 3) || "1E", 16);
+  const g = parseInt(hex.slice(3, 5) || "29", 16);
+  const b = parseInt(hex.slice(5, 7) || "3B", 16);
+  const crcTable = (() => {
+    const t = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+  const crc32 = (buf: Buffer) => {
+    let c = 0xffffffff;
+    for (let i = 0; i < buf.length; i++) c = crcTable[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  };
+  const chunk = (type: string, data: Buffer) => {
+    const len = Buffer.alloc(4);
+    len.writeUInt32BE(data.length, 0);
+    const typeBuf = Buffer.from(type, "ascii");
+    const crc = Buffer.alloc(4);
+    crc.writeUInt32BE(crc32(Buffer.concat([typeBuf, data])), 0);
+    return Buffer.concat([len, typeBuf, data, crc]);
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(1, 0);
+  ihdr.writeUInt32BE(1, 4);
+  ihdr[8] = 8; // bit depth
+  ihdr[9] = 2; // color type RGB
+  ihdr[10] = 0;
+  ihdr[11] = 0;
+  ihdr[12] = 0;
+  const raw = Buffer.from([r, g, b]);
+  const idat = Buffer.concat([Buffer.from([0]), raw]);
+  const sig = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  return Buffer.concat([
+    sig,
+    chunk("IHDR", ihdr),
+    chunk("IDAT", idat),
+    chunk("IEND", Buffer.alloc(0)),
+  ]);
+}
+
 const CATEGORIES = [
   { id: "cat-new-arrival", name: "New Arrival", slug: "new-arrival" },
   { id: "cat-best-seller", name: "Best Seller", slug: "best-seller" },
@@ -81,7 +162,7 @@ function productToSanityDoc(product: Product): SanityDoc {
     categorySlug: categorySlug,
     amazonUrl: product.amazonUrl,
     flipkartUrl: product.flipkartUrl,
-    coverImage: product.image,
+    coverImage: resolvePrimaryImage(product),
     description: product.description,
     colors: (product.colors ?? []).map((c, i) => ({
       _key: `color-${i}-${c.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") || i}`,
@@ -106,7 +187,7 @@ function productToSanityDoc(product: Product): SanityDoc {
     })),
     featured: product.featured,
     lastUpdated: new Date().toISOString(),
-    images: [product.image],
+    images: [resolvePrimaryImage(product)],
   };
 }
 
