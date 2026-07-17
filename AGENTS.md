@@ -1529,6 +1529,14 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - STOCK: Sanity already matched static (24 outOfStock, 111 inStock) — NOT all inStock. Left as-is (consistent with source). Note: a targeted patch script initially used `createOrReplace` with only image fields and wiped name/price/stock for 14 docs; immediately re-seeded those 14 from `products.ts` (full `productToSanityDoc`) to restore them. Verified: 0 broken docs, stock back to 111/24, 135 total products.
 - NOTE: full `seed-sanity.ts` run intermittently hangs on Sanity API (network); used a targeted full-doc re-seed for the 14 affected products instead. `tsc` still fails at HEAD due to pre-existing `1d6215a` schema removal (ramOptions/amazonUrl etc.) — unrelated to this fix.
 
+## Done (July 16) — Full re-verification + realme-p3 image fix (PUSHED)
+- Re-verified all 135 Sanity products after the image/variant fixes:
+  - IMG_MISSING = 0 (every `coverImage` resolves to a real file on disk).
+  - BROKEN_DOCS = 0 (all have name + stock).
+  - STOCK_DIST = 111 inStock / 24 outOfStock (consistent with static; NOT all in stock).
+  - iPhone variants all carry ram (8GB / 12GB) + storage + price.
+- Found 1 straggler: `realme-p3` (not in static `products.ts` — created via launch automation) had `imageFolder: null` and pointed at a non-existent `realme-p3/1.webp`. Created `public/images/products/realme-p3/1.png` placeholder and patched Sanity `coverImage`/`images` (used a `patch` mutation, preserving all other fields — unlike the earlier `createOrReplace` mishap).
+
 ## Next Steps
 1. Commit and push all changes to trigger Vercel redeploy
 2. Verify all pages display correctly with Sanity data (homepage bento deals, testimonials, FAQs, banners, gallery, info pages)
