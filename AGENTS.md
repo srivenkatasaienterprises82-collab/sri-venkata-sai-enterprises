@@ -1537,6 +1537,11 @@ This file is preserved across sessions. Update it when starting/finishing major 
   - iPhone variants all carry ram (8GB / 12GB) + storage + price.
 - Found 1 straggler: `realme-p3` (not in static `products.ts` — created via launch automation) had `imageFolder: null` and pointed at a non-existent `realme-p3/1.webp`. Created `public/images/products/realme-p3/1.png` placeholder and patched Sanity `coverImage`/`images` (used a `patch` mutation, preserving all other fields — unlike the earlier `createOrReplace` mishap).
 
+## Done (July 16) — Set all products to inStock (PUSHED)
+- User asked to change all out-of-stock products to in stock.
+- Patched all 24 `outOfStock` Sanity product docs to `inStock` via targeted `patch` mutations (preserved all other fields). Verified STOCK_DIST = 135 inStock / 0 outOfStock.
+- Also updated the static `src/lib/data/products.ts` (24 `stock: "outOfStock"` → `"inStock"`) so future re-seeds stay consistent.
+
 ## Next Steps
 1. Commit and push all changes to trigger Vercel redeploy
 2. Verify all pages display correctly with Sanity data (homepage bento deals, testimonials, FAQs, banners, gallery, info pages)
