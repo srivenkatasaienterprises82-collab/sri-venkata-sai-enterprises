@@ -16,6 +16,18 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeRam, setActiveRam] = useState(product.ramOptions?.[0] ?? product.variants[0]?.ram ?? "");
   const [activeStorage, setActiveStorage] = useState(product.storageOptions?.[0] ?? product.variants[0]?.storage ?? "");
+
+  // Sanity products (e.g. iPhones) often arrive with empty `ramOptions` /
+  // `storageOptions` arrays even though their `variants` DO carry ram/storage.
+  // Derive the option lists from the variants so the selector actually renders
+  // — otherwise the price can never change on variant click. Mirrors the
+  // derivation in src/lib/data/products.ts (used for the static fallback).
+  const ramOptions = product.ramOptions?.length
+    ? product.ramOptions
+    : Array.from(new Set(product.variants.map((v) => v.ram).filter((r): r is string => !!r)));
+  const storageOptions = product.storageOptions?.length
+    ? product.storageOptions
+    : Array.from(new Set(product.variants.map((v) => v.storage).filter((s): s is string => !!s)));
   
   const enquiryOnly = isPriceOnEnquiry(product);
   // Keep hasProductPrice for the JSON-LD structured data (schemaOffers).
@@ -23,7 +35,11 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const hasProductPrice = typeof product.price === "number" && Number.isFinite(product.price);
   // Always prefer the selected variant's price over the product-level price.
   // This ensures the price updates when the user clicks a different variant button.
-  const matchingVariant = product.variants.find((variant) => variant.ram === activeRam && variant.storage === activeStorage);
+  // A variant whose `ram` is null (common for iPhones) should match an empty
+  // activeRam selection. Normalise null -> "" on both sides.
+  const matchingVariant = product.variants.find(
+    (variant) => (variant.ram ?? "") === activeRam && (variant.storage ?? "") === activeStorage,
+  );
   const displayPrice = matchingVariant?.price ?? activeVariant?.price ?? product.price;
   const displayOriginalPrice = matchingVariant?.originalPrice ?? activeVariant?.originalPrice ?? product.originalPrice;
   const amazonUrl = matchingVariant?.amazonUrl ?? product.amazonUrl;
@@ -278,13 +294,13 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                 </div>
               </div>
 
-              {(product.ramOptions?.length || product.storageOptions?.length || product.variants.length) ? (
+              {(ramOptions.length || storageOptions.length || product.variants.length) ? (
                 <div className="mb-10 space-y-6">
-                  {product.ramOptions?.length ? (
+                  {ramOptions.length ? (
                     <div>
                       <p className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-900">RAM</p>
                       <div className="flex flex-wrap gap-3">
-                        {product.ramOptions.map((ram) => (
+                        {ramOptions.map((ram) => (
                           <button
                             key={ram}
                             onClick={() => setActiveRam(ram)}
@@ -297,11 +313,11 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                     </div>
                   ) : null}
 
-                  {product.storageOptions?.length ? (
+                  {storageOptions.length ? (
                     <div>
                       <p className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-900">Storage</p>
                       <div className="flex flex-wrap gap-3">
-                        {product.storageOptions.map((storage) => (
+                        {storageOptions.map((storage) => (
                           <button
                             key={storage}
                             onClick={() => setActiveStorage(storage)}
