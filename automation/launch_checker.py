@@ -202,6 +202,7 @@ def sync_prices():
     skipped_dry = 0  # implausible-difference vs old price (≤ cap)
     failed_mutations = 0
     invalid_urls = 0
+    recovered = 0
 
     for product in products:
         # Draft products (enabled:false) – created by the launch-checker. They
@@ -308,7 +309,8 @@ def sync_prices():
                 _emit_row(product, "SKIP", source=source, old_price=old_price,
                           reason="no_flipkartUrl")
                 continue
-            details = get_flipkart_details(flipkart_url or url_for_check)
+            flip_url = flipkart_url or url_for_check
+            details = get_flipkart_details(flip_url)
             flip_price = details.get("price")
             scraped_variants = details.get("variants", [])
         elif source == "amazon":
@@ -317,7 +319,8 @@ def sync_prices():
                 _emit_row(product, "SKIP", source=source, old_price=old_price,
                           reason="no_amazonUrl")
                 continue
-            details = get_amazon_details(amazon_url or url_for_check)
+            amz_url = amazon_url or url_for_check
+            details = get_amazon_details(amz_url)
             amz_price = details.get("price")
             scraped_variants = details.get("variants", [])
         elif source == "both":
@@ -326,22 +329,62 @@ def sync_prices():
             flip_price = flip_details.get("price")
             amz_price = amz_details.get("price")
             scraped_variants = flip_details.get("variants") or amz_details.get("variants", [])
+
+        # Single recovery attempt: if both scrapers came back empty we may have
+        # hit a transient bot-check / CAPTCHA interstitial (common for CI IPs)
+        # on a URL that's actually valid. Re-resolve the product URL from the
+        # brand's live listings and re-scrape ONCE before giving up — but only
+        # if the freshly found URL also passes the name guard, so we never
+        # write a price for the wrong product.
+        recovered = False
+        if flip_price is None and amz_price is None:
+            brand_slug = (product.get("brandSlug") or brand).lower()
+            search_source = source if source != "both" else "flipkart"
+            try:
+                listings = get_brand_listings(brand_slug, search_source)
+                for name, url in listings:
+                    if not is_match(product.get("name", ""), name):
+                        continue
+                    if not url_name_matches(product.get("name", ""), url):
+                        continue
+                    if search_source == "flipkart":
+                        details = get_flipkart_details(url)
+                        flip_price = details.get("price")
+                        if details.get("variants"):
+                            scraped_variants = details["variants"]
+                        flipkart_url = url
+                    else:
+                        details = get_amazon_details(url)
+                        amz_price = details.get("price")
+                        if details.get("variants"):
+                            scraped_variants = details["variants"]
+                        amazon_url = url
+                    print(f"  -> Recovered URL via re-search: {url}")
+                    retries_used = 1
+                    recovered += 1
+                    break
+            except Exception as e:
+                print(f"  Auto re-search failed for {product.get('name')}: {e}")
+
+        if source == "both":
             prices = [p for p in [amz_price, flip_price] if p is not None]
             if not prices:
                 _emit_row(product, "SKIP", source=source, old_price=old_price,
-                          reason="both_scrapers_returned_none")
+                          reason="both_scrapers_returned_none",
+                          retries=retries_used)
                 skipped_no_price += 1
                 continue
             display_price = min(prices)
-        scrape_ms = (time.time() - scrape_start) * 1000
-
-        if source in ("flipkart", "amazon"):
+        else:
             display_price = flip_price if source == "flipkart" else amz_price
+
+        scrape_ms = (time.time() - scrape_start) * 1000
 
         if display_price is None:
             skipped_no_price += 1
             _emit_row(product, "SKIP", source=source, old_price=old_price,
-                      reason="scraper_returned_none", scrape_ms=scrape_ms)
+                      reason="scraper_returned_none", scrape_ms=scrape_ms,
+                      retries=retries_used)
             continue
 
         # Hard band guard.
@@ -418,6 +461,7 @@ def sync_prices():
         f"│ Implausible delta      │ {skipped_dry:<48}│\n"
         f"│ Scrape failed          │ {skipped_no_price:<48}│\n"
         f"│ Mutation failures      │ {failed_mutations:<48}│\n"
+        f"│ Recovered (re-search)  │ {recovered:<48}│\n"
         f"│ Invalid URLs logged    │ {invalid_urls:<48}│\n"
         "└────────────────────────┴──────────────────────────────────────────────────┘"
     )
@@ -434,6 +478,7 @@ def sync_prices():
         "matched": matched,
         "failed_mutations": failed_mutations,
         "invalid_urls": invalid_urls,
+        "recovered": recovered,
     }
 
 

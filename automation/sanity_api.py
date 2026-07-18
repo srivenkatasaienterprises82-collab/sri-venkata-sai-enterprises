@@ -1,6 +1,60 @@
 import os
+import time
 import requests
 from datetime import datetime
+
+
+def _mutate(mutations: dict, *, retries: int = 3) -> dict:
+    """POST a Sanity mutation with bounded retry for transient failures.
+
+    Retries on network errors and on 429/5xx responses (rate limits, brief
+    outages). Non-transient 4xx (e.g. 400/401/403) and 2xx are returned
+    immediately so the caller's error logic stays authoritative. Raises
+    RuntimeError on a final non-2xx response so the orchestrator can count
+    the failure and exit non-zero instead of reporting a false green.
+    """
+    url = f"{BASE_URL}/data/mutate/{DATASET}"
+    last_err = None
+    for attempt in range(1, retries + 1):
+        try:
+            res = requests.post(url, headers=HEADERS, json=mutations)
+        except requests.RequestException as e:
+            last_err = e
+            print(f"  Sanity mutation network error (attempt {attempt}/{retries}): {e}")
+            if attempt < retries:
+                time.sleep(min(2 ** attempt, 8))
+            continue
+        if res.status_code in (200, 201):
+            body = res.json() if res.text else {}
+            if not body.get("results"):
+                print(f"  WARNING: Sanity returned no mutation results: {body}")
+            return body
+        # Transient? Retry only on 429 / 5xx.
+        if res.status_code in (429, 500, 502, 503, 504):
+            last_err = f"HTTP {res.status_code}"
+            print(f"  Sanity mutation {res.status_code} (attempt {attempt}/{retries}); retrying")
+            if attempt < retries:
+                time.sleep(min(2 ** attempt, 8))
+            continue
+        # Non-transient 4xx: surface immediately.
+        raise RuntimeError(
+            f"Sanity mutation failed: HTTP {res.status_code} {res.text[:200]}"
+        )
+    raise RuntimeError(f"Sanity mutation failed after {retries} attempts: {last_err}")
+
+
+def _norm_variant_size(value) -> str:
+    """Normalize a RAM/Storage token for matching.
+
+    Collapses spacing/units so "8 GB" == "8GB" and "128 GB" == "128GB". An
+    empty/absent value stays empty so missing storage still matches missing
+    storage rather than collapsing to "0" or "gb".
+    """
+    if not value:
+        return ""
+    s = str(value).lower().strip()
+    s = s.replace(" ", "").replace("gb", "").replace("ram", "").replace("rom", "")
+    return s
 
 PROJECT_ID = os.getenv("SANITY_PROJECT_ID")
 DATASET = os.getenv("SANITY_DATASET")
@@ -184,19 +238,10 @@ def update_price(product_id: str, amazon_price, flipkart_price, display_price) -
 
     url = f"{BASE_URL}/data/mutate/{DATASET}"
     mutations = {"mutations": [{"patch": {"id": product_id, "set": set_fields}}]}
-    res = requests.post(url, headers=HEADERS, json=mutations)
-    if res.status_code not in (200, 201):
-        # Surface the failure loudly instead of swallowing it — the previous
-        # code returned res.json() even on a 4xx, hiding the error from the
-        # orchestrator's "matched/updated" counters.
-        raise RuntimeError(
-            f"Sanity price update failed for {product_id}: "
-            f"HTTP {res.status_code} {res.text[:200]}"
-        )
-    body = res.json() if res.text else {}
-    if not body.get("results"):
-        print(f"  WARNING: Sanity returned no mutation results for {product_id}: {body}")
-    return body
+    # _mutate retries transient 429/5xx and raises RuntimeError on a final
+    # non-2xx response, so the orchestrator counts the failure and exits
+    # non-zero rather than reporting a false green.
+    return _mutate(mutations)
 
 
 def update_price_and_variants(product_id: str, product_name: str,
@@ -234,17 +279,24 @@ def update_price_and_variants(product_id: str, product_name: str,
     updated_variants = []
     applied_scraped = False
     for v in existing_variants:
-        ram = str(v.get("ram", "")).lower().strip()
-        storage = str(v.get("storage", "")).lower().strip()
+        ram = _norm_variant_size(v.get("ram"))
+        storage = _norm_variant_size(v.get("storage"))
 
-        # Try to find a matching scraped variant
+        # Try to find a matching scraped variant (exact RAM+storage first,
+        # then a looser RAM-only fallback so a listing that omits storage
+        # still anchors the right tier).
         matched_scraped = None
         for sv in scraped_variants:
-            sv_ram = str(sv.get("ram", "")).lower().strip()
-            sv_storage = str(sv.get("storage", "")).lower().strip()
+            sv_ram = _norm_variant_size(sv.get("ram"))
+            sv_storage = _norm_variant_size(sv.get("storage"))
             if sv_ram == ram and sv_storage == storage:
                 matched_scraped = sv
                 break
+        if matched_scraped is None and ram:
+            for sv in scraped_variants:
+                if _norm_variant_size(sv.get("ram")) == ram and sv.get("price") is not None:
+                    matched_scraped = sv
+                    break
 
         new_variant_price = v.get("price")
         if matched_scraped and matched_scraped.get("price") is not None:
@@ -287,18 +339,8 @@ def update_price_and_variants(product_id: str, product_name: str,
     if updated_variants:
         set_fields["variants"] = updated_variants
 
-    url = f"{BASE_URL}/data/mutate/{DATASET}"
     mutations = {"mutations": [{"patch": {"id": product_id, "set": set_fields}}]}
-    res = requests.post(url, headers=HEADERS, json=mutations)
-    if res.status_code not in (200, 201):
-        raise RuntimeError(
-            f"Sanity price+variants update failed for {product_id}: "
-            f"HTTP {res.status_code} {res.text[:200]}"
-        )
-    body = res.json() if res.text else {}
-    if not body.get("results"):
-        print(f"  WARNING: Sanity returned no mutation results for {product_id}: {body}")
-    return body
+    return _mutate(mutations)
 
 
 def update_url(product_id: str, url: str) -> dict:
@@ -313,16 +355,9 @@ def update_url(product_id: str, url: str) -> dict:
     other = "amazonUrl" if field == "flipkartUrl" else "flipkartUrl"
     set_fields = {field: url}
     unset_fields = [other]
-    url = f"{BASE_URL}/data/mutate/{DATASET}"
     mutations = {
         "mutations": [
             {"patch": {"id": product_id, "set": set_fields, "unset": unset_fields}}
         ]
     }
-    res = requests.post(url, headers=HEADERS, json=mutations)
-    if res.status_code not in (200, 201):
-        raise RuntimeError(
-            f"Sanity url update failed for {product_id}: "
-            f"HTTP {res.status_code} {res.text[:200]}"
-        )
-    return res.json() if res.text else {}
+    return _mutate(mutations)

@@ -343,3 +343,39 @@ def test_launch_checker_ignores_variant_metadata(monkeypatch):
     result = launch_checker.sync_prices()
     assert result["checked"] == 1
 
+
+def test_sync_recovers_via_research_when_scrape_empty(monkeypatch, capsys):
+    """When the stored URL returns no price (transient bot-check on CI IPs),
+    the sync must re-resolve the product URL from the brand's live listings
+    and re-scrape ONCE before giving up. The recovered price is then applied.
+    """
+    product = {
+        "_id": "p1", "name": "Moto G85", "brand": {"name": "Motorola"},
+        "brandSlug": "motorola",
+        "flipkartUrl": "https://www.flipkart.com/moto-g85-stale/p/itm_old",
+        "price": 17999, "priceLocked": False, "enabled": None,
+        "variants": [{"ram": "8GB", "storage": "128GB", "price": 17999}],
+    }
+    monkeypatch.setattr(LC, "fetch_all_products", lambda: [product])
+    monkeypatch.setattr(LC, "url_name_matches", lambda n, u: True)
+    # First (stale) URL returns nothing; the re-search url returns a price.
+    monkeypatch.setattr(
+        LC, "get_flipkart_details",
+        lambda u: {"price": 16999, "variants": []}
+        if "fresh" in u else {"price": None, "variants": []},
+    )
+    monkeypatch.setattr(
+        LC, "get_brand_listings",
+        lambda b, s: [("Moto G85", "https://www.flipkart.com/moto-g85-fresh/p/itm_new")],
+    )
+    updated = []
+    monkeypatch.setattr(
+        LC, "update_price_and_variants",
+        lambda *a, **k: updated.append(a) or {"results": [{"id": "p1"}]},
+    )
+    summary = LC.sync_prices()
+    assert summary["updated"] == 1
+    assert summary["recovered"] == 1
+    out = capsys.readouterr().out
+    assert "Recovered URL" in out
+

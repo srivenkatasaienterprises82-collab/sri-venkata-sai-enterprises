@@ -176,3 +176,70 @@ def test_update_variants_exact_scrape_wins():
     assert by_ram["16GB"] == 70000
     assert by_ram["12GB"] == 57999
 
+
+def test_update_variants_matches_with_spacing_differences():
+    # "8 GB" in Sanity should match "8GB" from the scraper (unit/space
+    # normalization), so the correct tier gets the exact scraped price.
+    captured, _post = _capture_post()
+    existing = [
+        {"ram": "8 GB", "storage": "128 GB", "price": 24999},
+        {"ram": "12 GB", "storage": "256 GB", "price": 28999},
+    ]
+    scraped = [{"ram": "8GB", "storage": "128GB", "price": 23999}]
+    with patch.object(sa.requests, "post", _post):
+        sa.update_price_and_variants("p1", "Moto Edge", 23999, None, 23999, scraped, existing)
+    variants = captured["json"]["mutations"][0]["patch"]["set"]["variants"]
+    by_ram = {v["ram"]: v["price"] for v in variants}
+    assert by_ram["8 GB"] == 23999  # matched despite spacing diff
+    assert by_ram["12 GB"] == 28999
+
+
+def test_update_price_retries_transient_5xx_then_succeeds():
+    # _mutate must retry on 503/429 and return the eventual 2xx body rather
+    # than raising — so a brief Sanity outage doesn't fail the whole sync run.
+    calls = {"n": 0}
+
+    class _Resp:
+        text = '{"results":[{"id":"p1"}]}'
+
+        def __init__(self, code):
+            self.status_code = code
+
+        def json(self):
+            return {"results": [{"id": "p1"}]}
+
+    def _post(url, headers=None, json=None):
+        calls["n"] += 1
+        # First two attempts are transient 503, third succeeds.
+        return _Resp(503 if calls["n"] < 3 else 200)
+
+    with patch.object(sa.requests, "post", _post):
+        res = sa.update_price("p1", None, 19999, 19999)
+    assert calls["n"] == 3
+    assert res["results"][0]["id"] == "p1"
+
+
+def test_update_price_surfaces_non_transient_4xx():
+    # A 400/401/403 is NOT retried (it won't fix itself) and must raise so the
+    # orchestrator counts the failure and exits non-zero.
+    calls = {"n": 0}
+
+    class _Resp:
+        status_code = 400
+        text = '{"error":"bad request"}'
+
+        def json(self):
+            return {"error": "bad request"}
+
+    def _post(url, headers=None, json=None):
+        calls["n"] += 1
+        return _Resp()
+
+    with patch.object(sa.requests, "post", _post):
+        try:
+            sa.update_price("p1", 100, 200, 150)
+            assert False, "expected RuntimeError"
+        except RuntimeError:
+            pass
+    assert calls["n"] == 1  # no retries on non-transient 4xx
+
