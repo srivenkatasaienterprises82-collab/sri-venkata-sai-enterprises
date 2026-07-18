@@ -44,9 +44,10 @@ def _review(product_id: str, failed: bool) -> None:
     failed=True increments syncFailCount (bot-block / implausible / mismatch);
     failed=False resets it and clears needsManualReview. Failures here are
     non-fatal — they never abort the run, just telemetry. No-op when no
-    SANITY_TOKEN is configured (local test runs), so we don't hit the network.
+    SANITY_TOKEN is configured (local test runs) or during a --dry-run, so we
+    never mutate Sanity while only validating.
     """
-    if not os.getenv("SANITY_TOKEN"):
+    if DRY_RUN or not os.getenv("SANITY_TOKEN"):
         return
     try:
         flag_manual_review(product_id, failed)
@@ -195,8 +196,15 @@ def get_assigned_source(product: dict) -> str | None:
 
 # ─── Price sync ─────────────────────────────────────────────────────────────
 
-def sync_prices():
-    print("Starting Price Sync...")
+# Module-level flag so helper telemetry writers (_review, record_freshness)
+# can skip Sanity mutations during a --dry-run validation pass.
+DRY_RUN = False
+
+
+def sync_prices(dry_run: bool = False):
+    global DRY_RUN
+    DRY_RUN = dry_run
+    print("Starting Price Sync..." + (" (DRY RUN — no Sanity writes)" if dry_run else ""))
     if not os.path.exists(LOG_FILE):
         with open(LOG_FILE, "w") as f:
             f.write("timestamp,product,brand,old_price,new_price,diff,direction,source\n")
@@ -447,7 +455,8 @@ def sync_prices():
                 # Telemetry: record that we tried and were blocked, so the
                 # freshness report shows this product isn't being kept current.
                 try:
-                    record_freshness(product["_id"], "blocked")
+                    if not DRY_RUN:
+                        record_freshness(product["_id"], "blocked")
                 except RuntimeError as e:
                     print(f"    freshness write failed: {e}")
                 _review(product["_id"], True)
@@ -481,7 +490,8 @@ def sync_prices():
                       retries=retries_used)
             scrape_blocked += 1
             try:
-                record_freshness(product["_id"], "blocked")
+                if not DRY_RUN:
+                    record_freshness(product["_id"], "blocked")
             except RuntimeError as e:
                 print(f"    freshness write failed: {e}")
             _review(product["_id"], True)
@@ -517,7 +527,16 @@ def sync_prices():
             continue
 
         # Update Sanity (including per-variant prices). A non-2xx response
-        # raises RuntimeError, which we count as a hard failure.
+        # raises RuntimeError, which we count as a hard failure. Under a dry
+        # run we skip the write entirely and just log what *would* change.
+        if DRY_RUN:
+            print(f"    >> DRY-RUN would update ₹{old_price} → ₹{display_price} via {source}")
+            updated_count += 1
+            _emit_row(product, "UPDATE", source=source, old_price=old_price,
+                      new_price=display_price, scrape_ms=scrape_ms,
+                      retries=retries_used)
+            continue
+
         try:
             mut = update_price_and_variants(
                 product["_id"],
@@ -555,7 +574,8 @@ def sync_prices():
             nudge_updates += 1
         # Freshness telemetry: a successful scrape keeps the product "ok".
         try:
-            record_freshness(product["_id"], "ok")
+            if not DRY_RUN:
+                record_freshness(product["_id"], "ok")
         except RuntimeError as e:
             print(f"    freshness write failed: {e}")
         _review(product["_id"], False)
@@ -668,7 +688,7 @@ if __name__ == "__main__":
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     if args.mode == "sync":
-        summary = sync_prices()
+        summary = sync_prices(dry_run=args.dry_run)
         # Fail the GitHub Action (non-zero exit) when any product could not be
         # synced, so a partial/failed run is never reported as a green check.
         if summary.get("failed_mutations", 0) > 0 or summary.get("invalid_urls", 0) > 0:

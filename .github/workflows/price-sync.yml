@@ -55,3 +55,11 @@ jobs:
       # NOTE: The Vercel Deploy Hook was removed. Storefront pages use
       # `force-dynamic` + no-store Sanity fetches, so prices are fresh without
       # a full site rebuild. Redeploys are now unnecessary for price updates.
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "::error::Price sync failed. Check GitHub Actions logs and the uploaded artifacts."
+          # Optional: wire a Slack/Discord webhook here, e.g.
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"6h price-sync FAILED on '"${{ github.sha }}"'"}' \
+          #   "${{ secrets.SLACK_WEBHOOK_URL }}"

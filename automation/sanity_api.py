@@ -379,11 +379,14 @@ def flag_manual_review(product_id: str, failed: bool, threshold: int = 3) -> Non
     the orchestrator, same as the price mutations).
     """
     # Read the current counter so we can increment atomically-ish (the 6h cron
-    # never overlaps, so a single read-modify-write is safe).
-    current = _query(
+    # never overlaps, so a single read-modify-write is safe). `_query` returns
+    # either a list (GROQ array) or — for a `[0]` single-object query — the
+    # object directly, so normalise both shapes.
+    raw = _query(
         f'*[_id=="{product_id}"][0]{{syncFailCount, needsManualReview}}'
     )
-    prev = current[0].get("syncFailCount", 0) if current else 0
+    current = raw[0] if isinstance(raw, list) and raw else (raw if isinstance(raw, dict) else None)
+    prev = current.get("syncFailCount", 0) if current else 0
     count = (prev + 1) if failed else 0
     needs = count >= threshold
     set_fields = {
