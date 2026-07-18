@@ -3,15 +3,24 @@ from dotenv import load_dotenv
 from automation.flipkart import get_flipkart_price
 from automation.amazon import get_amazon_price
 
-load_dotenv("C:/Users/ramak/Downloads/sri-venkata-sai-enterprises-main/sri-venkata-sai-enterprises-main/.env.local")
-TOKEN = "skB1QV0Fc0WB5752sNh4DE03AZ85FDo5kZcR6JH4gDJ5GPSU6DG4Y46JTB1xuqD6rH1TSLeHMRZJl4Ly6TA4eAoxoyCA0JnptpyYbhh1IFa3ZLPXzk3pFDKG7zteCQSn2VQ8v2uWDTfZhuEoEUe4ZZdVEIpRMDFeIeJJL7hCbeqNDoNpIEBb"
+# NEVER hardcode a Sanity token. Load it from .env.local (local) or the
+# SANITY_TOKEN environment variable (CI). If the token is missing the script
+# must fail loudly rather than fall back to a committed secret.
+load_dotenv()
+TOKEN = os.getenv("SANITY_TOKEN")
+if not TOKEN:
+    raise SystemExit("SANITY_TOKEN is not set — export it or add it to .env.local")
 BASE = "https://homvjne9.api.sanity.io/v2024-01-01"
 HDR = {"Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json"}
 
 BRANDS = {"Samsung", "iQOO", "Apple", "OnePlus", "Motorola", "Vivo", "Realme", "Redmi", "POCO", "Oppo", "Google"}
-FLIPKART_ONLY = {"Motorola", "Oppo", "Vivo", "Realme", "Poco", "Nothing", "Narzo", "Google", "Infinix"}
+# Mirror the routing in automation/launch_checker.py: Apple/Samsung are
+# Flipkart-only, iQOO/Redmi are Amazon-only, OnePlus/Google are scraped on
+# both and the lower price wins. (Narzo/Infinix/POCO are covered by the
+# FLIPKART_ONLY set below.)
+FLIPKART_ONLY = {"Motorola", "Oppo", "Vivo", "Realme", "Poco", "Nothing", "Narzo", "Google", "Infinix", "Apple", "Samsung"}
 AMAZON_ONLY = {"iQOO", "Redmi"}
-BOTH = {"Apple", "Samsung", "OnePlus"}
+BOTH = {"OnePlus"}
 
 def q(slug):
     r = requests.get(f"{BASE}/data/query/production?query={requests.utils.quote(slug)}", headers=HDR, timeout=15)
@@ -55,13 +64,23 @@ for p in products:
         print(f"  = {p['name']}: Rs.{old_price}")
         continue
 
+    set_fields = {
+        "price": new_price,
+        "lastUpdated": __import__('datetime').datetime.now().isoformat(),
+    }
+    # Only overwrite the source-specific price we actually scraped; never
+    # wipe the other marketplace's stored price with None.
+    if brand in FLIPKART_ONLY:
+        set_fields["flipkartPrice"] = new_price
+    elif brand in AMAZON_ONLY:
+        set_fields["amazonPrice"] = new_price
+    elif brand in BOTH:
+        if fk_price is not None:
+            set_fields["flipkartPrice"] = fk_price
+        if az_price is not None:
+            set_fields["amazonPrice"] = az_price
     patch = {
-        "mutations": [{"patch": {"id": p["_id"], "set": {
-            "price": new_price,
-            "amazonPrice": az_price if brand in BOTH else None,
-            "flipkartPrice": fk_price if brand in BOTH else None,
-            "lastUpdated": __import__('datetime').datetime.now().isoformat(),
-        }}}]
+        "mutations": [{"patch": {"id": p["_id"], "set": set_fields}}]
     }
     r = requests.post(f"{BASE}/data/mutate/production", headers=HDR, json=patch, timeout=15)
     if r.status_code == 200:
