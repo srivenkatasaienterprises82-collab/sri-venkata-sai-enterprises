@@ -35,7 +35,7 @@ import sys
 import time
 from datetime import datetime
 
-from sanity_api import fetch_all_products, update_price, update_price_and_variants, create_full_product
+from sanity_api import fetch_all_products, update_price, update_price_and_variants, create_full_product, record_freshness
 from amazon import get_amazon_price, get_amazon_details
 from flipkart import get_flipkart_price, get_flipkart_details
 from listing import get_brand_listings
@@ -205,6 +205,7 @@ def sync_prices():
     failed_mutations = 0
     invalid_urls = 0
     recovered = 0
+    scrape_blocked = 0  # primary (and fallback) source(s) served bot-walls
 
     for product in products:
         # Draft products (enabled:false) – created by the launch-checker. They
@@ -317,6 +318,7 @@ def sync_prices():
 
         scrape_start = time.time()
         retries_used = 0
+        blocked = False  # True when the primary source returned no data (bot-wall)
 
         if source == "flipkart":
             if not flipkart_url and not url_for_check:
@@ -328,6 +330,8 @@ def sync_prices():
             details = get_flipkart_details(flip_url)
             flip_price = details.get("price")
             scraped_variants = details.get("variants", [])
+            if flip_price is None:
+                blocked = True
         elif source == "amazon":
             if not amazon_url and not url_for_check:
                 skipped_no_url += 1
@@ -338,12 +342,45 @@ def sync_prices():
             details = get_amazon_details(amz_url)
             amz_price = details.get("price")
             scraped_variants = details.get("variants", [])
+            if amz_price is None:
+                blocked = True
         elif source == "both":
             flip_details = get_flipkart_details(flipkart_url) if flipkart_url else {}
             amz_details = get_amazon_details(amazon_url) if amazon_url else {}
             flip_price = flip_details.get("price")
             amz_price = amz_details.get("price")
             scraped_variants = flip_details.get("variants") or amz_details.get("variants", [])
+
+        # Cross-source fallback (bot-block resilience). A single-source brand
+        # (Flipkart-only / Amazon-only) whose primary marketplace served a
+        # bot-check interstitial would otherwise stay stale FOREVER. If the
+        # product has a URL on the *other* marketplace, try it once — but only
+        # write the price if it survives the existing name/colour/plausibility
+        # guards downstream. This is what keeps the storefront fresh when
+        # Flipkart (the primary source for most brands here) blocks the CI IP.
+        if blocked:
+            alt_source, alt_url = None, None
+            if source == "flipkart" and amazon_url:
+                alt_source, alt_url = "amazon", amazon_url
+            elif source == "amazon" and flipkart_url:
+                alt_source, alt_url = "flipkart", flipkart_url
+            if alt_source and alt_url and url_name_matches(product.get("name", ""), alt_url):
+                print(f"  -> Primary source blocked; trying {alt_source} fallback")
+                alt_details = (
+                    get_amazon_details(alt_url) if alt_source == "amazon"
+                    else get_flipkart_details(alt_url)
+                )
+                if alt_source == "amazon":
+                    amz_price = alt_details.get("price")
+                    if alt_details.get("variants"):
+                        scraped_variants = alt_details["variants"]
+                else:
+                    flip_price = alt_details.get("price")
+                    if alt_details.get("variants"):
+                        scraped_variants = alt_details["variants"]
+                if (amz_price if alt_source == "amazon" else flip_price) is not None:
+                    retries_used = 1
+                    print(f"  -> Recovered price via {alt_source} fallback")
 
         # Single recovery attempt: if both scrapers came back empty we may have
         # hit a transient bot-check / CAPTCHA interstitial (common for CI IPs)
@@ -388,10 +425,24 @@ def sync_prices():
                           reason="both_scrapers_returned_none",
                           retries=retries_used)
                 skipped_no_price += 1
+                scrape_blocked += 1
+                # Telemetry: record that we tried and were blocked, so the
+                # freshness report shows this product isn't being kept current.
+                try:
+                    record_freshness(product["_id"], "blocked")
+                except RuntimeError as e:
+                    print(f"    freshness write failed: {e}")
                 continue
             display_price = min(prices)
         else:
-            display_price = flip_price if source == "flipkart" else amz_price
+            # Single-source brand. `blocked` means the primary returned nothing;
+            # the cross-source fallback above may have recovered a price from the
+            # *other* marketplace — prefer that over the (None) primary so the
+            # product stays fresh instead of going stale forever.
+            if source == "flipkart":
+                display_price = flip_price if flip_price is not None else amz_price
+            else:
+                display_price = amz_price if amz_price is not None else flip_price
 
         scrape_ms = (time.time() - scrape_start) * 1000
 
@@ -400,6 +451,11 @@ def sync_prices():
             _emit_row(product, "SKIP", source=source, old_price=old_price,
                       reason="scraper_returned_none", scrape_ms=scrape_ms,
                       retries=retries_used)
+            scrape_blocked += 1
+            try:
+                record_freshness(product["_id"], "blocked")
+            except RuntimeError as e:
+                print(f"    freshness write failed: {e}")
             continue
 
         # Hard band guard.
@@ -459,6 +515,11 @@ def sync_prices():
                   new_price=display_price, scrape_ms=scrape_ms,
                   retries=retries_used)
         print(f"    {arrow} ₹{old_price} → ₹{display_price} ({'+' if diff > 0 else ''}{diff}) via {source}")
+        # Freshness telemetry: a successful scrape keeps the product "ok".
+        try:
+            record_freshness(product["_id"], "ok")
+        except RuntimeError as e:
+            print(f"    freshness write failed: {e}")
 
     print(
         "\n"
@@ -476,6 +537,7 @@ def sync_prices():
         f"│ Out of band            │ {skipped_implausible:<48}│\n"
         f"│ Implausible delta      │ {skipped_dry:<48}│\n"
         f"│ Scrape failed          │ {skipped_no_price:<48}│\n"
+        f"│ Blocked (bot-wall)     │ {scrape_blocked:<48}│\n"
         f"│ Mutation failures      │ {failed_mutations:<48}│\n"
         f"│ Recovered (re-search)  │ {recovered:<48}│\n"
         f"│ Invalid URLs logged    │ {invalid_urls:<48}│\n"
@@ -495,6 +557,7 @@ def sync_prices():
         "failed_mutations": failed_mutations,
         "invalid_urls": invalid_urls,
         "recovered": recovered,
+        "scrape_blocked": scrape_blocked,
         "skipped_color_mismatch": skipped_color_mismatch,
     }
 

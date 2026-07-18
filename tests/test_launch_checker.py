@@ -378,6 +378,9 @@ def test_sync_skips_color_mismatch(monkeypatch, capsys):
     assert updated == []
     out = capsys.readouterr().out
     assert "url_color_mismatch" in out
+
+
+def test_sync_recovers_via_research(monkeypatch, capsys):
     """When the stored URL returns no price (transient bot-check on CI IPs),
     the sync must re-resolve the product URL from the brand's live listings
     and re-scrape ONCE before giving up. The recovered price is then applied.
@@ -411,4 +414,61 @@ def test_sync_skips_color_mismatch(monkeypatch, capsys):
     assert summary["recovered"] == 1
     out = capsys.readouterr().out
     assert "Recovered URL" in out
+
+
+def test_sync_falls_back_to_other_source_when_blocked(monkeypatch, capsys):
+    """Single-source brand (Flipkart-only) whose primary marketplace serves a
+    bot-check interstitial would otherwise stay stale forever. If the product
+    carries a URL on the *other* marketplace, the sync must try it once and
+    write the recovered price — keeping the storefront fresh.
+    """
+    product = {
+        "_id": "p1", "name": "Moto G85", "brand": {"name": "Motorola"},
+        "brandSlug": "motorola",
+        "flipkartUrl": "https://www.flipkart.com/moto-g85/p/itm_fk",
+        "amazonUrl": "https://www.amazon.in/Moto-G85/dp/B0FALLBACK",
+        "price": 17999, "priceLocked": False, "enabled": None,
+        "variants": [{"ram": "8GB", "storage": "128GB", "price": 17999}],
+    }
+    monkeypatch.setattr(LC, "fetch_all_products", lambda: [product])
+    # Primary (Flipkart) blocked; fallback to Amazon returns a price.
+    monkeypatch.setattr(LC, "get_flipkart_details", lambda u: {"price": None, "variants": []})
+    monkeypatch.setattr(LC, "get_amazon_details", lambda u: {"price": 16999, "variants": []})
+    monkeypatch.setattr(LC, "url_name_matches", lambda n, u: True)
+    updated = []
+    monkeypatch.setattr(
+        LC, "update_price_and_variants",
+        lambda *a, **k: updated.append(a) or {"results": [{"id": "p1"}]},
+    )
+    summary = LC.sync_prices()
+    assert summary["updated"] == 1
+    out = capsys.readouterr().out
+    assert "fallback" in out
+
+
+def test_sync_counts_blocked_when_no_fallback(monkeypatch, capsys):
+    """If the primary source is blocked AND no alternate URL exists, the
+    product is counted as scrape_blocked (telemetry) and not updated.
+    """
+    product = {
+        "_id": "p1", "name": "Moto G85", "brand": {"name": "Motorola"},
+        "brandSlug": "motorola",
+        "flipkartUrl": "https://www.flipkart.com/moto-g85/p/itm_fk",
+        "amazonUrl": "",
+        "price": 17999, "priceLocked": False, "enabled": None,
+        "variants": [{"ram": "8GB", "storage": "128GB", "price": 17999}],
+    }
+    monkeypatch.setattr(LC, "fetch_all_products", lambda: [product])
+    monkeypatch.setattr(LC, "get_flipkart_details", lambda u: {"price": None, "variants": []})
+    monkeypatch.setattr(LC, "get_amazon_details", lambda u: {"price": None, "variants": []})
+    updated = []
+    monkeypatch.setattr(
+        LC, "update_price_and_variants",
+        lambda *a, **k: updated.append(a) or {"results": [{"id": "p1"}]},
+    )
+    summary = LC.sync_prices()
+    assert summary["updated"] == 0
+    assert summary["scrape_blocked"] == 1
+    assert updated == []
+
 

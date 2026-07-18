@@ -243,3 +243,45 @@ def test_update_price_surfaces_non_transient_4xx():
             pass
     assert calls["n"] == 1  # no retries on non-transient 4xx
 
+
+def test_record_freshness_writes_status_field():
+    # Freshness telemetry must land in a `set` patch with lastScrapedAt +
+    # scrapeStatus and NOT touch price/variant data.
+    captured = {}
+
+    class _Resp:
+        status_code = 200
+        text = '{"results":[{"id":"p1"}]}'
+
+        def json(self):
+            return {"results": [{"id": "p1"}]}
+
+    def _post(url, headers=None, json=None):
+        captured["json"] = json
+        return _Resp()
+
+    with patch.object(sa.requests, "post", _post):
+        sa.record_freshness("p1", "ok")
+    set_fields = captured["json"]["mutations"][0]["patch"]["set"]
+    assert set_fields["scrapeStatus"] == "ok"
+    assert "lastScrapedAt" in set_fields
+    assert "price" not in set_fields
+    assert "variants" not in set_fields
+
+
+def test_record_freshness_raises_on_failure():
+    class _Resp:
+        status_code = 500
+        text = '{"error":"boom"}'
+
+        def json(self):
+            return {"error": "boom"}
+
+    with patch.object(sa.requests, "post", lambda *a, **k: _Resp()):
+        try:
+            sa.record_freshness("p1", "blocked")
+            assert False, "expected RuntimeError"
+        except RuntimeError:
+            pass
+
+

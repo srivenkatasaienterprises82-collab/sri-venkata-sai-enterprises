@@ -343,6 +343,25 @@ def update_price_and_variants(product_id: str, product_name: str,
     return _mutate(mutations)
 
 
+def record_freshness(product_id: str, status: str) -> None:
+    """Write scrape freshness telemetry for a product.
+
+    `status` is "ok" when a live price was successfully obtained, or "blocked"
+    when every source returned no usable data (bot-wall / CAPTCHA). This lets
+    operators see, at a glance, which products the automated sync is actively
+    keeping current versus which are stale because the marketplace blocked the
+    scraper. It never overwrites price/variant data — purely an audit field.
+    Raises RuntimeError on a non-2xx response so the orchestrator can count it
+    as a hard failure alongside the price mutations.
+    """
+    set_fields = {
+        "lastScrapedAt": datetime.now().isoformat(),
+        "scrapeStatus": status,
+    }
+    mutations = {"mutations": [{"patch": {"id": product_id, "set": set_fields}}]}
+    _mutate(mutations)
+
+
 def update_url(product_id: str, url: str) -> dict:
     """Set a product's marketplace URL in Sanity.
 

@@ -4,12 +4,7 @@ import random
 import requests
 from bs4 import BeautifulSoup
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Accept-Language": "en-IN,en;q=0.9",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Cache-Control": "no-cache",
-}
+from http_helper import new_session, get_with_retry, is_interstitial, random_user_agent
 
 # How many times to retry the requests/Playwright pass. Each pass already
 # has its own internal delay+jitter between attempts.
@@ -41,10 +36,9 @@ def get_flipkart_price(url: str) -> int | None:
 
 def _try_requests(url: str, attempt: int = 1) -> int | None:
     try:
-        time.sleep(random.uniform(1, 2))
-        resp = requests.get(url, headers=HEADERS, timeout=30)
-        if resp.status_code != 200:
-            print(f"  Flipkart requests: HTTP {resp.status_code} (attempt {attempt})")
+        session = new_session()
+        resp = get_with_retry(session, url, timeout=30, max_tries=2)
+        if resp is None:
             return None
 
         html = resp.text
@@ -169,13 +163,22 @@ def _try_playwright(url: str, attempt: int = 1) -> int | None:
 
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
+            # Rotate UA + spoof the automation signals Chrome exposes so the
+            # headless browser reads as a normal desktop visitor. Combined with
+            # the interstitial check below, this is what lets Playwright rescue
+            # requests that Flipkart's bot-wall blocked.
+            ua = random_user_agent()
             context = browser.new_context(
-                user_agent=HEADERS["User-Agent"],
-                viewport={"width": 1366, "height": 768},
+                user_agent=ua,
+                viewport={"width": random.choice([1366, 1440, 1536]), "height": 768},
                 locale="en-IN",
+                device_scale_factor=1,
             )
             context.add_init_script(
                 "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+            )
+            context.add_init_script(
+                "Object.defineProperty(navigator, 'languages', {get: () => ['en-IN','en']});"
             )
             page = context.new_page()
             page.set_default_timeout(60000)
@@ -187,6 +190,13 @@ def _try_playwright(url: str, attempt: int = 1) -> int | None:
                     page.wait_for_load_state("networkidle", timeout=20000)
                 except PwTimeout:
                     pass
+
+                # Bail early if Flipkart served a bot-check page instead of the
+                # product. Without this we'd parse a CAPTCHA interstitial's
+                # stray price widget.
+                if is_interstitial(page.content()):
+                    print(f"  Flipkart Playwright: bot-check interstitial (attempt {attempt})")
+                    return None
 
                 # Prefer JSON-LD from the fully-rendered page
                 pw_soup = BeautifulSoup(page.content(), "lxml")
@@ -263,10 +273,9 @@ def _try_requests_details(url: str, attempt: int = 1) -> dict | None:
     through to Playwright.
     """
     try:
-        time.sleep(random.uniform(1, 2))
-        resp = requests.get(url, headers=HEADERS, timeout=30)
-        if resp.status_code != 200:
-            print(f"  Flipkart details requests: HTTP {resp.status_code} (attempt {attempt})")
+        session = new_session()
+        resp = get_with_retry(session, url, timeout=30, max_tries=2)
+        if resp is None:
             return None
 
         soup = BeautifulSoup(resp.text, "lxml")
@@ -298,13 +307,18 @@ def _try_playwright_details(url: str, attempt: int = 1) -> dict | None:
 
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
+            ua = random_user_agent()
             context = browser.new_context(
-                user_agent=HEADERS["User-Agent"],
-                viewport={"width": 1366, "height": 768},
+                user_agent=ua,
+                viewport={"width": random.choice([1366, 1440, 1536]), "height": 768},
                 locale="en-IN",
+                device_scale_factor=1,
             )
             context.add_init_script(
                 "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+            )
+            context.add_init_script(
+                "Object.defineProperty(navigator, 'languages', {get: () => ['en-IN','en']});"
             )
             page = context.new_page()
             page.set_default_timeout(60000)
@@ -316,6 +330,10 @@ def _try_playwright_details(url: str, attempt: int = 1) -> dict | None:
                     page.wait_for_load_state("networkidle", timeout=20000)
                 except PwTimeout:
                     pass
+
+                if is_interstitial(page.content()):
+                    print(f"  Flipkart details Playwright: bot-check interstitial (attempt {attempt})")
+                    return None
 
                 pw_html = page.content()
                 details = _parse_flipkart_details(pw_html)
