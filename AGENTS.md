@@ -1546,6 +1546,16 @@ This file is preserved across sessions. Update it when starting/finishing major 
 1. Commit and push all changes to trigger Vercel redeploy
 2. Verify all pages display correctly with Sanity data (homepage bento deals, testimonials, FAQs, banners, gallery, info pages)
 
+## Done (July 18) — TLS-spoofing transport + delta-sync (NOT YET PUSHED)
+- RAN #52 still failed: 441-byte artifact (zero price writes) — concluded marketplace is unreachable from BOTH local IP (403) and GitHub Actions runner (ConnectTimeoutError / Page.goto timeout). Not a code bug; it's network egress blocking.
+- Applied safe, free anti-block upgrades (per user's curl_cffi proposal, implemented correctly rather than pasting their buggy code):
+  - `automation/http_helper.py`: `new_session()` now prefers a `curl_cffi` Session with `impersonate="chrome120"` (TLS/JA3 fingerprint spoofing to beat Akamai). Guarded import — falls back to stdlib `requests.Session` if curl_cffi missing. Keep UA rotation + `is_interstitial` logic intact.
+  - `automation/flipkart.py` & `amazon.py`: added `playwright-stealth` (`stealth_sync`) to both Playwright pages (guarded import). Did NOT replace the tested `__NEXT_DATA__`/Twister variant parsers with the user's guesswork regex.
+  - `requirements.txt`: added `curl_cffi>=0.6.0` + `playwright-stealth>=1.0.6` (workflow already does `pip install -r requirements.txt` + `playwright install chromium`, so no workflow change needed).
+  - DELTA SYNC: `launch_checker.py` now skips products whose last SUCCESSFUL price write (`lastPriceUpdatedAt`) is < `FRESH_WINDOW_HOURS` (24). Gated on `lastPriceUpdatedAt` (written only on success in `sanity_api.update_price_and_variants`), NOT `lastScrapedAt` (set even on blocks) — otherwise bot-walled products would be marked "fresh" and never retried. First run after deploy scrapes everything (no timestamp yet). Reduces daily requests ~4x to dodge rate limits. Added `_is_fresh()` + `skipped_fresh` counter + summary row + return value; tests added.
+- Tests: 97 pytest pass (added 5: _is_fresh recent/old/missing/bad-timestamp + sync-skips-fresh). tsc clean.
+- STILL OPEN: exposed Sanity token in git history (rotate). CI scraping likely still blocked even with curl_cffi (egress issue), so a successful live run is not guaranteed — will verify on next manual run.
+
 ## Critical Context
 - ALL 132 products have `price: null` in Sanity — NOT caused by price sync, but by the seed script never writing top-level prices (all prices are only in `variants[]`)
 - The site still shows correct prices because the Sanity fetch → fallback → static `products.ts` path works correctly

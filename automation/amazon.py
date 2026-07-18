@@ -7,6 +7,13 @@ from bs4 import BeautifulSoup
 
 from http_helper import new_session, get_with_retry, is_interstitial, random_user_agent
 
+try:
+    from playwright_stealth import stealth_sync
+    STEALTH_AVAILABLE = True
+except ImportError:  # pragma: no cover - optional dependency
+    stealth_sync = None
+    STEALTH_AVAILABLE = False
+
 REQUEST_RETRIES = 3
 PLAYWRIGHT_RETRIES = 2
 
@@ -194,6 +201,8 @@ def _try_playwright(url: str, attempt: int = 1) -> int | None:
                 "Object.defineProperty(navigator, 'languages', {get: () => ['en-IN','en']});"
             )
             page = context.new_page()
+            if STEALTH_AVAILABLE:
+                stealth_sync(page)
             page.set_default_timeout(60000)
 
             try:
@@ -332,6 +341,8 @@ def _try_playwright_details(url: str, attempt: int = 1) -> dict | None:
                 "Object.defineProperty(navigator, 'languages', {get: () => ['en-IN','en']});"
             )
             page = context.new_page()
+            if STEALTH_AVAILABLE:
+                stealth_sync(page)
             page.set_default_timeout(60000)
 
             try:

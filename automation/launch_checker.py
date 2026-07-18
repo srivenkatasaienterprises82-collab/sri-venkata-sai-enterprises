@@ -33,7 +33,7 @@ import argparse
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sanity_api import fetch_all_products, update_price, update_price_and_variants, create_full_product, record_freshness, flag_manual_review
 
@@ -200,6 +200,31 @@ def get_assigned_source(product: dict) -> str | None:
 # can skip Sanity mutations during a --dry-run validation pass.
 DRY_RUN = False
 
+# Delta-sync window: a product whose last *successful* price write is newer than
+# this many hours is skipped to cut request volume (and stay under Flipkart/
+# Amazon rate limits on GitHub's shared IP). With a 6h cron, this naturally
+# spreads the catalog across cycles while guaranteeing every product refreshes
+# at least once per window.
+FRESH_WINDOW_HOURS = 24
+
+
+def _is_fresh(product: dict) -> bool:
+    """True if the product's last successful price write is within the window.
+
+    Uses lastPriceUpdatedAt (set only on a real, successful write) so a product
+    that was bot-walled on the last run is NOT considered fresh and will be
+    scraped again. Products never updated (no timestamp) are never fresh.
+    """
+    ts = product.get("lastPriceUpdatedAt")
+    if not ts:
+        return False
+    try:
+        last = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+    except (ValueError, TypeError):
+        return False
+    age_hours = (datetime.now(timezone.utc) - last).total_seconds() / 3600.0
+    return age_hours < FRESH_WINDOW_HOURS
+
 
 def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
     global DRY_RUN
@@ -233,6 +258,7 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
     skipped_color_mismatch = 0
     skipped_implausible = 0
     skipped_dry = 0  # implausible-difference vs old price (≤ cap)
+    skipped_fresh = 0  # delta-sync: last successful update still within window
     failed_mutations = 0
     invalid_urls = 0
     recovered = 0
@@ -252,6 +278,19 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
         if product.get("priceLocked"):
             skipped_locked += 1
             _emit_row(product, "SKIP", reason="price_locked")
+            continue
+
+        # ── Delta sync gate ──────────────────────────────────────────────────
+        # Only scrape products whose last *successful* price update is older than
+        # FRESH_WINDOW_HOURS. This keeps daily request volume ~1/4 of a full
+        # scrape (Flipkart/Amazon rate-limit GitHub's shared IPs), while every
+        # product is refreshed at least once per window. Gated on
+        # lastPriceUpdatedAt (written only on a real write), NOT lastScrapedAt
+        # (set even on blocks) — otherwise a product that got bot-walled would
+        # be marked "fresh" and never retried.
+        if _is_fresh(product):
+            skipped_fresh += 1
+            _emit_row(product, "SKIP", reason="fresh_data")
             continue
 
         source = get_assigned_source(product)
@@ -599,6 +638,7 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
         f"│ Matched (no change)    │ {matched:<48}│\n"
         f"│ Locked (skipped)       │ {skipped_locked:<48}│\n"
         f"│ Draft disabled (skip)  │ {skipped_disabled:<48}│\n"
+        f"│ Fresh (delta-skip)     │ {skipped_fresh:<48}│\n"
         f"│ No URL                 │ {skipped_no_url:<48}│\n"
         f"│ URL name mismatch      │ {skipped_url_mismatch:<48}│\n"
         f"│ URL color mismatch     │ {skipped_color_mismatch:<48}│\n"
@@ -629,6 +669,7 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
         "recovered": recovered,
         "scrape_blocked": scrape_blocked,
         "skipped_color_mismatch": skipped_color_mismatch,
+        "skipped_fresh": skipped_fresh,
     }
 
 

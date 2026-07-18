@@ -472,3 +472,51 @@ def test_sync_counts_blocked_when_no_fallback(monkeypatch, capsys):
     assert updated == []
 
 
+def test_is_fresh_true_when_recently_updated():
+    from datetime import datetime, timezone, timedelta
+    recent = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+    assert LC._is_fresh({"lastPriceUpdatedAt": recent}) is True
+
+
+def test_is_fresh_false_when_older_than_window():
+    from datetime import datetime, timezone, timedelta
+    old = (datetime.now(timezone.utc) - timedelta(hours=LC.FRESH_WINDOW_HOURS + 1)).isoformat()
+    assert LC._is_fresh({"lastPriceUpdatedAt": old}) is False
+
+
+def test_is_fresh_false_without_timestamp():
+    # Never updated -> never fresh -> must be scraped (so bot-walled products
+    # are retried rather than skipped forever).
+    assert LC._is_fresh({}) is False
+    assert LC._is_fresh({"lastPriceUpdatedAt": None}) is False
+
+
+def test_is_fresh_false_on_bad_timestamp():
+    assert LC._is_fresh({"lastPriceUpdatedAt": "not-a-date"}) is False
+
+
+def test_sync_skips_fresh_products(monkeypatch):
+    # A product updated an hour ago must be delta-skipped, not scraped.
+    from datetime import datetime, timezone, timedelta
+    recent = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+    product = {
+        "_id": "p1",
+        "name": "X Phone",
+        "slug": "x-phone",
+        "brand": {"name": "Motorola", "slug": "motorola"},
+        "price": 10000,
+        "flipkartUrl": "https://flipkart.com/x",
+        "variants": [],
+        "lastPriceUpdatedAt": recent,
+    }
+    _setup(monkeypatch, {"motorola": []}, {"price": 9999, "variants": []}, existing=[product])
+    scraped = []
+    monkeypatch.setattr(
+        LC, "get_flipkart_details",
+        lambda u: scraped.append(u) or {"price": 9999, "variants": []},
+    )
+    summary = LC.sync_prices()
+    assert summary["skipped_fresh"] == 1
+    assert scraped == []  # never hit the network for a fresh product
+
+

@@ -6,6 +6,15 @@ from bs4 import BeautifulSoup
 
 from http_helper import new_session, get_with_retry, is_interstitial, random_user_agent
 
+# playwright-stealth hides the automation tells Playwright leaves in the DOM.
+# Guarded so tests/locales without the package still run (just less stealthy).
+try:
+    from playwright_stealth import stealth_sync
+    STEALTH_AVAILABLE = True
+except ImportError:  # pragma: no cover - optional dependency
+    stealth_sync = None
+    STEALTH_AVAILABLE = False
+
 # How many times to retry the requests/Playwright pass. Each pass already
 # has its own internal delay+jitter between attempts.
 REQUEST_RETRIES = 3
@@ -181,6 +190,8 @@ def _try_playwright(url: str, attempt: int = 1) -> int | None:
                 "Object.defineProperty(navigator, 'languages', {get: () => ['en-IN','en']});"
             )
             page = context.new_page()
+            if STEALTH_AVAILABLE:
+                stealth_sync(page)
             page.set_default_timeout(60000)
 
             try:
@@ -321,6 +332,8 @@ def _try_playwright_details(url: str, attempt: int = 1) -> dict | None:
                 "Object.defineProperty(navigator, 'languages', {get: () => ['en-IN','en']});"
             )
             page = context.new_page()
+            if STEALTH_AVAILABLE:
+                stealth_sync(page)
             page.set_default_timeout(60000)
 
             try:

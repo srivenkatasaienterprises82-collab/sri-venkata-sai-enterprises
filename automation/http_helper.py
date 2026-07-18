@@ -24,6 +24,22 @@ import time
 
 import requests
 
+# `curl_cffi` mimics the TLS/JA3 fingerprint of a real Chrome browser, which is
+# what gets past Flipkart/Amazon's TLS-fingerprinting (Akamai) bot checks that
+# drop vanilla `requests` connections. It's optional: if it isn't installed we
+# fall back to the stdlib `requests` session so the code still runs (just less
+# stealthy). `curl_cffi_requests` is aliased to avoid shadowing `requests`.
+try:
+    from curl_cffi import requests as curl_cffi_requests
+    CURL_CFFI_AVAILABLE = True
+except ImportError:  # pragma: no cover - depends on environment
+    curl_cffi_requests = None
+    CURL_CFFI_AVAILABLE = False
+
+# Which Chrome build curl_cffi should impersonate. Kept as a single knob so it
+# can be bumped when the marketplaces update their expected fingerprint.
+IMPERSONATE = "chrome120"
+
 # A small pool of current, realistic desktop UA strings. Rotating these (rather
 # than sending the same one on every request) is the cheapest, highest-impact
 # anti-bot-avoidance tweak: a single fixed UA is a classic bot fingerprint.
@@ -61,14 +77,23 @@ def random_user_agent() -> str:
     return random.choice(USER_AGENTS)
 
 
-def new_session() -> requests.Session:
-    """Return a cookie-jar `requests.Session` with a fresh rotated UA.
+def new_session() -> object:
+    """Return a cookie-jar session with a fresh rotated UA.
+
+    Prefers a `curl_cffi` session impersonating Chrome (TLS-fingerprint
+    stealth) when available; otherwise falls back to the stdlib `requests`
+    session. Both expose `.get()` / `.headers`, so callers don't care which.
 
     Reusing the session (and thus its cookies) across a scrape makes the traffic
     look like a returning visitor rather than a fresh bot hit each time.
     """
+    ua = random_user_agent()
+    if CURL_CFFI_AVAILABLE:
+        s = curl_cffi_requests.Session(impersonate=IMPERSONATE)
+        s.headers.update(_browser_headers(ua))
+        return s
     s = requests.Session()
-    s.headers.update(_browser_headers(random_user_agent()))
+    s.headers.update(_browser_headers(ua))
     return s
 
 

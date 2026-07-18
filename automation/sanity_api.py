@@ -269,6 +269,10 @@ def update_price_and_variants(product_id: str, product_name: str,
     set_fields = {
         "price": display_price,
         "lastUpdated": datetime.now().isoformat(),
+        # Written ONLY on a successful price write, so the delta-sync gate
+        # never treats a blocked/empty scrape as "fresh". Distinct from
+        # lastScrapedAt (which is set even on blocks) — see record_freshness.
+        "lastPriceUpdatedAt": datetime.now().isoformat(),
     }
     if amazon_price is not None:
         set_fields["amazonPrice"] = amazon_price
