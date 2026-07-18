@@ -201,7 +201,7 @@ def get_assigned_source(product: dict) -> str | None:
 DRY_RUN = False
 
 
-def sync_prices(dry_run: bool = False):
+def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
     global DRY_RUN
     DRY_RUN = dry_run
     print("Starting Price Sync..." + (" (DRY RUN — no Sanity writes)" if dry_run else ""))
@@ -213,6 +213,13 @@ def sync_prices(dry_run: bool = False):
             f.write("timestamp,product,brand,reason,url\n")
 
     products = fetch_all_products()
+    if brands:
+        wanted = {b.lower().strip() for b in brands}
+        products = [
+            p for p in products
+            if (p.get("brandSlug") or (p.get("brand") or {}).get("slug") or "").lower() in wanted
+        ]
+        print(f"Filtered to brands {sorted(wanted)} -> {len(products)} products")
     print(f"Found {len(products)} products in Sanity")
 
     updated_count = 0
@@ -686,9 +693,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", type=str, required=True, choices=["sync", "launch"])
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--brands", type=str, default=None,
+        help="Comma-separated brand slugs to limit the sync (e.g. samsung,iqoo). "
+             "Useful for a fast targeted live validation instead of all 135 products.",
+    )
     args = parser.parse_args()
     if args.mode == "sync":
-        summary = sync_prices(dry_run=args.dry_run)
+        brands = [b for b in args.brands.split(",")] if args.brands else None
+        summary = sync_prices(dry_run=args.dry_run, brands=brands)
         # Fail the GitHub Action (non-zero exit) when any product could not be
         # synced, so a partial/failed run is never reported as a green check.
         if summary.get("failed_mutations", 0) > 0 or summary.get("invalid_urls", 0) > 0:
