@@ -278,6 +278,7 @@ def update_price_and_variants(product_id: str, product_name: str,
     # Update variants array with scraped prices (or fallback to display_price)
     updated_variants = []
     applied_scraped = False
+    exact_matches = 0
     for v in existing_variants:
         ram = _norm_variant_size(v.get("ram"))
         storage = _norm_variant_size(v.get("storage"))
@@ -300,8 +301,14 @@ def update_price_and_variants(product_id: str, product_name: str,
 
         new_variant_price = v.get("price")
         if matched_scraped and matched_scraped.get("price") is not None:
+            # Rule 1 (Exact Match): apply the scraped price verbatim. The
+            # per-variant plausibility guard (is_price_plausible) has already
+            # run in the orchestrator against the display price, so a matched
+            # variant that is wildly off would have been rejected upstream.
             new_variant_price = matched_scraped["price"]
             applied_scraped = True
+            exact_matches += 1
+            print(f"    EXACT MATCH APPLIED: {ram}/{storage} -> ₹{new_variant_price}")
         elif new_variant_price is None and display_price is not None:
             # Only fill in a price for a variant that has NONE at all
             # (e.g. a freshly created launch). Never overwrite an existing
@@ -318,6 +325,7 @@ def update_price_and_variants(product_id: str, product_name: str,
     # cheapest variant is the reference; other tiers keep their relative spread.
     # VARIANT_SCALE_BLEND damps the move so prices partially match Flipkart/
     # Amazon rather than snapping exactly to them.
+    nudged = False
     if not applied_scraped and display_price is not None and updated_variants:
         priced = [v for v in updated_variants if isinstance(v.get("price"), (int, float))]
         if priced:
@@ -325,10 +333,17 @@ def update_price_and_variants(product_id: str, product_name: str,
             if base > 0:
                 scale = display_price / base
                 if VARIANT_SCALE_MIN <= scale <= VARIANT_SCALE_MAX:
+                    # Rule 2 (Fallback Nudge): no exact scraped variant matched,
+                    # so nudge the existing tiers slightly toward the live price.
                     blend = 1.0 + VARIANT_SCALE_BLEND * (scale - 1.0)
                     for v in updated_variants:
                         if isinstance(v.get("price"), (int, float)):
                             v["price"] = round(v["price"] * blend)
+                    nudged = True
+                    print(
+                        f"    FALLBACK NUDGE APPLIED: {product_name} "
+                        f"(scale {scale:.2f}, blend {blend:.3f})"
+                    )
                 else:
                     print(
                         f"  WARNING: variant scale {scale:.2f} out of "
@@ -340,7 +355,43 @@ def update_price_and_variants(product_id: str, product_name: str,
         set_fields["variants"] = updated_variants
 
     mutations = {"mutations": [{"patch": {"id": product_id, "set": set_fields}}]}
-    return _mutate(mutations)
+    result = _mutate(mutations)
+    # Surface per-variant sync accounting so the orchestrator can report it
+    # (Rule 1 exact matches vs Rule 2 fallback nudges).
+    if isinstance(result, dict):
+        result["exact_matches"] = exact_matches
+        result["nudged"] = nudged
+    return result
+
+
+def flag_manual_review(product_id: str, failed: bool, threshold: int = 3) -> None:
+    """Track consecutive sync failures and flag products that need a human.
+
+    Called by the orchestrator on every scrape outcome for a product:
+      * failed=True  — the product was skipped (bot-block / implausible /
+        URL mismatch), so its `syncFailCount` is incremented.
+      * failed=False — a real price was written, so the counter resets to 0
+        and any prior `needsManualReview` flag is cleared.
+
+    Once `syncFailCount` reaches `threshold` (default 3 consecutive cycles),
+    `needsManualReview` is set so an operator can fix the URL or scraper.
+    Raises RuntimeError on a non-2xx response (counted as a hard failure by
+    the orchestrator, same as the price mutations).
+    """
+    # Read the current counter so we can increment atomically-ish (the 6h cron
+    # never overlaps, so a single read-modify-write is safe).
+    current = _query(
+        f'*[_id=="{product_id}"][0]{{syncFailCount, needsManualReview}}'
+    )
+    prev = current[0].get("syncFailCount", 0) if current else 0
+    count = (prev + 1) if failed else 0
+    needs = count >= threshold
+    set_fields = {
+        "syncFailCount": count,
+        "needsManualReview": needs,
+    }
+    mutations = {"mutations": [{"patch": {"id": product_id, "set": set_fields}}]}
+    _mutate(mutations)
 
 
 def record_freshness(product_id: str, status: str) -> None:

@@ -418,15 +418,27 @@ def _extract_flipkart_colors(soup: BeautifulSoup) -> list:
 def _extract_flipkart_variants(soup: BeautifulSoup) -> list:
     """Extract RAM/Storage variant combos from the page HTML.
 
-    Uses two strategies (merged, JSON-LD prices win):
-      1. Text-pattern scan  — find "X GB / Y GB" patterns anywhere in text
-         (yields variants with price=None for RAM/Storage combos).
-      2. JSON-LD offers     — parse structured-data offers whose name/desc
-         contains a RAM/Storage pattern, giving us per-variant prices.
+    Three strategies, merged with the most authoritative price source winning:
 
-    Returns a deduplicated list of {"ram", "storage", "price"} dicts.
+      Tier 1  — `window.__NEXT_DATA__` / `_pageContext` inline JSON. This is
+                the structured variant/price tree Flipkart *renders* from and is
+                by far the most reliable source of per-variant prices (JSON-LD
+                rarely carries them).
+      Tier 2  — JSON-LD offers whose name/desc contains a "X GB / Y GB" pattern.
+      Tier 3  — text-pattern scan for "X GB / Y GB" anywhere on the page
+                (yields variants with price=None as a last resort).
+
+    Returns a deduplicated list of {"ram", "storage", "price"} dicts. A variant
+    with price=None means "we know this combo exists but couldn't read its
+    price" — the orchestrator then falls back to the blend logic.
     """
-    # ── Strategy 1: text-pattern scan ──────────────────────────────────
+    # ── Tier 1: inline Next.js / pageContext JSON ──────────────────────
+    next_variants = _extract_variants_from_next_data(soup)
+
+    # ── Tier 2: JSON-LD offers ─────────────────────────────────────────
+    ld_variants = _extract_variants_from_jsonld(soup)
+
+    # ── Tier 3: text-pattern scan ─────────────────────────────────────
     text_variants = {}
     for el in soup.find_all(string=re.compile(r"\d+\s*GB\s*/\s*\d+\s*GB", re.I)):
         m = re.search(r"(\d+)\s*GB\s*/\s*(\d+)\s*GB", el, re.I)
@@ -435,13 +447,144 @@ def _extract_flipkart_variants(soup: BeautifulSoup) -> list:
             if key not in text_variants:
                 text_variants[key] = {"ram": key[0], "storage": key[1], "price": None}
 
-    # ── Strategy 2: JSON-LD offers (structured data with real prices) ──
-    ld_variants = _extract_variants_from_jsonld(soup)
-    for v in ld_variants:
+    # Merge: Tier 1 wins on price, then Tier 2, then Tier 3 supplies combos
+    # that nothing else found.
+    merged = {}
+    for v in list(text_variants.values()) + ld_variants + next_variants:
         key = (v["ram"], v["storage"])
-        text_variants[key] = v  # JSON-LD price (may be None) overwrites
+        if key not in merged or merged[key].get("price") is None:
+            merged[key] = v
+    return list(merged.values())
 
-    return list(text_variants.values())
+
+def _extract_variants_from_next_data(soup: BeautifulSoup) -> list:
+    """Parse Flipkart's inline `window.__NEXT_DATA__` / `_pageContext` JSON.
+
+    Flipkart renders the PDP from a big inline JSON blob (script id
+    `__NEXT_DATA__` in newer builds, or `window.__INITIAL_STATE__` /
+    `window._pageContext` in others). The variant price tree usually lives under
+    a key like `variants` / `colorVariant` / `productView` / `price`. We walk
+    the whole blob for objects that carry both a RAM/Storage label and a price,
+    which is robust to FK reshuffling the exact nesting.
+
+    Returns a list of {"ram", "storage", "price"} dicts (may be empty).
+    """
+    import json as _json
+
+    candidates = []
+    for script in soup.find_all("script"):
+        raw = script.string or script.get_text() or ""
+        if not raw.strip():
+            continue
+        # Grab the JSON object assigned to the known inline-state globals.
+        for marker in ("__NEXT_DATA__", "__INITIAL_STATE__", "_pageContext"):
+            idx = raw.find(marker)
+            if idx == -1:
+                continue
+            # Find the first '{' after the assignment and parse greedily.
+            brace = raw.find("{", idx)
+            if brace == -1:
+                continue
+            # Try progressively shorter suffixes until json.loads accepts it.
+            depth = 0
+            end = None
+            for i in range(brace, len(raw)):
+                if raw[i] == "{":
+                    depth += 1
+                elif raw[i] == "}":
+                    depth -= 1
+                    if depth == 0:
+                        end = i + 1
+                        break
+            if end is None:
+                continue
+            chunk = raw[brace:end]
+            try:
+                data = _json.loads(chunk)
+            except _json.JSONDecodeError:
+                # Handle the case where the assignment is `= {...};` and there's
+                # trailing JS after the object (retry trimming at last '}').
+                last = chunk.rfind("}")
+                if last != -1:
+                    try:
+                        data = _json.loads(chunk[: last + 1])
+                    except _json.JSONDecodeError:
+                        continue
+                else:
+                    continue
+            candidates.append(data)
+
+    variants = []
+    for data in candidates:
+        variants.extend(_walk_for_variants(data))
+    # Dedupe by (ram, storage), keeping first non-None price.
+    seen = {}
+    out = []
+    for v in variants:
+        key = (v["ram"], v["storage"])
+        if key not in seen or seen[key].get("price") is None:
+            seen[key] = v
+    return list(seen.values())
+
+
+def _find_price(node):
+    """Recursively find the first price-like number (₹1000–₹300000) in a
+    JSON subtree. Returns an int or None. Excludes "X GB / Y GB" label strings
+    so a variant's own name can't be mistaken for its price.
+    """
+    if isinstance(node, (int, float)):
+        if 1000 <= float(node) <= 300000:
+            return int(node)
+        return None
+    if isinstance(node, str):
+        s = node.strip()
+        if "gb" in s.lower():
+            return None
+        digits = re.sub(r"[^\d]", "", s)
+        if digits and 1000 <= int(digits) <= 300000:
+            return int(digits)
+        return None
+    if isinstance(node, dict):
+        for v in node.values():
+            p = _find_price(v)
+            if p is not None:
+                return p
+    if isinstance(node, list):
+        for v in node:
+            p = _find_price(v)
+            if p is not None:
+                return p
+    return None
+
+
+def _walk_for_variants(node, _path=""):
+    """Recursively search a parsed JSON blob for variant-shaped objects.
+
+    A variant-shaped object is one that has BOTH a RAM/Storage "X GB / Y GB"
+    string (in any of its fields) AND a numeric price (possibly nested under a
+    `price`/`value` key — Flipkart nests it). We deliberately avoid requiring
+    exact key names (RamCapacity / storage / price) because Flipkart renames
+    them across builds.
+    """
+    found = []
+    if isinstance(node, dict):
+        blob = " ".join(str(v) for v in node.values())
+        m = re.search(r"(\d+)\s*GB\s*/\s*(\d+)\s*GB", blob, re.I)
+        price = None
+        if m:
+            price = _find_price(node)
+        if m and price is not None:
+            found.append({
+                "ram": f"{m.group(1)} GB",
+                "storage": f"{m.group(2)} GB",
+                "price": price,
+            })
+        for val in node.values():
+            found.extend(_walk_for_variants(val, _path + "."))
+    elif isinstance(node, list):
+        for item in node:
+            found.extend(_walk_for_variants(item, _path + "[]"))
+    return found
 
 
 def _extract_variants_from_jsonld(soup: BeautifulSoup) -> list:

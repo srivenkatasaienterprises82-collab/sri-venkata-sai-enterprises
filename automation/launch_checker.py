@@ -35,7 +35,23 @@ import sys
 import time
 from datetime import datetime
 
-from sanity_api import fetch_all_products, update_price, update_price_and_variants, create_full_product, record_freshness
+from sanity_api import fetch_all_products, update_price, update_price_and_variants, create_full_product, record_freshness, flag_manual_review
+
+
+def _review(product_id: str, failed: bool) -> None:
+    """Record a sync outcome for the manual-review failure counter (PHASE 6).
+
+    failed=True increments syncFailCount (bot-block / implausible / mismatch);
+    failed=False resets it and clears needsManualReview. Failures here are
+    non-fatal — they never abort the run, just telemetry. No-op when no
+    SANITY_TOKEN is configured (local test runs), so we don't hit the network.
+    """
+    if not os.getenv("SANITY_TOKEN"):
+        return
+    try:
+        flag_manual_review(product_id, failed)
+    except RuntimeError as e:
+        print(f"    review-flag write failed: {e}")
 from amazon import get_amazon_price, get_amazon_details
 from flipkart import get_flipkart_price, get_flipkart_details
 from listing import get_brand_listings
@@ -206,6 +222,8 @@ def sync_prices():
     invalid_urls = 0
     recovered = 0
     scrape_blocked = 0  # primary (and fallback) source(s) served bot-walls
+    exact_updates = 0   # Rule 1: per-variant exact matches applied
+    nudge_updates = 0   # Rule 2: per-variant fallback nudges applied
 
     for product in products:
         # Draft products (enabled:false) – created by the launch-checker. They
@@ -432,6 +450,7 @@ def sync_prices():
                     record_freshness(product["_id"], "blocked")
                 except RuntimeError as e:
                     print(f"    freshness write failed: {e}")
+                _review(product["_id"], True)
                 continue
             display_price = min(prices)
         else:
@@ -443,6 +462,15 @@ def sync_prices():
                 display_price = flip_price if flip_price is not None else amz_price
             else:
                 display_price = amz_price if amz_price is not None else flip_price
+
+        # When the scraper returned real per-variant prices, the product's
+        # top-level `price` should reflect the cheapest variant (so the
+        # storefront default shows the entry-level price) and the per-variant
+        # prices flow through update_price_and_variants verbatim (Rule 1).
+        priced_variants = [v["price"] for v in scraped_variants
+                           if isinstance(v.get("price"), (int, float))]
+        if priced_variants:
+            display_price = min(priced_variants)
 
         scrape_ms = (time.time() - scrape_start) * 1000
 
@@ -456,6 +484,7 @@ def sync_prices():
                 record_freshness(product["_id"], "blocked")
             except RuntimeError as e:
                 print(f"    freshness write failed: {e}")
+            _review(product["_id"], True)
             continue
 
         # Hard band guard.
@@ -464,6 +493,7 @@ def sync_prices():
             _emit_row(product, "SKIP", source=source, old_price=old_price,
                       new_price=display_price, reason="price_out_of_band",
                       scrape_ms=scrape_ms)
+            _review(product["_id"], True)
             continue
 
         # Relative-delta guard. Reject suspicious_price_change vs the old
@@ -475,6 +505,7 @@ def sync_prices():
             _emit_row(product, "SKIP", source=source, old_price=old_price,
                       new_price=display_price, reason=f"implausible_delta:{why}",
                       scrape_ms=scrape_ms)
+            _review(product["_id"], True)
             continue
 
         if old_price == display_price:
@@ -482,6 +513,7 @@ def sync_prices():
             _emit_row(product, "MATCH", source=source, old_price=old_price,
                       new_price=display_price, scrape_ms=scrape_ms,
                       retries=retries_used)
+            _review(product["_id"], False)
             continue
 
         # Update Sanity (including per-variant prices). A non-2xx response
@@ -499,12 +531,14 @@ def sync_prices():
             _emit_row(product, "ERROR", source=source, old_price=old_price,
                       new_price=display_price, reason=f"sanity_mutation_failed:{e}",
                       scrape_ms=scrape_ms)
+            _review(product["_id"], True)
             continue
         if not mut or not mut.get("results"):
             failed_mutations += 1
             _emit_row(product, "ERROR", source=source, old_price=old_price,
                       new_price=display_price, reason="sanity_mutation_failed",
                       scrape_ms=scrape_ms)
+            _review(product["_id"], True)
             continue
 
         updated_count += 1
@@ -515,11 +549,16 @@ def sync_prices():
                   new_price=display_price, scrape_ms=scrape_ms,
                   retries=retries_used)
         print(f"    {arrow} ₹{old_price} → ₹{display_price} ({'+' if diff > 0 else ''}{diff}) via {source}")
+        # Per-variant accounting from the mutation result.
+        exact_updates += (mut.get("exact_matches") or 0) if isinstance(mut, dict) else 0
+        if isinstance(mut, dict) and mut.get("nudged"):
+            nudge_updates += 1
         # Freshness telemetry: a successful scrape keeps the product "ok".
         try:
             record_freshness(product["_id"], "ok")
         except RuntimeError as e:
             print(f"    freshness write failed: {e}")
+        _review(product["_id"], False)
 
     print(
         "\n"
@@ -528,6 +567,8 @@ def sync_prices():
         "├────────────────────────┼──────────────────────────────────────────────────┤\n"
         f"│ Checked                │ {checked:<48}│\n"
         f"│ Updated                │ {updated_count:<48}│\n"
+        f"│ Exact variant matches  │ {exact_updates:<48}│\n"
+        f"│ Fallback nudges        │ {nudge_updates:<48}│\n"
         f"│ Matched (no change)    │ {matched:<48}│\n"
         f"│ Locked (skipped)       │ {skipped_locked:<48}│\n"
         f"│ Draft disabled (skip)  │ {skipped_disabled:<48}│\n"
@@ -553,6 +594,8 @@ def sync_prices():
     return {
         "checked": checked,
         "updated": updated_count,
+        "exact_updates": exact_updates,
+        "nudge_updates": nudge_updates,
         "matched": matched,
         "failed_mutations": failed_mutations,
         "invalid_urls": invalid_urls,

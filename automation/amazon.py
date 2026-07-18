@@ -348,6 +348,16 @@ def _try_playwright_details(url: str, attempt: int = 1) -> dict | None:
 
                 pw_html = page.content()
                 details = _parse_amazon_details(pw_html)
+                # Tier 1: interact with the Twister variant widget to read the
+                # REAL per-variant prices Amazon hides behind JS. This is the
+                # only reliable way to get RAM/Storage-specific prices; the
+                # static HTML only ever shows the default-variant price.
+                twister_variants = _extract_amazon_variants_twister(page)
+                if twister_variants:
+                    merged = {(v["ram"], v["storage"]): v for v in details.get("variants", [])}
+                    for v in twister_variants:
+                        merged[(v["ram"], v["storage"])] = v
+                    details["variants"] = list(merged.values())
                 return details
 
             except Exception as e:
@@ -457,6 +467,95 @@ def _extract_amazon_variants(soup: BeautifulSoup) -> list:
         text_variants[key] = v  # JSON-LD price (may be None) overwrites
 
     return list(text_variants.values())
+
+
+def _extract_amazon_variants_twister(page) -> list:
+    """Read real per-variant RAM/Storage prices by driving the Twister widget.
+
+    Amazon hides non-default variant prices behind JS: the static HTML shows
+    only the selected variant's price. The Twister (`#twister`, `.twisterSlotDiv`)
+    exposes a button per RAM/Storage combo; clicking it updates the buy-box
+    price after a short render. We click each enabled button, read the scoped
+    buy-box price, and map it back to its RAM/Storage label.
+
+    Returns a list of {"ram", "storage", "price"} dicts (may be empty if the
+    page has no Twister widget or all clicks fail). Never raises — a failure
+    just means "no Twister prices", and the caller keeps its HTML-derived ones.
+    """
+    try:
+        # Locate the Twister container. Amazon renders variant buttons either
+        # as <li> rows inside #twister or as .twisterSlotDiv buttons.
+        twister = page.query_selector("#twister")
+        if twister is None:
+            twister = page.query_selector(".twisterSlotDiv")
+        if twister is None:
+            return []
+
+        # Each selectable variant button carries a data attribute or text that
+        # names the RAM/Storage combo (e.g. "8GB RAM + 128GB storage").
+        buttons = twister.query_selector_all(
+            "li:not(.dropdownDisabled), span.twisterSlotDiv:not(.twisterSlotDiv_decorative), "
+            "button:not([disabled])"
+        )
+        if not buttons:
+            return []
+
+        results = []
+        seen = set()
+        for btn in buttons:
+            try:
+                label = (btn.inner_text() or "").strip()
+            except Exception:
+                continue
+            m = re.search(r"(\d+)\s*GB\s*(?:RAM)?\s*\+?\s*(\d+)\s*GB", label, re.I)
+            if not m:
+                continue
+            ram = f"{m.group(1)} GB"
+            storage = f"{m.group(2)} GB"
+            if (ram, storage) in seen:
+                continue
+            try:
+                btn.click()
+            except Exception:
+                continue
+            # Wait for the buy-box price to re-render after the variant switch.
+            time.sleep(1.5)
+            price = _read_twister_price(page)
+            if price is not None and 1000 <= price <= 300000:
+                seen.add((ram, storage))
+                results.append({"ram": ram, "storage": storage, "price": price})
+        return results
+    except Exception as e:
+        print(f"  Amazon Twister extraction error: {e}")
+        return []
+
+
+def _read_twister_price(page) -> int | None:
+    """Read the current buy-box price after a Twister variant switch.
+
+    Scoped to the buy-box containers only (never a global `.a-price-whole`,
+    which also decorates sponsored/related carousels and would return a
+    DIFFERENT product's price).
+    """
+    for scope in BUYBOX_SCOPES:
+        try:
+            box = page.query_selector(scope)
+        except Exception:
+            box = None
+        if box is None:
+            continue
+        for sel in (".a-price .a-offscreen", "span.a-price-whole", "#priceblock_ourprice",
+                    "#priceblock_dealprice"):
+            try:
+                el = box.query_selector(sel)
+            except Exception:
+                el = None
+            if el:
+                text = el.inner_text()
+                digits = re.sub(r"[^\d]", "", text or "")
+                if digits:
+                    return int(digits)
+    return None
 
 
 def _extract_variants_from_jsonld(soup: BeautifulSoup) -> list:
