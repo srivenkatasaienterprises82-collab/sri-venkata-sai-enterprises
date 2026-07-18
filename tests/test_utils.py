@@ -114,3 +114,41 @@ def test_url_name_matches_rejects_accessory_url():
         "/p/itm9405ab466427e"
     )
     assert not U.url_name_matches("Realme C83", screen_guard)
+
+
+# ── url_color_matches ────────────────────────────────────────────────────────
+
+def _colors(*names):
+    return [{"name": n, "hex": "#000000"} for n in names]
+
+
+def test_url_color_matches_passes_when_color_in_palette():
+    # V70 Elite is listed in Red and Black; a "passion-red" URL is fine.
+    url = "https://www.flipkart.com/vivo-v70-elite-passion-red-2026-256-gb/p/itm_x"
+    assert U.url_color_matches("Vivo V70 Elite", url, _colors("Black", "Blue", "Red"))
+
+
+def test_url_color_matches_flags_color_not_in_palette():
+    # URL names "passion-red" but the product only comes in Black/Blue/Gold.
+    url = "https://www.flipkart.com/vivo-v70-elite-passion-red-2026-256-gb/p/itm_x"
+    assert not U.url_color_matches(
+        "Vivo V70 Elite", url, _colors("Black", "Blue", "Gold")
+    )
+
+
+def test_url_color_matches_passes_when_url_names_no_color():
+    # Generic slug with no colour word — can't judge, accept.
+    url = "https://www.flipkart.com/vivo-v70-elite-2026-256-gb/p/itm_x"
+    assert U.url_color_matches("Vivo V70 Elite", url, _colors("Black", "Red"))
+
+
+def test_url_color_matches_passes_without_palette():
+    # Product carries no colour data — don't guess, accept.
+    url = "https://www.flipkart.com/vivo-v70-elite-passion-red-2026-256-gb/p/itm_x"
+    assert U.url_color_matches("Vivo V70 Elite", url, [])
+
+
+def test_url_color_matches_amazon_multiword_color():
+    # "northern-lights-purple" -> purple; product has Purple.
+    url = "https://www.amazon.in/vivo-v70-northern-lights-purple-256-gb/dp/B0X"
+    assert U.url_color_matches("Vivo V70", url, _colors("Purple", "Black"))

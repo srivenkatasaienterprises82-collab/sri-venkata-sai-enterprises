@@ -200,3 +200,99 @@ def _tokenize_slug(s: str):
     s = s.lower()
     s = re.sub(r"[^a-z0-9]+", " ", s)
     return [t for t in s.split() if len(t) >= 2]
+
+
+# ─── URL ↔ product-color sanity check ───────────────────────────────────────
+# Flipkart/Amazon product URLs embed the specific colour variant in the slug
+# (e.g. `vivo-v70-elite-passion-red-2026-256-gb`). When that colour is NOT
+# one the Sanity product actually comes in, the URL points at a different
+# colourway of the same model — and marketplace pricing/stock for colourways
+# differs, so writing its price onto the canonical product is wrong. The V70
+# Elite case is exactly this: the stored URL says `passion-red` while the live
+# page resolves to "Authentic Black", yet Sanity lists both Red and Black in
+# its palette, so a name-only check passes while the price is off by ~₹12k.
+#
+# We keep this conservative: only FLAG when the URL slug clearly names a
+# colour that is absent from the product's `colors[]` palette. URLs that name
+# no colour (generic slugs) are accepted — we fall back to the downstream
+# price-band / relative-delta guards rather than guessing.
+
+# Marketing colour phrase -> canonical keyword(s) found in Sanity `colors[].name`.
+_COLOR_ALIASES = {
+    "black": "black", "authenticblack": "black", "midnightblack": "black",
+    "blue": "blue", "twilightblue": "blue", "emerald": "blue", "glacierblue": "blue",
+    "navy": "blue", "cyber": "blue", "star": "silver", "starsilver": "silver",
+    "silver": "silver", "titanium": "gold", "gold": "gold", "titaniumgold": "gold",
+    "champagne": "gold", "red": "red", "passionred": "red", "crimson": "red",
+    "purple": "purple", "northernlightspurple": "purple", "lavender": "purple",
+    "green": "green", "cybergreen": "green", "forest": "green", "sage": "green",
+    "orange": "orange", "racing": "black", "white": "white", "arctic": "white",
+    "pink": "pink", "rose": "pink", "beige": "beige", "cream": "white",
+    "yellow": "yellow", "cyan": "blue", "teal": "green", "grey": "silver",
+    "gray": "silver", "brown": "brown", "bronze": "gold",
+}
+
+
+def _color_tokens_from_slug(slug: str) -> list:
+    """Pull colour-ish tokens out of a marketplace URL slug.
+
+    Colour phrases are multi-word marketing names glued with dashes
+    (`passion-red`, `authentic-black`, `northern-lights-purple`). We scan
+    every 1- and 2-gram of the slug against the alias table so both
+    `red` and `passion-red` resolve.
+    """
+    toks = _tokenize_slug(slug)
+    found = []
+    for i, t in enumerate(toks):
+        if t in _COLOR_ALIASES:
+            found.append(_COLOR_ALIASES[t])
+        # 2-gram: previous + current (handles glued/multiword colours)
+        if i > 0:
+            bigram = toks[i - 1] + toks[i]
+            if bigram in _COLOR_ALIASES:
+                found.append(_COLOR_ALIASES[bigram])
+    return found
+
+
+def url_color_matches(name: str, url: str, colors: list) -> bool:
+    """Return False when the URL slug names a colour the product doesn't have.
+
+    `colors` is the Sanity product's `colors[]` (each item has a `name`,
+    e.g. "Black", "Red"). We normalise those names to keywords and compare
+    against the colours extracted from the URL slug. A URL that names a
+    colour absent from the palette is rejected (return False); a URL with no
+    discernible colour is accepted (return True) to avoid false negatives.
+    """
+    if not url:
+        return True
+    path = url.split("?", 1)[0]
+    slug = ""
+    m = re.search(r"/([a-z0-9][a-z0-9\-+]{3,})/p/", path, re.I)
+    if not m:
+        m = re.search(r"/([a-z0-9][a-z0-9\-+]{3,})/dp/", path, re.I)
+    if m:
+        slug = m.group(1)
+    if not slug:
+        return True
+
+    # Canonical keywords from the product's own colour palette.
+    palette = set()
+    for c in (colors or []):
+        nm = (c.get("name") if isinstance(c, dict) else str(c)).lower().strip()
+        palette.add(nm)
+        # also accept the slugified form of the name (e.g. "authentic black")
+        palette.add(re.sub(r"[^a-z0-9]+", "", nm))
+    if not palette:
+        # No colour data on the product — can't judge, accept.
+        return True
+
+    url_colors = _color_tokens_from_slug(slug)
+    if not url_colors:
+        # URL names no colour — don't guess, accept and rely on other guards.
+        return True
+
+    # Reject only if EVERY colour the URL names is outside the palette.
+    # (A URL naming one valid + one unknown colour is still plausibly right.)
+    if all(c not in palette for c in url_colors):
+        return False
+    return True

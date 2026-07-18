@@ -44,6 +44,7 @@ from utils import (
     price_in_bounds,
     price_change_is_plausible,
     url_name_matches,
+    url_color_matches,
 )
 
 LOG_FILE = "price-changes.csv"
@@ -198,6 +199,7 @@ def sync_prices():
     skipped_locked = 0
     skipped_disabled = 0
     skipped_url_mismatch = 0
+    skipped_color_mismatch = 0
     skipped_implausible = 0
     skipped_dry = 0  # implausible-difference vs old price (≤ cap)
     failed_mutations = 0
@@ -293,6 +295,19 @@ def sync_prices():
             _log_invalid(product, "url_name_mismatch", url_for_check)
             _emit_row(product, "SKIP", source=source, old_price=old_price,
                       reason="url_name_mismatch")
+            continue
+
+        # Colour-way guard: reject URLs whose slug names a colour the product
+        # doesn't come in (e.g. a "passion-red" URL for a product listed only
+        # in Black/Blue). Colourways carry different prices/stock, so a match
+        # on the wrong colourway would write the wrong price. Logged to
+        # invalid_products.csv for triage.
+        if not url_color_matches(product.get("name", ""), url_for_check,
+                                  product.get("colors") or []):
+            skipped_color_mismatch += 1
+            _log_invalid(product, "url_color_mismatch", url_for_check)
+            _emit_row(product, "SKIP", source=source, old_price=old_price,
+                      reason="url_color_mismatch")
             continue
 
         amz_price = None
@@ -457,6 +472,7 @@ def sync_prices():
         f"│ Draft disabled (skip)  │ {skipped_disabled:<48}│\n"
         f"│ No URL                 │ {skipped_no_url:<48}│\n"
         f"│ URL name mismatch      │ {skipped_url_mismatch:<48}│\n"
+        f"│ URL color mismatch     │ {skipped_color_mismatch:<48}│\n"
         f"│ Out of band            │ {skipped_implausible:<48}│\n"
         f"│ Implausible delta      │ {skipped_dry:<48}│\n"
         f"│ Scrape failed          │ {skipped_no_price:<48}│\n"
@@ -479,6 +495,7 @@ def sync_prices():
         "failed_mutations": failed_mutations,
         "invalid_urls": invalid_urls,
         "recovered": recovered,
+        "skipped_color_mismatch": skipped_color_mismatch,
     }
 
 

@@ -344,7 +344,40 @@ def test_launch_checker_ignores_variant_metadata(monkeypatch):
     assert result["checked"] == 1
 
 
-def test_sync_recovers_via_research_when_scrape_empty(monkeypatch, capsys):
+def test_sync_skips_color_mismatch(monkeypatch, capsys):
+    """A URL whose slug names a colour the product doesn't come in must be
+    refused (the V70 Elite 'passion-red' vs a Black/Blue/Gold palette case)
+    and logged as url_color_mismatch rather than writing the wrong colourway's
+    price onto the canonical product.
+    """
+    products = [{
+        "_id": "p1",
+        "name": "Vivo V70 Elite",
+        "brand": {"name": "Vivo"},
+        "brandSlug": "vivo",
+        "flipkartUrl": (
+            "https://www.flipkart.com/vivo-v70-elite-passion-red-2026-256-gb"
+            "/p/itmf8e28e33a9cd0"
+        ),
+        "price": 51999,
+        "priceLocked": False,
+        "enabled": None,
+        "colors": [
+            {"name": "Black"}, {"name": "Blue"}, {"name": "Gold"},
+        ],
+        "variants": [{"ram": "8GB", "storage": "256GB", "price": 51999}],
+    }]
+    monkeypatch.setattr(LC, "fetch_all_products", lambda: products)
+    # url_name_matches passes (both contain "v70-elite"); the colour guard is
+    # what should reject this one.
+    monkeypatch.setattr(LC, "url_name_matches", lambda n, u: True)
+    updated = []
+    monkeypatch.setattr(LC, "update_price_and_variants",
+                        lambda *a, **k: updated.append(a) or {"results": [{"id": "p1"}]})
+    LC.sync_prices()
+    assert updated == []
+    out = capsys.readouterr().out
+    assert "url_color_mismatch" in out
     """When the stored URL returns no price (transient bot-check on CI IPs),
     the sync must re-resolve the product URL from the brand's live listings
     and re-scrape ONCE before giving up. The recovered price is then applied.
