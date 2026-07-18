@@ -197,7 +197,7 @@ def _try_playwright(url: str, attempt: int = 1) -> int | None:
             page.set_default_timeout(60000)
 
             try:
-                page.goto(url, wait_until="commit", timeout=60000)
+                page.goto(url, wait_until="commit", timeout=20000)
                 time.sleep(random.uniform(2, 3))
                 try:
                     page.wait_for_load_state("networkidle", timeout=20000)
@@ -335,7 +335,7 @@ def _try_playwright_details(url: str, attempt: int = 1) -> dict | None:
             page.set_default_timeout(60000)
 
             try:
-                page.goto(url, wait_until="commit", timeout=60000)
+                page.goto(url, wait_until="commit", timeout=20000)
                 time.sleep(random.uniform(2, 3))
                 try:
                     page.wait_for_load_state("networkidle", timeout=20000)

@@ -72,9 +72,15 @@ def new_session() -> requests.Session:
     return s
 
 
-def get_with_retry(session: requests.Session, url: str, *, timeout: int = 30,
-                   max_tries: int = 2) -> requests.Response | None:
+def get_with_retry(session: requests.Session, url: str, *,
+                   timeout=(5, 30), max_tries: int = 2) -> requests.Response | None:
     """GET `url` on `session`, rotating the UA once on a soft failure.
+
+    `timeout` is a (connect, read) tuple: a short 5s connect timeout fails fast
+    when the marketplace silently drops the connection (GitHub Actions runners
+    get `ConnectTimeoutError` from Flipkart/Amazon rather than a fast 403), so we
+    move to the Playwright fallback instead of hanging. The 30s read budget
+    still allows slow-but-real page loads.
 
     Returns the `Response` on HTTP 200, or None on non-200 / network error /
     being served an interstitial (callers should treat None as "no data").
