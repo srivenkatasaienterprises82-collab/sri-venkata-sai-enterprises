@@ -1573,3 +1573,22 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - `src/sanity/lib/live.ts`: `safeSanityFetch` wrapper around `defineLive().sanityFetch()`
 - `.env.local`: Contains `SANITY_TOKEN` (Editor) and `SANITY_API_READ_TOKEN` (Viewer)
 - `.github/workflows/price-sync.yml`: Runs every 6 hours, uploads `price-changes.csv` + `invalid_products.csv` artifacts (`if: always()`), NO Vercel deploy hook. `launch_checker.py --mode sync` exits non-zero if any mutation fails or any URL is invalid, so a broken run is never reported green.
+
+## Done (July 19) — curl_cffi works locally + per-product crash isolation (NOT YET PUSHED)
+- CORRECTION to July 18 "network egress blocking" conclusion: installed `curl_cffi==0.15.0` locally and the scrapers DO work. RAN #52 failed because curl_cffi was not reliably present on the runner (so 100% bot-block → 0 writes → non-zero exit). Local verification: vivo dry-run = 11 UPDATES / 3 MATCHES; real vivo sync wrote 11 prices to Sanity (lastPriceUpdatedAt changed at 2026-07-19T11:43+). So the fix is to GUARANTEE curl_cffi on the CI runner, not abandon scraping.
+- PER-PRODUCT CRASH ISOLATION in `automation/launch_checker.py` `sync_prices()`:
+  - Wrapped the entire `for product in products:` body in `try: ... except Exception as e:` so ANY uncaught error (curl_cffi `Timeout`, `requests.exceptions.ConnectionError`, None-arithmetic) is caught per-product, logged with traceback, counted as `failed_mutations += 1`, emits an ERROR row, flags manual review, and `continue`s — the loop no longer aborts mid-run.
+  - Broadened all `except RuntimeError` (and the bare `except RuntimeError:`) to `except Exception` so curl_cffi transport errors escape-free are caught at every `_review` / `record_freshness` / mutation wrapper.
+  - `flag_manual_review` in `sanity_api.py` hardened against `syncFailCount: None` (`prev = prev_raw if isinstance(prev_raw, (int,float)) else 0`) so log_change's `prev + 1` can't TypeError.
+- TEST FIX: `tests/test_http_helper.py::test_new_session_carries_browser_headers_and_cookiejar` now accepts either a `curl_cffi` Session (preferred when installed) or stdlib `requests.Session` fallback, since `new_session()` correctly returns the curl_cffi impersonation session when available.
+- RESULT: `pytest` 97 passed (was 96 + 1 pre-existing failure that is now fixed). `python -m py_compile` clean. Infinix full run now completes cleanly (0 updates, 3 matches, 2 no_url, 1 blocked — no crash).
+- STILL OPEN: (1) guarantee curl_cffi on GitHub runner — add explicit `pip install --upgrade curl_cffi` + (on Linux) `sudo apt-get install -y libcurl4-openssl-dev` in `price-sync.yml` so CI matches local success. (2) exposed Sanity token in git history — rotate. (3) re-run `--mode sync` across ALL brands and confirm UPDATE counts before pushing.
+
+## Done (July 19, cont.) — Full sync re-run + live verification (PARTIAL — verified)
+- Per-product `try/except` WRAPPER VERIFIED END-TO-END:
+  - Full `--mode sync` (all brands) run wrote real updates (e.g. iQOO 15: ₹82888 → ₹82490 UPDATE via curl_cffi).
+  - `--brands vivo` run completed cleanly: 13 MATCHES, 1 ERROR. The 1 ERROR was a transient `curl: (28) Operation timed out` on `Vivo T5 Pro` — it was caught by the new wrapper, logged as an ERROR row + flagged for manual review, and the loop CONTINUED (previously this aborted the whole run). This is exactly the crash-isolation goal.
+  - Summary box now ASCII (was Unicode box-drawing that crashed on cp1252 Windows console with `UnicodeEncodeError` at the 0-product `print`) — fixed so the summary always prints.
+- `pytest` 97 passed (unchanged). `py_compile` clean.
+- NOTE: each scrape takes ~30s with retries, so a full all-brand run exceeds 10 min locally — fine for CI (90-min timeout) but run single brands for quick local checks.
+- STILL OPEN: (1) guarantee curl_cffi on GitHub runner — add explicit `pip install --upgrade curl_cffi` + (Linux) `sudo apt-get install -y libcurl4-openssl-dev` in `price-sync.yml`. (2) exposed Sanity token in git history — rotate. (3) commit & push these fixes (launch_checker.py wrapper + test_http_helper.py + AGENTS.md) to trigger Vercel redeploy.

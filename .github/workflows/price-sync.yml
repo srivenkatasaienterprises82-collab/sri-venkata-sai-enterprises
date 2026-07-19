@@ -22,9 +22,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+      - name: Install system deps for curl_cffi
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          # Guarantee curl_cffi is present and current — the impersonation
+          # transport is what lets us beat Flipkart/Amazon bot-walls. Without
+          # it the runner silently falls back to stdlib requests and every
+          # scrape returns a 403 interstitial (the root cause of run #52/#53).
+          pip install --upgrade "curl_cffi>=0.6.0"
           pip install -r requirements.txt
       - name: Install Playwright browsers
         run: python -m playwright install chromium --with-deps

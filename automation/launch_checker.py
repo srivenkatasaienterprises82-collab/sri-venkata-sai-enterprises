@@ -51,7 +51,7 @@ def _review(product_id: str, failed: bool) -> None:
         return
     try:
         flag_manual_review(product_id, failed)
-    except RuntimeError as e:
+    except Exception as e:
         print(f"    review-flag write failed: {e}")
 from amazon import get_amazon_price, get_amazon_details
 from flipkart import get_flipkart_price, get_flipkart_details
@@ -267,389 +267,409 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
     nudge_updates = 0   # Rule 2: per-variant fallback nudges applied
 
     for product in products:
-        # Draft products (enabled:false) – created by the launch-checker. They
-        # aren't visible on the storefront yet, so we don't price-sync them.
-        # No silent skip: emit a row.
-        if product.get("enabled") is False:
-            skipped_disabled += 1
-            _emit_row(product, "SKIP", reason="draft_disabled")
-            continue
-
-        if product.get("priceLocked"):
-            skipped_locked += 1
-            _emit_row(product, "SKIP", reason="price_locked")
-            continue
-
-        # ── Delta sync gate ──────────────────────────────────────────────────
-        # Only scrape products whose last *successful* price update is older than
-        # FRESH_WINDOW_HOURS. This keeps daily request volume ~1/4 of a full
-        # scrape (Flipkart/Amazon rate-limit GitHub's shared IPs), while every
-        # product is refreshed at least once per window. Gated on
-        # lastPriceUpdatedAt (written only on a real write), NOT lastScrapedAt
-        # (set even on blocks) — otherwise a product that got bot-walled would
-        # be marked "fresh" and never retried.
-        if _is_fresh(product):
-            skipped_fresh += 1
-            _emit_row(product, "SKIP", reason="fresh_data")
-            continue
-
-        source = get_assigned_source(product)
-        brand = (product.get("brand") or {}).get("name", "")
-        if source is None:
-            # Unsupported brand. Not a "skip" — emit a NO_MAPPING row so the
-            # operator can see unsupported brands and decide whether to add
-            # them.
-            _emit_row(product, "NO_MAPPING", reason=f"brand_unsupported:{brand}")
-            continue
-
-        flipkart_url = product.get("flipkartUrl")
-        amazon_url = product.get("amazonUrl")
-        old_price = product.get("price")
-        existing_variants = product.get("variants") or []
-        checked += 1
-
-        # ── URL Resolution with Auto-Search ────────────────────────────────
-        # Determine the primary URL for this source, auto-searching if missing.
-        url_for_check = flipkart_url if source != "amazon" else amazon_url
-        if source == "both":
-            url_for_check = flipkart_url or amazon_url
-
-        if not url_for_check:
-            # Auto-search: try to find the URL dynamically from brand listings
-            brand_slug = (product.get("brandSlug") or brand).lower()
-            search_source = source if source != "both" else "flipkart"
-            try:
-                listings = get_brand_listings(brand_slug, search_source)
-                for name, url in listings:
-                    if is_match(product.get("name", ""), name):
-                        url_for_check = url
-                        # Patch the found URL into Sanity so we don't search
-                        # again on the next run — but ONLY if it actually names
-                        # the right product. Persisting a URL that fails the
-                        # name check would poison Sanity with a wrong listing
-                        # (the C83 → tempered-glass case) and make every
-                        # subsequent run red.
-                        if url_name_matches(product.get("name", ""), url):
-                            try:
-                                from sanity_api import update_url as _patch_url
-                                _patch_url(product["_id"], url_for_check)
-                            except RuntimeError:
-                                pass  # Non-critical; log and continue
-                        if search_source == "flipkart":
-                            flipkart_url = url_for_check
-                        else:
-                            amazon_url = url_for_check
-                        print(f"  -> Auto-found URL: {url_for_check}")
-                        break
-            except Exception as e:
-                print(f"  Auto-search failed for {product.get('name')}: {e}")
-
-        if not url_for_check:
-            skipped_no_url += 1
-            # Missing a marketplace URL is expected for most products (only a
-            # subset is tracked) — it is NOT a failure that should turn the run
-            # red. Log it for triage but don't count it as an invalid URL.
-            _log_invalid(product, "no_url", url_for_check or "")
-            _emit_row(product, "SKIP", source=source, old_price=old_price,
-                      reason="no_url")
-            continue
-
-        # Enforce URL↔name sanity before scraping. A bad URL silently returns
-        # the price of a *different* product. The C83 screen-protector case
-        # is what motivated this guard.
-        #
-        # A product whose URL fails this check is SKIPPED (no wrong price is
-        # ever written), so it is *not* a broken run — we log it to the
-        # invalid_products.csv artifact for triage but do NOT fail the
-        # workflow. Failing the whole run here only produces a perpetually-red
-        # sync for stale data and blocks every other product's update.
-        if not url_name_matches(product.get("name", ""), url_for_check):
-            skipped_url_mismatch += 1
-            _log_invalid(product, "url_name_mismatch", url_for_check)
-            _emit_row(product, "SKIP", source=source, old_price=old_price,
-                      reason="url_name_mismatch")
-            continue
-
-        # Colour-way guard: reject URLs whose slug names a colour the product
-        # doesn't come in (e.g. a "passion-red" URL for a product listed only
-        # in Black/Blue). Colourways carry different prices/stock, so a match
-        # on the wrong colourway would write the wrong price. Logged to
-        # invalid_products.csv for triage.
-        if not url_color_matches(product.get("name", ""), url_for_check,
-                                  product.get("colors") or []):
-            skipped_color_mismatch += 1
-            _log_invalid(product, "url_color_mismatch", url_for_check)
-            _emit_row(product, "SKIP", source=source, old_price=old_price,
-                      reason="url_color_mismatch")
-            continue
-
-        amz_price = None
-        flip_price = None
-        display_price = None
-        scraped_variants = []
-
-        scrape_start = time.time()
-        retries_used = 0
-        blocked = False  # True when the primary source returned no data (bot-wall)
-
-        if source == "flipkart":
-            if not flipkart_url and not url_for_check:
-                skipped_no_url += 1
-                _emit_row(product, "SKIP", source=source, old_price=old_price,
-                          reason="no_flipkartUrl")
+        try:
+            # Draft products (enabled:false) – created by the launch-checker. They
+            # aren't visible on the storefront yet, so we don't price-sync them.
+            # No silent skip: emit a row.
+            if product.get("enabled") is False:
+                skipped_disabled += 1
+                _emit_row(product, "SKIP", reason="draft_disabled")
                 continue
-            flip_url = flipkart_url or url_for_check
-            details = get_flipkart_details(flip_url)
-            flip_price = details.get("price")
-            scraped_variants = details.get("variants", [])
-            if flip_price is None:
-                blocked = True
-        elif source == "amazon":
-            if not amazon_url and not url_for_check:
-                skipped_no_url += 1
-                _emit_row(product, "SKIP", source=source, old_price=old_price,
-                          reason="no_amazonUrl")
+
+            if product.get("priceLocked"):
+                skipped_locked += 1
+                _emit_row(product, "SKIP", reason="price_locked")
                 continue
-            amz_url = amazon_url or url_for_check
-            details = get_amazon_details(amz_url)
-            amz_price = details.get("price")
-            scraped_variants = details.get("variants", [])
-            if amz_price is None:
-                blocked = True
-        elif source == "both":
-            flip_details = get_flipkart_details(flipkart_url) if flipkart_url else {}
-            amz_details = get_amazon_details(amazon_url) if amazon_url else {}
-            flip_price = flip_details.get("price")
-            amz_price = amz_details.get("price")
-            scraped_variants = flip_details.get("variants") or amz_details.get("variants", [])
 
-        # Cross-source fallback (bot-block resilience). A single-source brand
-        # (Flipkart-only / Amazon-only) whose primary marketplace served a
-        # bot-check interstitial would otherwise stay stale FOREVER. If the
-        # product has a URL on the *other* marketplace, try it once — but only
-        # write the price if it survives the existing name/colour/plausibility
-        # guards downstream. This is what keeps the storefront fresh when
-        # Flipkart (the primary source for most brands here) blocks the CI IP.
-        if blocked:
-            alt_source, alt_url = None, None
-            if source == "flipkart" and amazon_url:
-                alt_source, alt_url = "amazon", amazon_url
-            elif source == "amazon" and flipkart_url:
-                alt_source, alt_url = "flipkart", flipkart_url
-            if alt_source and alt_url and url_name_matches(product.get("name", ""), alt_url):
-                print(f"  -> Primary source blocked; trying {alt_source} fallback")
-                alt_details = (
-                    get_amazon_details(alt_url) if alt_source == "amazon"
-                    else get_flipkart_details(alt_url)
-                )
-                if alt_source == "amazon":
-                    amz_price = alt_details.get("price")
-                    if alt_details.get("variants"):
-                        scraped_variants = alt_details["variants"]
-                else:
-                    flip_price = alt_details.get("price")
-                    if alt_details.get("variants"):
-                        scraped_variants = alt_details["variants"]
-                if (amz_price if alt_source == "amazon" else flip_price) is not None:
-                    retries_used = 1
-                    print(f"  -> Recovered price via {alt_source} fallback")
+            # ── Delta sync gate ──────────────────────────────────────────────────
+            # Only scrape products whose last *successful* price update is older than
+            # FRESH_WINDOW_HOURS. This keeps daily request volume ~1/4 of a full
+            # scrape (Flipkart/Amazon rate-limit GitHub's shared IPs), while every
+            # product is refreshed at least once per window. Gated on
+            # lastPriceUpdatedAt (written only on a real write), NOT lastScrapedAt
+            # (set even on blocks) — otherwise a product that got bot-walled would
+            # be marked "fresh" and never retried.
+            if _is_fresh(product):
+                skipped_fresh += 1
+                _emit_row(product, "SKIP", reason="fresh_data")
+                continue
 
-        # Single recovery attempt: if both scrapers came back empty we may have
-        # hit a transient bot-check / CAPTCHA interstitial (common for CI IPs)
-        # on a URL that's actually valid. Re-resolve the product URL from the
-        # brand's live listings and re-scrape ONCE before giving up — but only
-        # if the freshly found URL also passes the name guard, so we never
-        # write a price for the wrong product.
-        recovered = False
-        if flip_price is None and amz_price is None:
-            brand_slug = (product.get("brandSlug") or brand).lower()
-            search_source = source if source != "both" else "flipkart"
-            try:
-                listings = get_brand_listings(brand_slug, search_source)
-                for name, url in listings:
-                    if not is_match(product.get("name", ""), name):
-                        continue
-                    if not url_name_matches(product.get("name", ""), url):
-                        continue
-                    if search_source == "flipkart":
-                        details = get_flipkart_details(url)
-                        flip_price = details.get("price")
-                        if details.get("variants"):
-                            scraped_variants = details["variants"]
-                        flipkart_url = url
+            source = get_assigned_source(product)
+            brand = (product.get("brand") or {}).get("name", "")
+            if source is None:
+                # Unsupported brand. Not a "skip" — emit a NO_MAPPING row so the
+                # operator can see unsupported brands and decide whether to add
+                # them.
+                _emit_row(product, "NO_MAPPING", reason=f"brand_unsupported:{brand}")
+                continue
+
+            flipkart_url = product.get("flipkartUrl")
+            amazon_url = product.get("amazonUrl")
+            old_price = product.get("price")
+            existing_variants = product.get("variants") or []
+            checked += 1
+
+            # ── URL Resolution with Auto-Search ────────────────────────────────
+            # Determine the primary URL for this source, auto-searching if missing.
+            url_for_check = flipkart_url if source != "amazon" else amazon_url
+            if source == "both":
+                url_for_check = flipkart_url or amazon_url
+
+            if not url_for_check:
+                # Auto-search: try to find the URL dynamically from brand listings
+                brand_slug = (product.get("brandSlug") or brand).lower()
+                search_source = source if source != "both" else "flipkart"
+                try:
+                    listings = get_brand_listings(brand_slug, search_source)
+                    for name, url in listings:
+                        if is_match(product.get("name", ""), name):
+                            url_for_check = url
+                            # Patch the found URL into Sanity so we don't search
+                            # again on the next run — but ONLY if it actually names
+                            # the right product. Persisting a URL that fails the
+                            # name check would poison Sanity with a wrong listing
+                            # (the C83 → tempered-glass case) and make every
+                            # subsequent run red.
+                            if url_name_matches(product.get("name", ""), url):
+                                try:
+                                    from sanity_api import update_url as _patch_url
+                                    _patch_url(product["_id"], url_for_check)
+                                except Exception:
+                                    pass  # Non-critical; log and continue
+                            if search_source == "flipkart":
+                                flipkart_url = url_for_check
+                            else:
+                                amazon_url = url_for_check
+                            print(f"  -> Auto-found URL: {url_for_check}")
+                            break
+                except Exception as e:
+                    print(f"  Auto-search failed for {product.get('name')}: {e}")
+
+            if not url_for_check:
+                skipped_no_url += 1
+                # Missing a marketplace URL is expected for most products (only a
+                # subset is tracked) — it is NOT a failure that should turn the run
+                # red. Log it for triage but don't count it as an invalid URL.
+                _log_invalid(product, "no_url", url_for_check or "")
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          reason="no_url")
+                continue
+
+            # Enforce URL↔name sanity before scraping. A bad URL silently returns
+            # the price of a *different* product. The C83 screen-protector case
+            # is what motivated this guard.
+            #
+            # A product whose URL fails this check is SKIPPED (no wrong price is
+            # ever written), so it is *not* a broken run — we log it to the
+            # invalid_products.csv artifact for triage but do NOT fail the
+            # workflow. Failing the whole run here only produces a perpetually-red
+            # sync for stale data and blocks every other product's update.
+            if not url_name_matches(product.get("name", ""), url_for_check):
+                skipped_url_mismatch += 1
+                _log_invalid(product, "url_name_mismatch", url_for_check)
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          reason="url_name_mismatch")
+                continue
+
+            # Colour-way guard: reject URLs whose slug names a colour the product
+            # doesn't come in (e.g. a "passion-red" URL for a product listed only
+            # in Black/Blue). Colourways carry different prices/stock, so a match
+            # on the wrong colourway would write the wrong price. Logged to
+            # invalid_products.csv for triage.
+            if not url_color_matches(product.get("name", ""), url_for_check,
+                                      product.get("colors") or []):
+                skipped_color_mismatch += 1
+                _log_invalid(product, "url_color_mismatch", url_for_check)
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          reason="url_color_mismatch")
+                continue
+
+            amz_price = None
+            flip_price = None
+            display_price = None
+            scraped_variants = []
+
+            scrape_start = time.time()
+            retries_used = 0
+            blocked = False  # True when the primary source returned no data (bot-wall)
+
+            if source == "flipkart":
+                if not flipkart_url and not url_for_check:
+                    skipped_no_url += 1
+                    _emit_row(product, "SKIP", source=source, old_price=old_price,
+                              reason="no_flipkartUrl")
+                    continue
+                flip_url = flipkart_url or url_for_check
+                details = get_flipkart_details(flip_url)
+                flip_price = details.get("price")
+                scraped_variants = details.get("variants", [])
+                if flip_price is None:
+                    blocked = True
+            elif source == "amazon":
+                if not amazon_url and not url_for_check:
+                    skipped_no_url += 1
+                    _emit_row(product, "SKIP", source=source, old_price=old_price,
+                              reason="no_amazonUrl")
+                    continue
+                amz_url = amazon_url or url_for_check
+                details = get_amazon_details(amz_url)
+                amz_price = details.get("price")
+                scraped_variants = details.get("variants", [])
+                if amz_price is None:
+                    blocked = True
+            elif source == "both":
+                flip_details = get_flipkart_details(flipkart_url) if flipkart_url else {}
+                amz_details = get_amazon_details(amazon_url) if amazon_url else {}
+                flip_price = flip_details.get("price")
+                amz_price = amz_details.get("price")
+                scraped_variants = flip_details.get("variants") or amz_details.get("variants", [])
+
+            # Cross-source fallback (bot-block resilience). A single-source brand
+            # (Flipkart-only / Amazon-only) whose primary marketplace served a
+            # bot-check interstitial would otherwise stay stale FOREVER. If the
+            # product has a URL on the *other* marketplace, try it once — but only
+            # write the price if it survives the existing name/colour/plausibility
+            # guards downstream. This is what keeps the storefront fresh when
+            # Flipkart (the primary source for most brands here) blocks the CI IP.
+            if blocked:
+                alt_source, alt_url = None, None
+                if source == "flipkart" and amazon_url:
+                    alt_source, alt_url = "amazon", amazon_url
+                elif source == "amazon" and flipkart_url:
+                    alt_source, alt_url = "flipkart", flipkart_url
+                if alt_source and alt_url and url_name_matches(product.get("name", ""), alt_url):
+                    print(f"  -> Primary source blocked; trying {alt_source} fallback")
+                    alt_details = (
+                        get_amazon_details(alt_url) if alt_source == "amazon"
+                        else get_flipkart_details(alt_url)
+                    )
+                    if alt_source == "amazon":
+                        amz_price = alt_details.get("price")
+                        if alt_details.get("variants"):
+                            scraped_variants = alt_details["variants"]
                     else:
-                        details = get_amazon_details(url)
-                        amz_price = details.get("price")
-                        if details.get("variants"):
-                            scraped_variants = details["variants"]
-                        amazon_url = url
-                    print(f"  -> Recovered URL via re-search: {url}")
-                    retries_used = 1
-                    recovered += 1
-                    break
-            except Exception as e:
-                print(f"  Auto re-search failed for {product.get('name')}: {e}")
+                        flip_price = alt_details.get("price")
+                        if alt_details.get("variants"):
+                            scraped_variants = alt_details["variants"]
+                    if (amz_price if alt_source == "amazon" else flip_price) is not None:
+                        retries_used = 1
+                        print(f"  -> Recovered price via {alt_source} fallback")
 
-        if source == "both":
-            prices = [p for p in [amz_price, flip_price] if p is not None]
-            if not prices:
-                _emit_row(product, "SKIP", source=source, old_price=old_price,
-                          reason="both_scrapers_returned_none",
-                          retries=retries_used)
+            # Single recovery attempt: if both scrapers came back empty we may have
+            # hit a transient bot-check / CAPTCHA interstitial (common for CI IPs)
+            # on a URL that's actually valid. Re-resolve the product URL from the
+            # brand's live listings and re-scrape ONCE before giving up — but only
+            # if the freshly found URL also passes the name guard, so we never
+            # write a price for the wrong product.
+            recovered = False
+            if flip_price is None and amz_price is None:
+                brand_slug = (product.get("brandSlug") or brand).lower()
+                search_source = source if source != "both" else "flipkart"
+                try:
+                    listings = get_brand_listings(brand_slug, search_source)
+                    for name, url in listings:
+                        if not is_match(product.get("name", ""), name):
+                            continue
+                        if not url_name_matches(product.get("name", ""), url):
+                            continue
+                        if search_source == "flipkart":
+                            details = get_flipkart_details(url)
+                            flip_price = details.get("price")
+                            if details.get("variants"):
+                                scraped_variants = details["variants"]
+                            flipkart_url = url
+                        else:
+                            details = get_amazon_details(url)
+                            amz_price = details.get("price")
+                            if details.get("variants"):
+                                scraped_variants = details["variants"]
+                            amazon_url = url
+                        print(f"  -> Recovered URL via re-search: {url}")
+                        retries_used = 1
+                        recovered += 1
+                        break
+                except Exception as e:
+                    print(f"  Auto re-search failed for {product.get('name')}: {e}")
+
+            if source == "both":
+                prices = [p for p in [amz_price, flip_price] if p is not None]
+                if not prices:
+                    _emit_row(product, "SKIP", source=source, old_price=old_price,
+                              reason="both_scrapers_returned_none",
+                              retries=retries_used)
+                    skipped_no_price += 1
+                    scrape_blocked += 1
+                    # Telemetry: record that we tried and were blocked, so the
+                    # freshness report shows this product isn't being kept current.
+                    try:
+                        if not DRY_RUN:
+                            record_freshness(product["_id"], "blocked")
+                    except Exception as e:
+                        print(f"    freshness write failed: {e}")
+                    _review(product["_id"], True)
+                    continue
+                display_price = min(prices)
+            else:
+                # Single-source brand. `blocked` means the primary returned nothing;
+                # the cross-source fallback above may have recovered a price from the
+                # *other* marketplace — prefer that over the (None) primary so the
+                # product stays fresh instead of going stale forever.
+                if source == "flipkart":
+                    display_price = flip_price if flip_price is not None else amz_price
+                else:
+                    display_price = amz_price if amz_price is not None else flip_price
+
+            # When the scraper returned real per-variant prices, the product's
+            # top-level `price` should reflect the cheapest variant (so the
+            # storefront default shows the entry-level price) and the per-variant
+            # prices flow through update_price_and_variants verbatim (Rule 1).
+            priced_variants = [v["price"] for v in scraped_variants
+                               if isinstance(v.get("price"), (int, float))]
+            if priced_variants:
+                display_price = min(priced_variants)
+
+            scrape_ms = (time.time() - scrape_start) * 1000
+
+            if display_price is None:
                 skipped_no_price += 1
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          reason="scraper_returned_none", scrape_ms=scrape_ms,
+                          retries=retries_used)
                 scrape_blocked += 1
-                # Telemetry: record that we tried and were blocked, so the
-                # freshness report shows this product isn't being kept current.
                 try:
                     if not DRY_RUN:
                         record_freshness(product["_id"], "blocked")
-                except RuntimeError as e:
+                except Exception as e:
                     print(f"    freshness write failed: {e}")
                 _review(product["_id"], True)
                 continue
-            display_price = min(prices)
-        else:
-            # Single-source brand. `blocked` means the primary returned nothing;
-            # the cross-source fallback above may have recovered a price from the
-            # *other* marketplace — prefer that over the (None) primary so the
-            # product stays fresh instead of going stale forever.
-            if source == "flipkart":
-                display_price = flip_price if flip_price is not None else amz_price
-            else:
-                display_price = amz_price if amz_price is not None else flip_price
 
-        # When the scraper returned real per-variant prices, the product's
-        # top-level `price` should reflect the cheapest variant (so the
-        # storefront default shows the entry-level price) and the per-variant
-        # prices flow through update_price_and_variants verbatim (Rule 1).
-        priced_variants = [v["price"] for v in scraped_variants
-                           if isinstance(v.get("price"), (int, float))]
-        if priced_variants:
-            display_price = min(priced_variants)
+            # Hard band guard.
+            if not price_in_bounds(display_price):
+                skipped_implausible += 1
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          new_price=display_price, reason="price_out_of_band",
+                          scrape_ms=scrape_ms)
+                _review(product["_id"], True)
+                continue
 
-        scrape_ms = (time.time() - scrape_start) * 1000
+            # Relative-delta guard. Reject suspicious_price_change vs the old
+            # Sanity price — only if we had one. This is the guard that would
+            # have caught the C83 → ₹173 accessory swap.
+            ok, why = price_change_is_plausible(old_price, display_price)
+            if not ok:
+                skipped_dry += 1
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          new_price=display_price, reason=f"implausible_delta:{why}",
+                          scrape_ms=scrape_ms)
+                _review(product["_id"], True)
+                continue
 
-        if display_price is None:
-            skipped_no_price += 1
-            _emit_row(product, "SKIP", source=source, old_price=old_price,
-                      reason="scraper_returned_none", scrape_ms=scrape_ms,
-                      retries=retries_used)
-            scrape_blocked += 1
+            if old_price == display_price:
+                matched += 1
+                _emit_row(product, "MATCH", source=source, old_price=old_price,
+                          new_price=display_price, scrape_ms=scrape_ms,
+                          retries=retries_used)
+                _review(product["_id"], False)
+                continue
+
+            # Update Sanity (including per-variant prices). A non-2xx response
+            # raises RuntimeError, which we count as a hard failure. Under a dry
+            # run we skip the write entirely and just log what *would* change.
+            if DRY_RUN:
+                print(f"    >> DRY-RUN would update Rs{old_price} -> Rs{display_price} via {source}")
+                updated_count += 1
+                _emit_row(product, "UPDATE", source=source, old_price=old_price,
+                          new_price=display_price, scrape_ms=scrape_ms,
+                          retries=retries_used)
+                continue
+
             try:
-                if not DRY_RUN:
-                    record_freshness(product["_id"], "blocked")
-            except RuntimeError as e:
-                print(f"    freshness write failed: {e}")
-            _review(product["_id"], True)
-            continue
+                mut = update_price_and_variants(
+                    product["_id"],
+                    product.get("name", ""),
+                    amz_price, flip_price, display_price,
+                    scraped_variants,
+                    existing_variants,
+                )
+            except Exception as e:
+                failed_mutations += 1
+                _emit_row(product, "ERROR", source=source, old_price=old_price,
+                          new_price=display_price, reason=f"sanity_mutation_failed:{e}",
+                          scrape_ms=scrape_ms)
+                _review(product["_id"], True)
+                continue
+            if not mut or not mut.get("results"):
+                failed_mutations += 1
+                _emit_row(product, "ERROR", source=source, old_price=old_price,
+                          new_price=display_price, reason="sanity_mutation_failed",
+                          scrape_ms=scrape_ms)
+                _review(product["_id"], True)
+                continue
 
-        # Hard band guard.
-        if not price_in_bounds(display_price):
-            skipped_implausible += 1
-            _emit_row(product, "SKIP", source=source, old_price=old_price,
-                      new_price=display_price, reason="price_out_of_band",
-                      scrape_ms=scrape_ms)
-            _review(product["_id"], True)
-            continue
-
-        # Relative-delta guard. Reject suspicious_price_change vs the old
-        # Sanity price — only if we had one. This is the guard that would
-        # have caught the C83 → ₹173 accessory swap.
-        ok, why = price_change_is_plausible(old_price, display_price)
-        if not ok:
-            skipped_dry += 1
-            _emit_row(product, "SKIP", source=source, old_price=old_price,
-                      new_price=display_price, reason=f"implausible_delta:{why}",
-                      scrape_ms=scrape_ms)
-            _review(product["_id"], True)
-            continue
-
-        if old_price == display_price:
-            matched += 1
-            _emit_row(product, "MATCH", source=source, old_price=old_price,
-                      new_price=display_price, scrape_ms=scrape_ms,
-                      retries=retries_used)
-            _review(product["_id"], False)
-            continue
-
-        # Update Sanity (including per-variant prices). A non-2xx response
-        # raises RuntimeError, which we count as a hard failure. Under a dry
-        # run we skip the write entirely and just log what *would* change.
-        if DRY_RUN:
-            print(f"    >> DRY-RUN would update Rs{old_price} -> Rs{display_price} via {source}")
             updated_count += 1
+            diff = display_price - (old_price or 0)
+            arrow = "^" if diff > 0 else "v"
+            log_change(product["name"], brand, old_price, display_price, source)
             _emit_row(product, "UPDATE", source=source, old_price=old_price,
                       new_price=display_price, scrape_ms=scrape_ms,
                       retries=retries_used)
-            continue
+            print(f"    {arrow} Rs{old_price} -> Rs{display_price} ({'+' if diff > 0 else ''}{diff}) via {source}")
+            # Per-variant accounting from the mutation result.
+            exact_updates += (mut.get("exact_matches") or 0) if isinstance(mut, dict) else 0
+            if isinstance(mut, dict) and mut.get("nudged"):
+                nudge_updates += 1
+            # Freshness telemetry: a successful scrape keeps the product "ok".
+            try:
+                if not DRY_RUN:
+                    record_freshness(product["_id"], "ok")
+            except Exception as e:
+                print(f"    freshness write failed: {e}")
+            _review(product["_id"], False)
 
-        try:
-            mut = update_price_and_variants(
-                product["_id"],
-                product.get("name", ""),
-                amz_price, flip_price, display_price,
-                scraped_variants,
-                existing_variants,
-            )
-        except RuntimeError as e:
+        except Exception as e:
+            import traceback as _tb
+            _tb.print_exc()
             failed_mutations += 1
-            _emit_row(product, "ERROR", source=source, old_price=old_price,
-                      new_price=display_price, reason=f"sanity_mutation_failed:{e}",
-                      scrape_ms=scrape_ms)
-            _review(product["_id"], True)
+            try:
+                _emit_row(product, "ERROR", source=source if 'source' in dir() else None,
+                          old_price=old_price if 'old_price' in dir() else None,
+                          new_price=None, reason=f"unhandled_exception:{e}")
+            except Exception:
+                pass
+            try:
+                _review(product["_id"], True)
+            except Exception:
+                pass
+            try:
+                _log_invalid(product, "unhandled_exception", "")
+            except Exception:
+                pass
             continue
-        if not mut or not mut.get("results"):
-            failed_mutations += 1
-            _emit_row(product, "ERROR", source=source, old_price=old_price,
-                      new_price=display_price, reason="sanity_mutation_failed",
-                      scrape_ms=scrape_ms)
-            _review(product["_id"], True)
-            continue
-
-        updated_count += 1
-        diff = display_price - (old_price or 0)
-        arrow = "^" if diff > 0 else "v"
-        log_change(product["name"], brand, old_price, display_price, source)
-        _emit_row(product, "UPDATE", source=source, old_price=old_price,
-                  new_price=display_price, scrape_ms=scrape_ms,
-                  retries=retries_used)
-        print(f"    {arrow} Rs{old_price} -> Rs{display_price} ({'+' if diff > 0 else ''}{diff}) via {source}")
-        # Per-variant accounting from the mutation result.
-        exact_updates += (mut.get("exact_matches") or 0) if isinstance(mut, dict) else 0
-        if isinstance(mut, dict) and mut.get("nudged"):
-            nudge_updates += 1
-        # Freshness telemetry: a successful scrape keeps the product "ok".
-        try:
-            if not DRY_RUN:
-                record_freshness(product["_id"], "ok")
-        except RuntimeError as e:
-            print(f"    freshness write failed: {e}")
-        _review(product["_id"], False)
-
     print(
         "\n"
-        "┌─────────────────────────── Price Sync Summary ───────────────────────────┐\n"
-        "│ Metric                 │ Count                                            │\n"
-        "├────────────────────────┼──────────────────────────────────────────────────┤\n"
-        f"│ Checked                │ {checked:<48}│\n"
-        f"│ Updated                │ {updated_count:<48}│\n"
-        f"│ Exact variant matches  │ {exact_updates:<48}│\n"
-        f"│ Fallback nudges        │ {nudge_updates:<48}│\n"
-        f"│ Matched (no change)    │ {matched:<48}│\n"
-        f"│ Locked (skipped)       │ {skipped_locked:<48}│\n"
-        f"│ Draft disabled (skip)  │ {skipped_disabled:<48}│\n"
-        f"│ Fresh (delta-skip)     │ {skipped_fresh:<48}│\n"
-        f"│ No URL                 │ {skipped_no_url:<48}│\n"
-        f"│ URL name mismatch      │ {skipped_url_mismatch:<48}│\n"
-        f"│ URL color mismatch     │ {skipped_color_mismatch:<48}│\n"
-        f"│ Out of band            │ {skipped_implausible:<48}│\n"
-        f"│ Implausible delta      │ {skipped_dry:<48}│\n"
-        f"│ Scrape failed          │ {skipped_no_price:<48}│\n"
-        f"│ Blocked (bot-wall)     │ {scrape_blocked:<48}│\n"
-        f"│ Mutation failures      │ {failed_mutations:<48}│\n"
-        f"│ Recovered (re-search)  │ {recovered:<48}│\n"
-        f"│ Invalid URLs logged    │ {invalid_urls:<48}│\n"
-        "└────────────────────────┴──────────────────────────────────────────────────┘"
+        "+--------------------------------------------------- Price Sync Summary ----+\n"
+        "| Metric                   | Count                                |\n"
+        "+--------------------------+-------------------------------------+\n"
+        f"| Checked                  | {checked:<36}|\n"
+        f"| Updated                  | {updated_count:<36}|\n"
+        f"| Exact variant matches    | {exact_updates:<36}|\n"
+        f"| Fallback nudges          | {nudge_updates:<36}|\n"
+        f"| Matched (no change)      | {matched:<36}|\n"
+        f"| Locked (skipped)         | {skipped_locked:<36}|\n"
+        f"| Draft disabled (skip)    | {skipped_disabled:<36}|\n"
+        f"| Fresh (delta-skip)       | {skipped_fresh:<36}|\n"
+        f"| No URL                   | {skipped_no_url:<36}|\n"
+        f"| URL name mismatch        | {skipped_url_mismatch:<36}|\n"
+        f"| URL color mismatch       | {skipped_color_mismatch:<36}|\n"
+        f"| Out of band              | {skipped_implausible:<36}|\n"
+        f"| Implausible delta        | {skipped_dry:<36}|\n"
+        f"| Scrape failed            | {skipped_no_price:<36}|\n"
+        f"| Blocked (bot-wall)       | {scrape_blocked:<36}|\n"
+        f"| Mutation failures        | {failed_mutations:<36}|\n"
+        f"| Recovered (re-search)    | {recovered:<36}|\n"
+        f"| Invalid URLs logged      | {invalid_urls:<36}|\n"
+        "+--------------------------+-------------------------------------+"
     )
 
     if failed_mutations or invalid_urls:

@@ -17,7 +17,16 @@ def test_random_user_agent_returns_a_pool_member():
 
 def test_new_session_carries_browser_headers_and_cookiejar():
     s = hh.new_session()
-    assert isinstance(s, __import__("requests").Session)
+    # Accepts either the curl_cffi impersonation session (preferred, when
+    # available) or the stdlib requests.Session fallback — both expose the
+    # same .headers / .cookies interface used by the scrapers.
+    import requests as _requests
+    try:
+        import curl_cffi.requests as _cc
+        _session_types = (_requests.Session, _cc.Session)
+    except Exception:
+        _session_types = (_requests.Session,)
+    assert isinstance(s, _session_types)
     # Browser-like headers should be present (the absence is a strong bot signal).
     for key in ("User-Agent", "sec-ch-ua", "sec-fetch-mode", "Accept-Language"):
         assert key in s.headers
