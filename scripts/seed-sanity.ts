@@ -291,7 +291,7 @@ async function seedSiteSettings(): Promise<void> {
     city: siteConfig.address.city,
     pincode: siteConfig.address.pincode,
     hours: siteConfig.hours,
-    googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3829.4355523996715!2d80.03632557591871!3d15.512699985090159!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b011400000001%3A0xc6cb1c7ea6bfdb!2sSri%20Venkata%20Sai%20Enterprises!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin",
+    googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d961.1184488793124!2d80.04080936960561!3d15.512711199068063!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b0139c634018d%3A0x238e2d70ef708a34!2sSri%20venkata%20sai%20enterprises!5e0!3m2!1sen!2sin!4v1784481826639!5m2!1sen!2sin",
     facebookUrl: "",
     instagramUrl: "https://www.instagram.com/sri_venkata_sai_enterprises/",
     youtubeUrl: "",

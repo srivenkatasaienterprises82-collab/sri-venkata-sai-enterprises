@@ -35,7 +35,7 @@ export function ContactSection({ settings }: { settings?: SanitySiteSettings }) 
   const phoneTel = settings?.phoneTel || siteConfig.phoneTel;
   const phoneDisplay = settings?.phoneDisplay || siteConfig.phoneDisplay;
   const hours = settings?.hours || siteConfig.hours;
-  const mapEmbedUrl = settings?.googleMapsEmbed || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3844.473795777598!2d80.03887817512428!3d15.512711185089021!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b0139c634018d%3A0x238e2d70ef708a34!2sSri%20venkata%20sai%20enterprises!5e0!3m2!1sen!2sin!4v1782227080895!5m2!1sen!2sin";
+  const mapEmbedUrl = settings?.googleMapsEmbed || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d961.1184488793124!2d80.04080936960561!3d15.512711199068063!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b0139c634018d%3A0x238e2d70ef708a34!2sSri%20venkata%20sai%20enterprises!5e0!3m2!1sen!2sin!4v1784481826639!5m2!1sen!2sin";
   const whatsappUrl = settings?.whatsappNumber
     ? `https://wa.me/${settings.whatsappNumber}`
     : siteConfig.whatsappUrl;
