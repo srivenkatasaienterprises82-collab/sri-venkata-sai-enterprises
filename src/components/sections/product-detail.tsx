@@ -14,7 +14,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const [activeColor, setActiveColor] = useState(product.colors[0] ?? null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [activeRam, setActiveRam] = useState(product.ramOptions?.[0] ?? product.variants[0]?.ram ?? "");
+  const [activeRam, setActiveRam] = useState(product.ramOptions?.[0] ?? (product.variants[0]?.ram && product.variants[0].ram !== "N/A" ? product.variants[0].ram : "") ?? "");
   const [activeStorage, setActiveStorage] = useState(product.storageOptions?.[0] ?? product.variants[0]?.storage ?? "");
 
   // Sanity products (e.g. iPhones) often arrive with empty `ramOptions` /
@@ -28,11 +28,48 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const storageOptions = product.storageOptions?.length
     ? product.storageOptions
     : Array.from(new Set(product.variants.map((v) => v.storage).filter((s): s is string => !!s)));
-  
+
   const enquiryOnly = isPriceOnEnquiry(product);
   // Keep hasProductPrice for the JSON-LD structured data (schemaOffers).
   // Some products have a single price (accessories/earbuds), others have per-variant pricing.
   const hasProductPrice = typeof product.price === "number" && Number.isFinite(product.price);
+  // Normalize RAM values so empty string and "N/A" are treated as a single
+  // "no RAM tier" bucket (iPhones expose storage-only variants).
+  const normRam = (r: string | undefined) => (r && r !== "N/A" ? r : "");
+
+  // Variants are specific RAM+Storage *pairings* (e.g. 12GB/256GB, 16GB/512GB),
+  // not independent axes. When the user clicks a RAM or Storage chip we must
+  // resolve to an actual variant and lock BOTH axes to that pairing — otherwise
+  // a half-switched combination (ram:"16GB" + storage:"256GB") matches no
+  // variant and the price stays stuck on the first variant.
+  const resolveVariant = (ram: string, storage: string) => {
+    const nRam = normRam(ram);
+    const exact = product.variants.find(
+      (v) => normRam(v.ram) === nRam && v.storage === storage
+    );
+    if (exact) return exact;
+    // Same RAM, any storage (keep requested storage if it has a price match)
+    const sameRam = product.variants.find((v) => normRam(v.ram) === nRam);
+    if (sameRam) return sameRam;
+    // Same storage, any RAM
+    const sameStorage = product.variants.find((v) => v.storage === storage);
+    if (sameStorage) return sameStorage;
+    return product.variants[0] ?? null;
+  };
+
+  // Click a RAM chip → pick the best variant for that RAM (syncing storage too).
+  const selectRam = (ram: string) => {
+    const v = resolveVariant(ram, activeStorage);
+    setActiveRam(normRam(v?.ram) ?? "");
+    setActiveStorage(v?.storage ?? "");
+  };
+  // Click a Storage chip → pick the best variant for that storage (syncing RAM too).
+  const selectStorage = (storage: string) => {
+    const v = resolveVariant(activeRam, storage);
+    setActiveRam(normRam(v?.ram) ?? "");
+    setActiveStorage(v?.storage ?? "");
+  };
+
   // Always prefer the selected variant's price over the product-level price.
   // This ensures the price updates when the user clicks a different variant button.
   // A variant whose `ram` is null (common for iPhones) should match an empty
@@ -328,7 +365,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                         {ramOptions.map((ram) => (
                           <button
                             key={ram}
-                            onClick={() => setActiveRam(ram)}
+                            onClick={() => selectRam(ram)}
                             className={`rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all ${activeRam === ram ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
                           >
                             {ram}
@@ -345,7 +382,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                         {storageOptions.map((storage) => (
                           <button
                             key={storage}
-                            onClick={() => setActiveStorage(storage)}
+                            onClick={() => selectStorage(storage)}
                             className={`rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all ${activeStorage === storage ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
                           >
                             {storage}
