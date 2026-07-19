@@ -349,6 +349,14 @@ def update_price_and_variants(product_id: str, product_name: str,
             new_variant_price = display_price
 
         new_v = dict(v)
+        # Guard (regression fix): never let a sync write a variant that drops
+        # the existing ram/storage/colors, even if the scraped data lacked
+        # them. A variant without ram/storage makes the PDP selector render no
+        # buttons and the price never change on click. Carry forward the
+        # existing values when the merged variant is missing them.
+        for _field in ("ram", "storage", "colors"):
+            if not new_v.get(_field) and v.get(_field):
+                new_v[_field] = v[_field]
         if new_variant_price is not None:
             new_v["price"] = new_variant_price
         # Per-variant marketplace prices: carry the scraped Flipkart/Amazon
