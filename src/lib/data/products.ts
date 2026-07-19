@@ -33,6 +33,10 @@ export interface ProductVariant {
   /** Price in INR. Omit (undefined) when price is on enquiry only. */
   price?: number;
   originalPrice?: number;
+  /** Per-variant Amazon-specific price (when available). */
+  amazonPrice?: number;
+  /** Per-variant Flipkart-specific price (when available). */
+  flipkartPrice?: number;
   amazonUrl?: string;
   flipkartUrl?: string;
 }

@@ -175,6 +175,8 @@ function productToSanityDoc(product: Product): SanityDoc {
       storage: v.storage,
       price: v.price,
       originalPrice: v.originalPrice,
+      amazonPrice: v.amazonPrice,
+      flipkartPrice: v.flipkartPrice,
       amazonUrl: v.amazonUrl,
       flipkartUrl: v.flipkartUrl,
     })),

@@ -42,6 +42,12 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   );
   const displayPrice = matchingVariant?.price ?? activeVariant?.price ?? product.price;
   const displayOriginalPrice = matchingVariant?.originalPrice ?? activeVariant?.originalPrice ?? product.originalPrice;
+  // Per-variant marketplace prices: each RAM/Storage combo can carry its
+  // own Flipkart and/or Amazon price (written by the 6h price-sync). Show
+  // them so the user sees the split + the lowest deal, and so the "Buy Now"
+  // link opens the correct configuration.
+  const variantFlipkartPrice = matchingVariant?.flipkartPrice;
+  const variantAmazonPrice = matchingVariant?.amazonPrice;
   const amazonUrl = matchingVariant?.amazonUrl ?? product.amazonUrl;
   const flipkartUrl = matchingVariant?.flipkartUrl ?? product.flipkartUrl;
 
@@ -267,6 +273,24 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                   <span className="text-3xl font-extrabold text-slate-900">Price on Enquiry</span>
                 )}
               </div>
+
+              {/* Per-variant marketplace price breakdown (Flipkart vs Amazon) */}
+              {!enquiryOnly && (variantFlipkartPrice || variantAmazonPrice) ? (
+                <div className="mb-8 grid grid-cols-2 gap-3">
+                  {variantFlipkartPrice ? (
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 text-center">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Flipkart</p>
+                      <p className="text-lg font-bold text-slate-900">{formatPrice(variantFlipkartPrice)}</p>
+                    </div>
+                  ) : null}
+                  {variantAmazonPrice ? (
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 text-center">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Amazon</p>
+                      <p className="text-lg font-bold text-slate-900">{formatPrice(variantAmazonPrice)}</p>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
 
               {/* Color Selector */}
               <div className="mb-10">

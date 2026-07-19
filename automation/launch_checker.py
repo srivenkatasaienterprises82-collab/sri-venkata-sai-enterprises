@@ -31,6 +31,7 @@ Key design notes:
 """
 import argparse
 import os
+import re
 import sys
 import time
 from datetime import datetime, timezone
@@ -63,6 +64,57 @@ from utils import (
     url_name_matches,
     url_color_matches,
 )
+
+
+def _norm_variant_key(ram: str | None, storage: str | None) -> tuple:
+    """Normalise a (ram, storage) pair to a comparable key."""
+    def _norm(v: str | None) -> str:
+        if not v:
+            return ""
+        return re.sub(r"[\s_]", "", str(v)).lower()
+    return (_norm(ram), _norm(storage))
+
+
+def _merge_marketplace_variants(flipkart_variants: list, amazon_variants: list) -> list:
+    """Merge Flipkart + Amazon per-variant prices into one list.
+
+    Keyed by normalised (ram, storage). Each output variant carries:
+      - `price`      : legacy alias = the Flipkart price when present,
+                      else the Amazon price (used by the cheapest-variant
+                      display_price logic downstream).
+      - `flipkartPrice`: from the Flipkart variant (if any)
+      - `amazonPrice`  : from the Amazon variant (if any)
+
+    So a single Sanity variant can end up with BOTH marketplace prices,
+    which is what lets the storefront show the Flipkart vs Amazon price
+    per RAM/Storage combo and open the correct buy link. Variants found
+    on only one marketplace simply keep that one price.
+    """
+    merged: dict[tuple, dict] = {}
+
+    def _upsert(v: dict, mk: str) -> None:
+        key = _norm_variant_key(v.get("ram"), v.get("storage"))
+        if key not in merged:
+            merged[key] = {
+                "ram": v.get("ram"),
+                "storage": v.get("storage"),
+                "price": None,
+                "flipkartPrice": None,
+                "amazonPrice": None,
+            }
+        node = merged[key]
+        mp = v.get(mk)
+        if isinstance(mp, (int, float)) and mp > 0:
+            node[mk] = int(mp)
+            # Legacy `price` alias: prefer the first marketplace that has one.
+            if node["price"] is None:
+                node["price"] = int(mp)
+
+    for v in flipkart_variants or []:
+        _upsert(v, "flipkartPrice")
+    for v in amazon_variants or []:
+        _upsert(v, "amazonPrice")
+    return list(merged.values())
 
 LOG_FILE = "price-changes.csv"
 INVALID_LOG_FILE = "invalid_products.csv"
@@ -422,7 +474,17 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
                 amz_details = get_amazon_details(amazon_url) if amazon_url else {}
                 flip_price = flip_details.get("price")
                 amz_price = amz_details.get("price")
-                scraped_variants = flip_details.get("variants") or amz_details.get("variants", [])
+                # Merge BOTH marketplaces' per-variant prices into a single
+                # variant list, keyed by (ram, storage). A variant from Flipkart
+                # carries flipkartPrice; one from Amazon carries amazonPrice; the
+                # merge co-locates them so a single Sanity variant ends up with
+                # BOTH marketplace prices (the user's "lowest / buy-now opens
+                # correct config" requirement). Variants found on only one
+                # marketplace simply keep that one marketplace's price.
+                scraped_variants = _merge_marketplace_variants(
+                    flip_details.get("variants", []),
+                    amz_details.get("variants", []),
+                )
 
             # Cross-source fallback (bot-block resilience). A single-source brand
             # (Flipkart-only / Amazon-only) whose primary marketplace served a
@@ -446,11 +508,15 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
                     if alt_source == "amazon":
                         amz_price = alt_details.get("price")
                         if alt_details.get("variants"):
-                            scraped_variants = alt_details["variants"]
+                            # Merge the recovered Amazon variants into whatever
+                            # the primary (blocked) source already collected.
+                            scraped_variants = _merge_marketplace_variants(
+                                scraped_variants, alt_details["variants"])
                     else:
                         flip_price = alt_details.get("price")
                         if alt_details.get("variants"):
-                            scraped_variants = alt_details["variants"]
+                            scraped_variants = _merge_marketplace_variants(
+                                scraped_variants, alt_details["variants"])
                     if (amz_price if alt_source == "amazon" else flip_price) is not None:
                         retries_used = 1
                         print(f"  -> Recovered price via {alt_source} fallback")

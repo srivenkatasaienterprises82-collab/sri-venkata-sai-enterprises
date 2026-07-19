@@ -16,8 +16,8 @@ def test_flipkart_details_extracts_all():
     assert {"label": "RAM", "value": "8 GB"} in d["specifications"]
     assert len(d["colors"]) == 2
     assert d["colors"][0] == {"name": "Cobalt Blue", "hex": "#1a237e"}
-    assert {"ram": "8 GB", "storage": "128 GB", "price": None} in d["variants"]
-    assert {"ram": "12 GB", "storage": "256 GB", "price": None} in d["variants"]
+    assert {"ram": "8 GB", "storage": "128 GB", "price": None, "flipkartPrice": None} in d["variants"]
+    assert {"ram": "12 GB", "storage": "256 GB", "price": None, "flipkartPrice": None} in d["variants"]
 
 
 def test_amazon_details_extracts_all():
@@ -30,7 +30,7 @@ def test_amazon_details_extracts_all():
     assert {"label": "RAM", "value": "8 GB"} in d["specifications"]
     assert len(d["colors"]) == 2
     assert d["colors"][1] == {"name": "Ice Blue", "hex": "#4fc3f7"}
-    assert {"ram": "12 GB", "storage": "256 GB", "price": None} in d["variants"]
+    assert {"ram": "12 GB", "storage": "256 GB", "price": None, "amazonPrice": None} in d["variants"]
 
 
 def test_flipkart_details_handles_empty():

@@ -458,16 +458,31 @@ def _extract_flipkart_variants(soup: BeautifulSoup) -> list:
         if m:
             key = (f"{m.group(1)} GB", f"{m.group(2)} GB")
             if key not in text_variants:
-                text_variants[key] = {"ram": key[0], "storage": key[1], "price": None}
+                # Emit BOTH `price` (legacy, used by `update_price_and_variants`
+                # blend logic) AND `flipkartPrice` (per-variant marketplace
+                # price for the new variant-level schema). When the orchestrator
+                # scrapes both Flipkart and Amazon, the launch_checker merges
+                # variants by (ram, storage) so a single variant can carry
+                # both marketplace prices side-by-side.
+                text_variants[key] = {"ram": key[0], "storage": key[1], "price": None, "flipkartPrice": None}
 
-    # Merge: Tier 1 wins on price, then Tier 2, then Tier 3 supplies combos
+    # Merge: Tier 1 wins on flipkartPrice, then Tier 2, then Tier 3 supplies combos
     # that nothing else found.
     merged = {}
     for v in list(text_variants.values()) + ld_variants + next_variants:
         key = (v["ram"], v["storage"])
-        if key not in merged or merged[key].get("price") is None:
+        if key not in merged or _has_no_price(merged[key]):
             merged[key] = v
     return list(merged.values())
+
+
+def _has_no_price(v: dict) -> bool:
+    """True if a variant carries no per-variant price from any marketplace."""
+    return (
+        v.get("price") is None
+        and v.get("flipkartPrice") is None
+        and v.get("amazonPrice") is None
+    )
 
 
 def _extract_variants_from_next_data(soup: BeautifulSoup) -> list:
@@ -530,12 +545,12 @@ def _extract_variants_from_next_data(soup: BeautifulSoup) -> list:
     variants = []
     for data in candidates:
         variants.extend(_walk_for_variants(data))
-    # Dedupe by (ram, storage), keeping first non-None price.
+    # Dedupe by (ram, storage), keeping first variant that has any price.
     seen = {}
     out = []
     for v in variants:
         key = (v["ram"], v["storage"])
-        if key not in seen or seen[key].get("price") is None:
+        if key not in seen or _has_no_price(seen[key]):
             seen[key] = v
     return list(seen.values())
 
@@ -590,7 +605,12 @@ def _walk_for_variants(node, _path=""):
             found.append({
                 "ram": f"{m.group(1)} GB",
                 "storage": f"{m.group(2)} GB",
+                # Legacy `price` alias (used by update_price_and_variants when
+                # picking the cheapest variant as the product's display_price),
+                # plus the per-marketplace `flipkartPrice` for variant-level
+                # price storage on the product.
                 "price": price,
+                "flipkartPrice": price,
             })
         for val in node.values():
             found.extend(_walk_for_variants(val, _path + "."))
@@ -647,6 +667,7 @@ def _extract_variants_from_jsonld(soup: BeautifulSoup) -> list:
                         "ram": f"{m.group(1)} GB",
                         "storage": f"{m.group(2)} GB",
                         "price": price,
+                        "flipkartPrice": price,
                     })
 
                 # Also check itemOffered (nested Product with same pattern)
@@ -659,6 +680,7 @@ def _extract_variants_from_jsonld(soup: BeautifulSoup) -> list:
                             "ram": f"{m2.group(1)} GB",
                             "storage": f"{m2.group(2)} GB",
                             "price": price,
+                            "flipkartPrice": price,
                         })
 
     # Deduplicate (JSON-LD may list the same variant multiple times)
@@ -666,6 +688,6 @@ def _extract_variants_from_jsonld(soup: BeautifulSoup) -> list:
     out = []
     for v in variants:
         key = (v["ram"], v["storage"])
-        if key not in seen or seen[key]["price"] is None:
+        if key not in seen or _has_no_price(seen[key]):
             seen[key] = v
     return list(seen.values())

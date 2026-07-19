@@ -1592,3 +1592,17 @@ This file is preserved across sessions. Update it when starting/finishing major 
 - `pytest` 97 passed (unchanged). `py_compile` clean.
 - NOTE: each scrape takes ~30s with retries, so a full all-brand run exceeds 10 min locally — fine for CI (90-min timeout) but run single brands for quick local checks.
 - STILL OPEN: (1) guarantee curl_cffi on GitHub runner — add explicit `pip install --upgrade curl_cffi` + (Linux) `sudo apt-get install -y libcurl4-openssl-dev` in `price-sync.yml`. (2) exposed Sanity token in git history — rotate. (3) commit & push these fixes (launch_checker.py wrapper + test_http_helper.py + AGENTS.md) to trigger Vercel redeploy.
+
+## Done (July 19, cont. 2) — Per-Variant Marketplace Price System (IMPLEMENTED + VERIFIED)
+- NEW REQUIREMENT from user: variant-level pricing is essential — each RAM/Storage combo needs its OWN Flipkart + Amazon price (not just a single base price), shown on the PDP with a lowest/per-marketplace breakdown, and the Buy link must open the correct configuration.
+- IMPLEMENTED across the full stack:
+  - **Schema** (`src/sanity/schemaTypes/index.ts`): variant sub-object now has `amazonPrice` + `flipkartPrice` fields (alongside existing `price`, `originalPrice`, `amazonUrl`, `flipkartUrl`).
+  - **TypeScript** (`src/sanity/types.ts`, `src/lib/data/products.ts`): `ProductVariant` + Sanity variant type carry `amazonPrice?` / `flipkartPrice?`.
+  - **Scrapers** (`flipkart.py`, `amazon.py`): variant dicts now emit BOTH the legacy `price` alias AND a marketplace-tagged key — Flipkart variants carry `flipkartPrice`, Amazon variants carry `amazonPrice`. So a variant from each source is distinguishable by marketplace.
+  - **launch_checker.py** — NEW `_merge_marketplace_variants(fk, az)`: for `source=="both"` (and cross-source fallback) it merges Flipkart + Amazon variant lists by normalised (ram, storage) so ONE Sanity variant ends up carrying BOTH `flipkartPrice` and `amazonPrice`. Single-source brands keep just their one marketplace's key.
+  - **sanity_api.py** — NEW `_merge_variant_marketplace_prices(target, scraped)`: copies whichever marketplace key is present onto the matched variant WITHOUT wiping the other source's price (single-source run never clobbers the other). Called inside `update_price_and_variants` Rule-1 exact-match path.
+  - **Frontend** (`product-detail.tsx`): reads `matchingVariant.flipkartPrice` / `amazonPrice` and renders a 2-col Flipkart-vs-Amazon breakdown under the price that updates live when RAM/Storage changes. Existing `amazonUrl`/`flipkartUrl` per-variant buy links unchanged.
+  - **Seed** (`scripts/seed-sanity.ts`): passes `v.amazonPrice` / `v.flipkartPrice` through to Sanity.
+- VERIFIED END-TO-END: wrote merged both-source variants to `product-iqoo-z10-lite` — AFTER shows `4GB/128GB → fk=19999 az=20599`, `6GB/128GB → fk=12068 az=12599`. GROQ `PRODUCT_BY_SLUG_QUERY` projects `variants` whole → fields flow to the PDP. `npx tsc --noEmit` clean. `pytest` 97 passed (updated test_details.py variant-shape assertions).
+- NOTE: per-variant marketplace keys are only WRITTEN on a real UPDATE (not on MATCH/no-change), so a product must actually re-sync a changed price before its variant FK/AZ split appears. Full `--mode sync` run is the trigger.
+- STILL OPEN: (1) commit & push (this work + the July-19 crash-isolation + July-18 curl_cffi work are all unpushed). (2) rotate exposed Sanity token. (3) guarantee curl_cffi on CI runner in price-sync.yml.

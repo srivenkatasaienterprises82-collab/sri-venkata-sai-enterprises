@@ -244,6 +244,25 @@ def update_price(product_id: str, amazon_price, flipkart_price, display_price) -
     return _mutate(mutations)
 
 
+def _merge_variant_marketplace_prices(target: dict, scraped: dict | None) -> None:
+    """Carry a scraped variant's per-marketplace price onto a Sanity variant.
+
+    The scraped variant (from Flipkart or Amazon) carries either a
+    `flipkartPrice` or an `amazonPrice` key (plus the legacy `price`
+    alias). We copy whichever marketplace key is present onto `target`
+    *without* touching the other marketplace's key, so a single-source
+    run never wipes a price previously written by the other source.
+
+    Only non-None marketplace prices are written.
+    """
+    if not isinstance(scraped, dict):
+        return
+    for mk in ("flipkartPrice", "amazonPrice"):
+        val = scraped.get(mk)
+        if isinstance(val, (int, float)) and val > 0:
+            target[mk] = int(val)
+
+
 def update_price_and_variants(product_id: str, product_name: str,
                                amazon_price, flipkart_price, display_price,
                                scraped_variants: list,
@@ -322,6 +341,13 @@ def update_price_and_variants(product_id: str, product_name: str,
         new_v = dict(v)
         if new_variant_price is not None:
             new_v["price"] = new_variant_price
+        # Per-variant marketplace prices: carry the scraped Flipkart/Amazon
+        # price onto the matching variant WITHOUT wiping the other source. A
+        # single-source scrape only ever sets that one marketplace's key, so a
+        # Flipkart-only run leaves any existing amazonPrice intact and vice
+        # versa. When both sources are scraped (source == "both"), both keys
+        # end up populated on the same variant object.
+        _merge_variant_marketplace_prices(new_v, matched_scraped)
         updated_variants.append(new_v)
 
     # No real per-variant scrape available -> nudge the existing tiers so

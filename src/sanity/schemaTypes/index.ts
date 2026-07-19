@@ -101,6 +101,8 @@ export const product = defineType({
             defineField({ name: "storage", title: "Storage", type: "string" }),
             defineField({ name: "price", title: "Price (₹)", type: "number" }),
             defineField({ name: "originalPrice", title: "Original Price (₹)", type: "number" }),
+            defineField({ name: "amazonPrice", title: "Amazon Price (₹)", type: "number" }),
+            defineField({ name: "flipkartPrice", title: "Flipkart Price (₹)", type: "number" }),
             defineField({ name: "amazonUrl", title: "Amazon URL", type: "url" }),
             defineField({ name: "flipkartUrl", title: "Flipkart URL", type: "url" }),
           ],

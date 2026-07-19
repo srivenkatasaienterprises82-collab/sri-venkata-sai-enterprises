@@ -23,7 +23,7 @@ export type SanityProduct = {
   colors: { name: string; hex: string }[];
   ramOptions?: string[];
   storageOptions?: string[];
-  variants: { ram: string; storage: string; price?: number; originalPrice?: number; amazonUrl?: string; flipkartUrl?: string }[];
+  variants: { ram: string; storage: string; price?: number; originalPrice?: number; amazonPrice?: number; flipkartPrice?: number; amazonUrl?: string; flipkartUrl?: string }[];
   specifications?: { label: string; value: string }[];
 };
 

@@ -451,6 +451,15 @@ def _extract_amazon_colors(soup: BeautifulSoup) -> list:
     return colors
 
 
+def _has_no_price(v: dict) -> bool:
+    """True if a variant carries no per-variant price from any marketplace."""
+    return (
+        v.get("price") is None
+        and v.get("flipkartPrice") is None
+        and v.get("amazonPrice") is None
+    )
+
+
 def _extract_amazon_variants(soup: BeautifulSoup) -> list:
     """Extract RAM/Storage variant combos from the page HTML.
 
@@ -469,7 +478,12 @@ def _extract_amazon_variants(soup: BeautifulSoup) -> list:
         if m:
             key = (f"{m.group(1)} GB", f"{m.group(2)} GB")
             if key not in text_variants:
-                text_variants[key] = {"ram": key[0], "storage": key[1], "price": None}
+                # Emit BOTH `price` (legacy, used by the blend logic) and
+                # `amazonPrice` (per-variant Amazon price for the new
+                # variant-level schema). The orchestrator merges Flipkart
+                # and Amazon variants by (ram, storage) so one variant can
+                # carry both marketplace prices side-by-side.
+                text_variants[key] = {"ram": key[0], "storage": key[1], "price": None, "amazonPrice": None}
 
     # ── Strategy 2: JSON-LD offers (structured data with real prices) ──
     ld_variants = _extract_variants_from_jsonld(soup)
@@ -534,7 +548,7 @@ def _extract_amazon_variants_twister(page) -> list:
             price = _read_twister_price(page)
             if price is not None and 1000 <= price <= 300000:
                 seen.add((ram, storage))
-                results.append({"ram": ram, "storage": storage, "price": price})
+                results.append({"ram": ram, "storage": storage, "price": price, "amazonPrice": price})
         return results
     except Exception as e:
         print(f"  Amazon Twister extraction error: {e}")
@@ -615,6 +629,7 @@ def _extract_variants_from_jsonld(soup: BeautifulSoup) -> list:
                         "ram": f"{m.group(1)} GB",
                         "storage": f"{m.group(2)} GB",
                         "price": price,
+                        "amazonPrice": price,
                     })
 
                 # Also check itemOffered (nested Product with same pattern)
@@ -627,6 +642,7 @@ def _extract_variants_from_jsonld(soup: BeautifulSoup) -> list:
                             "ram": f"{m2.group(1)} GB",
                             "storage": f"{m2.group(2)} GB",
                             "price": price,
+                            "amazonPrice": price,
                         })
 
     # Deduplicate (JSON-LD may list the same variant multiple times)
@@ -634,6 +650,6 @@ def _extract_variants_from_jsonld(soup: BeautifulSoup) -> list:
     out = []
     for v in variants:
         key = (v["ram"], v["storage"])
-        if key not in seen or seen[key]["price"] is None:
+        if key not in seen or _has_no_price(seen[key]):
             seen[key] = v
     return list(seen.values())
