@@ -97,6 +97,103 @@ def new_session() -> object:
     return s
 
 
+def warm_session_with_playwright(domain: str, base_url: str) -> object | None:
+    """Warm a fresh HTTP session by first passing the bot-check in a real browser.
+
+    Flipkart/Amazon serve a CAPTCHA / robot-check to a brand-new TLS session, but
+    a *returning* visitor that already holds the clearance cookies usually sails
+    straight through. So we:
+
+      1. open `base_url` in headless Chromium with `playwright-stealth`,
+      2. let any bot-check resolve (we don't solve CAPTCHAs — we just wait a beat
+         for cookie-bearing redirects / soft checks to settle),
+      3. export the browser's cookies for `domain` and inject them into a new
+         curl_cffi (or requests) session.
+
+    The returned session carries the warmed cookies, so the follow-up
+    `get_with_retry` calls look like a verified return visitor instead of a fresh
+    bot hit — which is the single biggest lever for beating the 503/403 walls.
+
+    Returns None if Playwright isn't installed or the warm-up fails, so callers
+    can fall back to a plain `new_session()`.
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:  # pragma: no cover - depends on environment
+        print("    warm_session: playwright not installed, skipping cookie warm-up")
+        return None
+
+    stealth = None
+    try:
+        from playwright_stealth import stealth_sync
+    except ImportError:  # pragma: no cover - stealth is optional
+        pass
+
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            try:
+                context = browser.new_context(
+                    user_agent=random_user_agent(),
+                    locale="en-IN",
+                    extra_http_headers={
+                        "Accept-Language": "en-IN,en;q=0.9",
+                        "Sec-Fetch-Dest": "document",
+                        "Sec-Fetch-Mode": "navigate",
+                        "Sec-Fetch-Site": "none",
+                        "Sec-Fetch-User": "?1",
+                    },
+                )
+                page = context.new_page()
+                if stealth:
+                    stealth_sync(page)
+                try:
+                    page.goto(base_url, timeout=45000, wait_until="domcontentloaded")
+                except Exception as e:  # navigation may "hang" on a soft check
+                    print(f"    warm_session: goto soft-fail ({e}); using cookies so far")
+                # Give any JS-driven bot-check / redirect a moment to settle and
+                # drop its clearance cookies. We don't solve CAPTCHAs — if it's a
+                # hard CAPTCHA, the cookies simply won't include clearance and the
+                # HTTP fallback will still hit the wall (safe, no wrong price).
+                time.sleep(random.uniform(3, 6))
+                try:
+                    page.wait_for_load_state("networkidle", timeout=8000)
+                except Exception:
+                    pass
+                raw_cookies = context.cookies(url=base_url)
+            finally:
+                browser.close()
+    except Exception as e:
+        print(f"    warm_session: browser warm-up failed ({e}); falling back")
+        return None
+
+    if not raw_cookies:
+        print("    warm_session: no cookies collected; falling back to cold session")
+        return None
+
+    s = new_session()
+    for c in raw_cookies:
+        # curl_cffi and requests both accept a name/value/domain/path dict.
+        cookie = {
+            "name": c.get("name"),
+            "value": c.get("value"),
+            "domain": c.get("domain", domain),
+            "path": c.get("path", "/"),
+        }
+        if not cookie["name"]:
+            continue
+        try:
+            s.cookies.set(**cookie)
+        except Exception:
+            # requests needs domain; curl_cffi is lenient. Try the bare form.
+            try:
+                s.cookies.set(cookie["name"], cookie["value"])
+            except Exception:
+                continue
+    print(f"    warm_session: injected {len(raw_cookies)} cookie(s) for {domain}")
+    return s
+
+
 def get_with_retry(session: requests.Session, url: str, *,
                    timeout=(5, 30), max_tries: int = 2) -> requests.Response | None:
     """GET `url` on `session`, rotating the UA once on a soft failure.

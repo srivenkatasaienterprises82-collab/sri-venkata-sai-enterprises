@@ -4,7 +4,18 @@ import random
 import requests
 from bs4 import BeautifulSoup
 
-from http_helper import new_session, get_with_retry, is_interstitial, random_user_agent
+from http_helper import (
+    new_session,
+    get_with_retry,
+    is_interstitial,
+    random_user_agent,
+    warm_session_with_playwright,
+)
+
+# Domain used when exporting the warmed Playwright cookies back into the HTTP
+# session. Flipkart sets clearance cookies on this host.
+FK_DOMAIN = "flipkart.com"
+FK_BASE = "https://www.flipkart.com/"
 
 # playwright-stealth hides the automation tells Playwright leaves in the DOM.
 # Guarded so tests/locales without the package still run (just less stealthy).
@@ -25,8 +36,14 @@ def get_flipkart_price(url: str) -> int | None:
     if not url:
         return None
 
+    # Warm the HTTP session via a real browser ONCE up front. If Flipkart serves
+    # a bot-check to a cold session, the cookies collected here let the first
+    # HTTP pass ride in as a returning, already-verified visitor. Returns None
+    # when Playwright is unavailable — in which case we just use a cold session.
+    warmed = warm_session_with_playwright(FK_DOMAIN, FK_BASE)
+
     for attempt in range(1, REQUEST_RETRIES + 1):
-        price = _try_requests(url, attempt)
+        price = _try_requests(url, attempt, session=warmed if attempt == 1 else None)
         if price is not None:
             return price
         # Small exponential-ish backoff before re-trying requests, then later
@@ -43,9 +60,10 @@ def get_flipkart_price(url: str) -> int | None:
     return None
 
 
-def _try_requests(url: str, attempt: int = 1) -> int | None:
+def _try_requests(url: str, attempt: int = 1, session: object = None) -> int | None:
     try:
-        session = new_session()
+        if session is None:
+            session = new_session()
         resp = get_with_retry(session, url, timeout=30, max_tries=2)
         if resp is None:
             return None
