@@ -116,6 +116,44 @@ def _merge_marketplace_variants(flipkart_variants: list, amazon_variants: list) 
         _upsert(v, "amazonPrice")
     return list(merged.values())
 
+
+def _variant_missing_marketplace(variants: list) -> bool:
+    """True if any Sanity variant lacks a per-marketplace price key."""
+    for v in variants or []:
+        if v.get("flipkartPrice") is None and v.get("amazonPrice") is None:
+            return True
+    return False
+
+
+def _maybe_backfill_variant_marketplace(product, amz_price, flip_price,
+                                        scraped_variants, existing_variants) -> None:
+    """On a MATCH (headline price unchanged) still write the per-variant
+    Flipkart/Amazon breakdown if any variant is missing it.
+
+    The marketplace keys are only populated on a real UPDATE, so products
+    whose price already matched the seed would otherwise never show the
+    FK/AZ split on the PDP. This backfill is a no-op when every variant
+    already carries at least one marketplace price, so it's cheap.
+    """
+    if DRY_RUN:
+        return
+    if not _variant_missing_marketplace(existing_variants):
+        return
+    if not (isinstance(flip_price, (int, float)) or
+            isinstance(amz_price, (int, float))):
+        return
+    try:
+        update_price_and_variants(
+            product["_id"],
+            product.get("name", ""),
+            amz_price, flip_price, product.get("price"),
+            scraped_variants, existing_variants,
+        )
+        print("    BACKFILL: wrote per-variant marketplace prices")
+    except Exception as e:
+        print(f"    backfill failed: {e}")
+
+
 LOG_FILE = "price-changes.csv"
 INVALID_LOG_FILE = "invalid_products.csv"
 
@@ -659,6 +697,13 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
                           new_price=display_price, scrape_ms=scrape_ms,
                           retries=retries_used)
                 _review(product["_id"], False)
+                # Even when the headline price is unchanged, a product may
+                # still be missing its per-variant Flipkart/Amazon breakdown
+                # (the marketplace keys are only written on a real UPDATE).
+                # Backfill them now so every PDP shows the FK/AZ split.
+                _maybe_backfill_variant_marketplace(
+                    product, amz_price, flip_price, scraped_variants,
+                    existing_variants)
                 continue
 
             # Update Sanity (including per-variant prices). A non-2xx response
