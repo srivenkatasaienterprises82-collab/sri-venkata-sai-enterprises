@@ -40,7 +40,16 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const matchingVariant = product.variants.find(
     (variant) => (variant.ram ?? "") === activeRam && (variant.storage ?? "") === activeStorage,
   );
-  const displayPrice = matchingVariant?.price ?? activeVariant?.price ?? product.price;
+  // The storefront shows ONLY the live Flipkart price (we never surface a
+  // competing Amazon price for Flipkart-sourced products). Prefer the
+  // selected variant's Flipkart price, then the product-level Flipkart price,
+  // then fall back to the variant's own price.
+  const displayPrice =
+    matchingVariant?.flipkartPrice ??
+    product.flipkartPrice ??
+    matchingVariant?.price ??
+    activeVariant?.price ??
+    product.price;
   const displayOriginalPrice = matchingVariant?.originalPrice ?? activeVariant?.originalPrice ?? product.originalPrice;
   // Per-variant marketplace prices: each RAM/Storage combo can carry its
   // own Flipkart and/or Amazon price (written by the 6h price-sync). Show
@@ -274,21 +283,13 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                 )}
               </div>
 
-              {/* Per-variant marketplace price breakdown (Flipkart vs Amazon) */}
-              {!enquiryOnly && (variantFlipkartPrice || variantAmazonPrice) ? (
-                <div className="mb-8 grid grid-cols-2 gap-3">
-                  {variantFlipkartPrice ? (
-                    <div className="rounded-xl border border-slate-200 bg-white p-3 text-center">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Flipkart</p>
-                      <p className="text-lg font-bold text-slate-900">{formatPrice(variantFlipkartPrice)}</p>
-                    </div>
-                  ) : null}
-                  {variantAmazonPrice ? (
-                    <div className="rounded-xl border border-slate-200 bg-white p-3 text-center">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Amazon</p>
-                      <p className="text-lg font-bold text-slate-900">{formatPrice(variantAmazonPrice)}</p>
-                    </div>
-                  ) : null}
+              {/* Live Flipkart price for the selected variant (single source) */}
+              {!enquiryOnly && variantFlipkartPrice ? (
+                <div className="mb-8">
+                  <div className="rounded-xl border border-slate-200 bg-white p-3 text-center max-w-[220px]">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Flipkart Price</p>
+                    <p className="text-lg font-bold text-slate-900">{formatPrice(variantFlipkartPrice)}</p>
+                  </div>
                 </div>
               ) : null}
 

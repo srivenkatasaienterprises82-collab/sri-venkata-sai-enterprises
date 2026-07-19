@@ -69,6 +69,10 @@ export interface Product {
   originalPrice?: number;
   /** When true, price is hidden — enquiry only. */
   priceOnEnquiry?: boolean;
+  /** Live Flipkart price written by the 6h price-sync (authoritative storefront price). */
+  flipkartPrice?: number;
+  /** Live Amazon price written by the 6h price-sync (only when an amazonUrl exists). */
+  amazonPrice?: number;
   amazonUrl?: string;
   flipkartUrl?: string;
   /** Legacy: derived from variants.ram / variants.storage */
@@ -513,6 +517,31 @@ export function getStartingPrice(product: Product): number | undefined {
     .filter((pr): pr is number => typeof pr === "number");
   if (prices.length) return Math.min(...prices);
   return product.price;
+}
+
+// The authoritative selling price shown on the storefront is the live
+// Flipkart price (the 6h price-sync writes `flipkartPrice` on every
+// Flipkart-sourced product). We never show a competing Amazon price for
+// Flipkart products — only the single Flipkart price.
+export function getFlipkartPrice(
+  product: Product,
+  ram?: string | null,
+  storage?: string | null,
+): number | undefined {
+  // Prefer the selected variant's Flipkart price when one is chosen.
+  if (ram || storage) {
+    const mv = product.variants.find(
+      (v) => (v.ram ?? "") === (ram ?? "") && (v.storage ?? "") === (storage ?? ""),
+    );
+    if (mv?.flipkartPrice) return mv.flipkartPrice;
+  }
+  if (typeof product.flipkartPrice === "number") return product.flipkartPrice;
+  // Fall back to the cheapest variant Flipkart price, then any variant price.
+  const fkVariants = product.variants
+    .map((v) => v.flipkartPrice)
+    .filter((pr): pr is number => typeof pr === "number");
+  if (fkVariants.length) return Math.min(...fkVariants);
+  return getStartingPrice(product);
 }
 
 export function isPriceOnEnquiry(product: Product): boolean {

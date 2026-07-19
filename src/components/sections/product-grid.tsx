@@ -12,7 +12,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import "swiper/css";
 
-import { getStartingPrice, formatPrice, isPriceOnEnquiry } from "@/lib/data/products";
+import { getFlipkartPrice, formatPrice, isPriceOnEnquiry } from "@/lib/data/products";
 import type { Product } from "@/lib/data/products";
 
 const swiperBreakpoints = {
@@ -105,7 +105,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
           >
             {filteredProducts.map((product) => {
               const enquiry = isPriceOnEnquiry(product);
-              const startingPrice = getStartingPrice(product);
+              const startingPrice = getFlipkartPrice(product);
               const variant = startingPrice
                 ? product.variants.find((v) => v.price === startingPrice)
                 : product.variants[0];

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { formatPrice, getStartingPrice } from "@/lib/data/products";
+import { formatPrice, getFlipkartPrice } from "@/lib/data/products";
 import type { Product } from "@/lib/data/products";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
@@ -294,7 +294,7 @@ className="mb-6 text-balance text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-e
                               {product.name}
                             </h3>
                             <p className="mt-2 font-extrabold text-slate-900 text-base">
-                              {formatPrice(getStartingPrice(product) || 0)}
+                              {formatPrice(getFlipkartPrice(product) || 0)}
                             </p>
                           </div>
                         </Link>

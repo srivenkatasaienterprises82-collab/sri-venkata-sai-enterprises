@@ -7,6 +7,7 @@ import { ShoppingBag, Eye, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   formatPrice,
+  getFlipkartPrice,
   getStartingPrice,
   isPriceOnEnquiry,
   type Product,
@@ -229,7 +230,7 @@ function PillButton({
 }
 
 function ProductCard({ product }: { product: Product }) {
-  const startingPrice = getStartingPrice(product);
+  const startingPrice = getFlipkartPrice(product);
   const enquiryOnly = isPriceOnEnquiry(product);
 
   return (

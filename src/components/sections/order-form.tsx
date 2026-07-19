@@ -30,7 +30,7 @@ export function OrderForm({ productId, variant, color, ram, storage }: { product
   const selectedVariant = product?.variants.find(v => `${v.ram}-${v.storage}` === variant) 
     || product?.variants?.[0];
     
-  const price = selectedVariant?.price;
+  const price = selectedVariant?.flipkartPrice ?? product?.flipkartPrice ?? selectedVariant?.price;
   const priceDisplay = isPriceOnEnquiry(product!) || !price ? "Price on Enquiry" : formatPrice(price);
   const storageStr = selectedVariant ? `${selectedVariant.ram} / ${selectedVariant.storage}` : "128GB";
 

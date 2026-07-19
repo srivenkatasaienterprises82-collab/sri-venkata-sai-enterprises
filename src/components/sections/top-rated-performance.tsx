@@ -84,7 +84,8 @@ export function TopRatedPerformance({ products }: { products?: Product[] }) {
           >
             {topRatedPhones.map((phone) => {
               const variant = phone.variants[0];
-              const startingPrice = variant?.price;
+              const startingPrice =
+                variant?.flipkartPrice ?? phone.flipkartPrice ?? variant?.price;
               const originalPrice = variant?.originalPrice;
               let discount = 0;
               if (startingPrice && originalPrice) {

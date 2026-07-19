@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Section } from "@/components/layout/section";
 
-import { getStartingPrice, formatPrice } from "@/lib/data/products";
+import { getFlipkartPrice, formatPrice } from "@/lib/data/products";
 import type { Product } from "@/lib/data/products";
 
 const POPULAR_BRANDS = [
@@ -63,7 +63,7 @@ export function BestSelling({ products }: { products: Product[] }) {
             className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-3 lg:grid-cols-4"
           >
             {bestSellers.map((product) => {
-              const startingPrice = getStartingPrice(product);
+              const startingPrice = getFlipkartPrice(product);
               const originalPrice = product.variants[0]?.originalPrice;
               let discount = 0;
               if (startingPrice && originalPrice) {
