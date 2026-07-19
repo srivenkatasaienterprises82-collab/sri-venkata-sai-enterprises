@@ -576,7 +576,7 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
         # raises RuntimeError, which we count as a hard failure. Under a dry
         # run we skip the write entirely and just log what *would* change.
         if DRY_RUN:
-            print(f"    >> DRY-RUN would update ₹{old_price} → ₹{display_price} via {source}")
+            print(f"    >> DRY-RUN would update Rs{old_price} -> Rs{display_price} via {source}")
             updated_count += 1
             _emit_row(product, "UPDATE", source=source, old_price=old_price,
                       new_price=display_price, scrape_ms=scrape_ms,
@@ -613,7 +613,7 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
         _emit_row(product, "UPDATE", source=source, old_price=old_price,
                   new_price=display_price, scrape_ms=scrape_ms,
                   retries=retries_used)
-        print(f"    {arrow} ₹{old_price} → ₹{display_price} ({'+' if diff > 0 else ''}{diff}) via {source}")
+        print(f"    {arrow} Rs{old_price} -> Rs{display_price} ({'+' if diff > 0 else ''}{diff}) via {source}")
         # Per-variant accounting from the mutation result.
         exact_updates += (mut.get("exact_matches") or 0) if isinstance(mut, dict) else 0
         if isinstance(mut, dict) and mut.get("nudged"):
@@ -712,7 +712,7 @@ def check_launches(dry_run: bool = False):
                 )
                 price = details.get("price")
                 if price is not None and not price_in_bounds(price):
-                    print(f"    SKIP {name}: implausible price ₹{price}")
+                    print(f"    SKIP {name}: implausible price Rs{price}")
                     continue
 
                 if dry_run:
@@ -742,10 +742,25 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.mode == "sync":
         brands = [b for b in args.brands.split(",")] if args.brands else None
-        summary = sync_prices(dry_run=args.dry_run, brands=brands)
-        # Fail the GitHub Action (non-zero exit) when any product could not be
-        # synced, so a partial/failed run is never reported as a green check.
-        if summary.get("failed_mutations", 0) > 0 or summary.get("invalid_urls", 0) > 0:
+        try:
+            summary = sync_prices(dry_run=args.dry_run, brands=brands)
+        except Exception as e:  # never let an unexpected crash break the whole run
+            import traceback
+            traceback.print_exc()
+            print(f"::error::Price sync crashed: {e}")
+            sys.exit(2)
+        # Hard failure = a Sanity mutation actually failed (price write / URL
+        # patch). That is a real problem and MUST turn the Action red.
+        # A fully-bot-blocked run (0 mutations, 0 writes) is expected on
+        # GitHub's shared IPs and is treated as a warning, not a failure —
+        # the next 6h cycle retries automatically.
+        failed = summary.get("failed_mutations", 0) + summary.get("invalid_urls", 0)
+        if failed > 0:
+            print(f"::error::{failed} hard failure(s) during price sync "
+                  f"(mutation/URL write).")
             sys.exit(1)
+        if summary.get("scrape_blocked", 0) > 0:
+            print(f"::warning::{summary['scrape_blocked']} product(s) bot-blocked "
+                  f"this cycle; will retry next run.")
     elif args.mode == "launch":
         check_launches(dry_run=args.dry_run)

@@ -312,7 +312,7 @@ def update_price_and_variants(product_id: str, product_name: str,
             new_variant_price = matched_scraped["price"]
             applied_scraped = True
             exact_matches += 1
-            print(f"    EXACT MATCH APPLIED: {ram}/{storage} -> ₹{new_variant_price}")
+            print(f"    EXACT MATCH APPLIED: {ram}/{storage} -> Rs{new_variant_price}")
         elif new_variant_price is None and display_price is not None:
             # Only fill in a price for a variant that has NONE at all
             # (e.g. a freshly created launch). Never overwrite an existing
