@@ -10,7 +10,10 @@ from http_helper import (
     get_with_retry,
     is_interstitial,
     random_user_agent,
-    warm_session_with_playwright,
+    get_warm_session,
+    log_stage,
+    STAGE_HTTP_BOT,
+    STAGE_PARSE_FAIL,
 )
 
 try:
@@ -33,19 +36,28 @@ def get_amazon_price(url: str) -> int | None:
     if not url:
         return None
 
-    # Warm the HTTP session via a real browser ONCE up front. If Amazon serves a
-    # robot-check to a cold session, the cookies collected here let the first
-    # HTTP pass ride in as a returning, already-verified visitor. Returns None
-    # when Playwright is unavailable — in which case we just use a cold session.
-    warmed = warm_session_with_playwright(AZ_DOMAIN, AZ_BASE)
+    # Warm a curl_cffi session from the proactive cookie cache (refreshed on a
+    # 12h schedule). If Amazon serves a robot-check to a cold session, the cached
+    # cookies let the first HTTP pass ride in as a returning, verified visitor.
+    warmed = get_warm_session(AZ_DOMAIN, AZ_BASE)
 
+    saw_bot = False
     for attempt in range(1, REQUEST_RETRIES + 1):
-        price = _try_requests(url, attempt, session=warmed if attempt == 1 else None)
+        price, stage = _try_requests(url, attempt, session=warmed if attempt == 1 else None)
         if price is not None:
             return price
+        # A confirmed bot page won't improve by retrying HTTP — escalate to the
+        # browser now instead of burning the remaining HTTP attempts (item 3).
+        if stage == STAGE_HTTP_BOT:
+            saw_bot = True
+            break
+        # Timeout/error → small exp backoff, then the next HTTP attempt uses a
+        # fresh session internally (item 1/2). cap so we don't blow the 6h budget.
         if attempt < REQUEST_RETRIES:
             time.sleep(min(2 ** attempt, 8))
 
+    if saw_bot:
+        print("    HTTP returned a bot page; skipping to Playwright fallback")
     for attempt in range(1, PLAYWRIGHT_RETRIES + 1):
         price = _try_playwright(url, attempt)
         if price is not None:
@@ -55,42 +67,42 @@ def get_amazon_price(url: str) -> int | None:
     return None
 
 
-def _try_requests(url: str, attempt: int = 1, session: object = None) -> int | None:
+def _try_requests(url: str, attempt: int = 1, session: object = None) -> tuple[int | None, str]:
+    """Return (price, stage). `stage` is a STAGE_* constant from http_helper so
+    the caller can decide whether to retry HTTP or escalate to Playwright."""
     try:
         if session is None:
             session = new_session()
-        resp = get_with_retry(session, url, timeout=30, max_tries=2)
-        if resp is None:
-            return None
+        result = get_with_retry(session, url, timeout=30, max_tries=2)
+        if not result.ok:
+            return None, result.stage
 
-        html = resp.text
+        html = result.html
         soup = BeautifulSoup(html, "lxml")
 
         # Strategy 1: JSON-LD structured data (most reliable)
         price = _extract_jsonld_price(soup)
         if price:
-            return price
+            return price, STAGE_HTTP_OK
 
         # Strategy 2: Standard Amazon price selectors — BUT only on a genuine
         # product page. Amazon frequently serves a "Robot Check" / CAPTCHA
-        # interstitial (a tiny page, no #productTitle) to datacenter IPs such
-        # as GitHub Actions runners. That page still contains a stray
-        # `.a-price` widget, so blindly reading it returns a bogus price
-        # (e.g. ₹279 for a ₹37,999 phone). Refuse to trust card selectors
-        # unless the product title element is present.
+        # interstitial to datacenter IPs such as GitHub Actions runners. That
+        # page still contains a stray `.a-price` widget, so blindly reading it
+        # returns a bogus price.
         if _is_amazon_product_page(soup):
             price = _extract_card_price(soup)
             if price:
-                return price
+                return price, STAGE_HTTP_OK
 
         # No reliable price found — DO NOT fall back to the first "₹" in the
-        # HTML, as that often captures a variant, accessory, sponsored, or
-        # bot-check page price.
-        return None
+        # HTML, as that often captures a variant, accessory, or sponsored price.
+        log_stage(STAGE_PARSE_FAIL, url)
+        return None, STAGE_PARSE_FAIL
 
     except requests.RequestException as e:
         print(f"  Amazon requests error (attempt {attempt}): {e}")
-        return None
+        return None, STAGE_HTTP_ERROR
 
 
 def _is_amazon_product_page(soup: BeautifulSoup) -> bool:

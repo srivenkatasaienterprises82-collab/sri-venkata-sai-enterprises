@@ -48,32 +48,41 @@ def test_is_interstitial_accepts_real_product_pages():
     assert hh.is_interstitial(real) is False
 
 
-def test_get_with_retry_returns_none_on_interstitial():
+def test_get_with_retry_returns_bot_stage_on_interstitial():
     class _Resp:
         status_code = 200
         text = "Robot Check — please verify you are human"
     with patch.object(hh.time, "sleep"):
         s = hh.new_session()
         with patch.object(s, "get", return_value=_Resp()):
-            assert hh.get_with_retry(s, "https://example.com/x") is None
+            res = hh.get_with_retry(s, "https://example.com/x")
+            # A bot page is surfaced immediately (no wasted retries) with the
+            # dedicated stage so the caller can escalate to Playwright.
+            assert res.ok is False
+            assert res.stage == hh.STAGE_HTTP_BOT
+            assert res.html is None
 
 
-def test_get_with_retry_returns_response_on_good_page():
+def test_get_with_retry_returns_ok_on_good_page():
     class _Resp:
         status_code = 200
         text = "<title>Real Product</title>"
     with patch.object(hh.time, "sleep"):
         s = hh.new_session()
         with patch.object(s, "get", return_value=_Resp()):
-            resp = hh.get_with_retry(s, "https://example.com/x")
-            assert resp is not None
-            assert resp.status_code == 200
+            res = hh.get_with_retry(s, "https://example.com/x")
+            assert res.ok is True
+            assert res.stage == hh.STAGE_HTTP_OK
+            assert res.html == "<title>Real Product</title>"
 
 
 def test_get_with_retry_rotates_ua_across_attempts():
+    # Use a non-200 status so the function actually retries (a bot page returns
+    # early on the first attempt). Each retry rotates the UA; with 2 attempts we
+    # expect the initial UA + 1 rotated UA.
     class _Resp:
-        status_code = 200
-        text = "Robot Check"
+        status_code = 503
+        text = ""
     seen = []
     orig_choice = hh.random_user_agent
 
@@ -86,6 +95,6 @@ def test_get_with_retry_rotates_ua_across_attempts():
          patch.object(hh.time, "sleep"):
         s = hh.new_session()
         with patch.object(s, "get", return_value=_Resp()):
-            hh.get_with_retry(s, "https://example.com/x")
-    # new_session() picks one UA, then each retry attempt rotates again (2).
+            hh.get_with_retry(s, "https://example.com/x", max_tries=2)
+    # new_session() picks 1 UA, then each of the 2 retry attempts rotates again.
     assert len(seen) == 3
