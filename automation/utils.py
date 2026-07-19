@@ -296,3 +296,144 @@ def url_color_matches(name: str, url: str, colors: list) -> bool:
     if all(c not in palette for c in url_colors):
         return False
     return True
+
+
+# ─── Marketplace cross-check (item 14) ──────────────────────────────────────
+# When BOTH Flipkart and Amazon prices are scraped for the same product, they
+# should agree within a tolerance. A ₹24999 vs ₹4999 split means one of the
+# two scrapes is a bot-check/interstitial artefact (a stray price widget), and
+# writing either would be wrong. Reject when the gap is implausibly wide.
+MAX_MARKET_GAP = 0.30  # >30% difference between the two marketplaces is suspect
+
+
+def marketplaces_agree(flipkart_price, amazon_price, gap: float = MAX_MARKET_GAP):
+    """Return (ok, reason). Only meaningful when BOTH prices are present."""
+    if flipkart_price is None or amazon_price is None:
+        return True, ""  # nothing to cross-check; rely on other guards
+    lo, hi = min(flipkart_price, amazon_price), max(flipkart_price, amazon_price)
+    if lo <= 0:
+        return True, ""
+    diff = (hi - lo) / lo
+    if diff > gap:
+        return False, f"market_gap_too_wide(fk={flipkart_price},az={amazon_price},{diff:.0%})"
+    return True, ""
+
+
+# ─── Variant self-consistency (item 15) ─────────────────────────────────────
+# Within a single marketplace's variant list, more storage (same RAM) must not
+# be CHEAPER than less storage, and more RAM (same storage) must not be cheaper.
+# A scrape that yields "8/256 = ₹22999 but 8/128 = ₹24999" is internally
+# impossible and signals a mis-aligned / wrong-page extraction.
+VARIANT_TOL = 0.05  # allow tiny 5% noise for offers; beyond that reject
+
+
+def variants_self_consistent(variants: list, tol: float = VARIANT_TOL):
+    """Return (ok, reason). Checks monotonic pricing within RAM/Storage groups."""
+    if not variants or len(variants) < 2:
+        return True, ""
+    def _ns(v) -> str:
+        if not v:
+            return ""
+        s = str(v).lower().strip()
+        s = s.replace(" ", "").replace("gb", "").replace("ram", "").replace("rom", "")
+        return s
+    norm = lambda v: (_ns(v.get("ram")), _ns(v.get("storage")), v.get("price"))
+    rows = [norm(v) for v in variants]
+    rows = [r for r in rows if isinstance(r[2], (int, float)) and r[2] > 0]
+    if len(rows) < 2:
+        return True, ""
+
+    # Sort helper: order tokens numerically when they're pure digits, else
+    # lexicographically (RAM/storage normalise to e.g. "8","12","128","256").
+    def _key(t: str):
+        return (0, int(t)) if t.isdigit() else (1, t)
+
+    # Group by RAM: within a RAM group, higher storage should cost >= lower.
+    by_ram: dict = {}
+    for ram, storage, price in rows:
+        by_ram.setdefault(ram, []).append((storage, price))
+    for ram, group in by_ram.items():
+        group_sorted = sorted((g for g in group if g[0]), key=lambda g: _key(g[0]))
+        for (s1, p1), (s2, p2) in zip(group_sorted, group_sorted[1:]):
+            if s1 and s2 and s1 != s2 and p2 < p1 * (1 - tol):
+                return False, f"variant_storage_inverted(ram={ram},{s1}={p1},{s2}={p2})"
+
+    # Group by storage: within a storage group, higher RAM should cost >= lower.
+    by_storage: dict = {}
+    for ram, storage, price in rows:
+        by_storage.setdefault(storage, []).append((ram, price))
+    for storage, group in by_storage.items():
+        group_sorted = sorted((g for g in group if g[0]), key=lambda g: _key(g[0]))
+        for (r1, p1), (r2, p2) in zip(group_sorted, group_sorted[1:]):
+            if r1 and r2 and r1 != r2 and p2 < p1 * (1 - tol):
+                return False, f"variant_ram_inverted(storage={storage},{r1}={p1},{r2}={p2})"
+    return True, ""
+
+
+# Brand slug -> alias tokens that appear in marketplace URL slugs. Lets the
+# identity check recognise "motorola" products hosted at "moto-..." URLs.
+_BRAND_ALIASES = {
+    "motorola": {"motorola", "moto"},
+    "amazon": {"amazon"},
+    "flipkart": {"flipkart"},
+}
+
+
+def _brand_in_url(brand_slug: str, url: str) -> bool:
+    """True if any brand token (slug or aliases) appears in the URL slug/path."""
+    if not brand_slug or not url:
+        return False
+    candidates = _BRAND_ALIASES.get(brand_slug.lower(), {brand_slug.lower()})
+    url_lower = url.lower()
+    return any(c in url_lower for c in candidates)
+
+
+# ─── Product-identity confidence (item 16) ──────────────────────────────────
+# Before trusting a scrape, score how confidently the stored product identity
+# matches the listing we actually fetched. Factors: brand slug present in URL,
+# model token match, colour match, and (if a product name is supplied) name
+# similarity. Returns (score 0..1, detail dict). The orchestrator may require a
+# minimum score before writing (guard against wrong-product writes).
+def identity_confidence(product: dict, url: str) -> "tuple[float, dict]":
+    """Score 0..1 that `url` really is the product in `product`.
+
+    Factors (each 0/1, averaged):
+      * brand slug appears in the URL host/path
+      * model identifier from the product name appears in the URL slug
+      * URL colour (if any) is in the product's colour palette
+      * product name fuzzy-matches the URL slug
+    """
+    detail = {}
+    name = product.get("name", "") or ""
+    brand_slug = (product.get("brandSlug") or "").lower()
+    colors = product.get("colors") or []
+
+    # 1) brand. Match the brand slug OR any of its common aliases against the
+    # URL (e.g. "motorola" products live at "moto-..." slugs). Host-only
+    # marketplaces (flipkart.com / amazon.in) carry no brand, so we only check
+    # the slug path, never penalise for the bare host.
+    brand_ok = bool(brand_slug) and _brand_in_url(brand_slug, url or "")
+    detail["brand"] = brand_ok
+
+    # 2) model token in URL slug
+    model_ok = url_name_matches(name, url or "")
+    detail["model"] = model_ok
+
+    # 3) colour
+    color_ok = url_color_matches(name, url or "", colors)
+    detail["color"] = color_ok
+
+    # 4) name similarity to slug
+    from rapidfuzz import fuzz
+    slug = ""
+    if url:
+        m = re.search(r"/([a-z0-9][a-z0-9\-+]{3,})/(?:p|dp)/", url.split("?")[0], re.I)
+        if m:
+            slug = m.group(1)
+    name_sim = fuzz.ratio(_norm_name(name), slug.replace("-", " ")) / 100.0 if slug else 0.0
+    detail["name_sim"] = round(name_sim, 2)
+
+    factors = [1.0 if brand_ok else 0.0, 1.0 if model_ok else 0.0,
+               1.0 if color_ok else 0.0, name_sim]
+    score = sum(factors) / len(factors)
+    return score, detail

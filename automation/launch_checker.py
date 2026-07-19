@@ -63,7 +63,15 @@ from utils import (
     price_change_is_plausible,
     url_name_matches,
     url_color_matches,
+    marketplaces_agree,
+    variants_self_consistent,
+    identity_confidence,
 )
+from price_history import history_consistent, record_price
+
+# Minimum identity-confidence required before a scrape may be written (item 16).
+# Below this we treat the listing as likely the wrong product and skip safely.
+MIN_IDENTITY_CONFIDENCE = 0.75
 
 
 def _norm_variant_key(ram: str | None, storage: str | None) -> tuple:
@@ -346,6 +354,7 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
     skipped_disabled = 0
     skipped_url_mismatch = 0
     skipped_color_mismatch = 0
+    skipped_identity = 0  # Phase 4 item 16: low product-identity confidence
     skipped_implausible = 0
     skipped_dry = 0  # implausible-difference vs old price (≤ cap)
     skipped_fresh = 0  # delta-sync: last successful update still within window
@@ -691,6 +700,55 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
                 _review(product["_id"], True)
                 continue
 
+            # Phase 4 validation (items 13-16) — all must pass before a write.
+
+            # Item 14: marketplace cross-check. When BOTH FK and AZ prices came
+            # back, a wide split means one is a bot-check artefact. Reject.
+            mok, mwhy = marketplaces_agree(flip_price, amz_price)
+            if not mok:
+                skipped_implausible += 1
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          new_price=display_price, reason=f"market:{mwhy}",
+                          scrape_ms=scrape_ms)
+                _review(product["_id"], True)
+                continue
+
+            # Item 15: variant self-consistency. A scrape with inverted
+            # RAM/Storage pricing is internally impossible -> wrong page.
+            vok, vwhy = variants_self_consistent(scraped_variants)
+            if not vok:
+                skipped_implausible += 1
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          new_price=display_price, reason=f"variant:{vwhy}",
+                          scrape_ms=scrape_ms)
+                _review(product["_id"], True)
+                continue
+
+            # Item 13: historical consistency. Reject a price that is a clear
+            # outlier vs the recent price window (catches CAPTCHA half-price
+            # artefacts the single prior value might miss).
+            hok, hwhy = history_consistent(display_price, product["_id"])
+            if not hok:
+                skipped_implausible += 1
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          new_price=display_price, reason=f"history:{hwhy}",
+                          scrape_ms=scrape_ms)
+                _review(product["_id"], True)
+                continue
+
+            # Item 16: product-identity confidence. Score how sure we are the
+            # URL really is this product; below the gate, skip rather than risk
+            # writing a wrong-product price.
+            score, idetail = identity_confidence(product, url_for_check)
+            if score < MIN_IDENTITY_CONFIDENCE:
+                skipped_identity += 1
+                _emit_row(product, "SKIP", source=source, old_price=old_price,
+                          new_price=display_price,
+                          reason=f"identity_low_conf({score:.2f})",
+                          scrape_ms=scrape_ms)
+                _review(product["_id"], True)
+                continue
+
             if old_price == display_price:
                 matched += 1
                 _emit_row(product, "MATCH", source=source, old_price=old_price,
@@ -756,6 +814,7 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
             try:
                 if not DRY_RUN:
                     record_freshness(product["_id"], "ok")
+                    record_price(product["_id"], display_price)  # item 13 history
             except Exception as e:
                 print(f"    freshness write failed: {e}")
             _review(product["_id"], False)
@@ -795,6 +854,7 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
         f"| No URL                   | {skipped_no_url:<36}|\n"
         f"| URL name mismatch        | {skipped_url_mismatch:<36}|\n"
         f"| URL color mismatch       | {skipped_color_mismatch:<36}|\n"
+        f"| Identity low-conf        | {skipped_identity:<36}|\n"
         f"| Out of band              | {skipped_implausible:<36}|\n"
         f"| Implausible delta        | {skipped_dry:<36}|\n"
         f"| Scrape failed            | {skipped_no_price:<36}|\n"
@@ -822,6 +882,7 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
         "recovered": recovered,
         "scrape_blocked": scrape_blocked,
         "skipped_color_mismatch": skipped_color_mismatch,
+        "skipped_identity": skipped_identity,
         "skipped_fresh": skipped_fresh,
     }
 

@@ -283,11 +283,11 @@ def _try_requests_details(url: str, attempt: int = 1) -> dict | None:
     """
     try:
         session = new_session()
-        resp = get_with_retry(session, url, timeout=30, max_tries=2)
-        if resp is None:
+        result = get_with_retry(session, url, timeout=30, max_tries=2)
+        if not result.ok:
             return None
 
-        soup = BeautifulSoup(resp.text, "lxml")
+        soup = BeautifulSoup(result.html, "lxml")
 
         # Reject bot-check / CAPTCHA interstitials that return HTTP 200
         # but aren't real product pages. Without this guard the parser
@@ -297,7 +297,7 @@ def _try_requests_details(url: str, attempt: int = 1) -> dict | None:
             print(f"  Amazon details: not a product page (attempt {attempt})")
             return None
 
-        details = _parse_amazon_details(resp.text)
+        details = _parse_amazon_details(result.html)
         return details
     except requests.RequestException as e:
         print(f"  Amazon details requests error (attempt {attempt}): {e}")
