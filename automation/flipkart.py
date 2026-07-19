@@ -5,20 +5,13 @@ import requests
 from bs4 import BeautifulSoup
 
 from http_helper import (
-    new_session,
-    get_with_retry,
     is_interstitial,
     random_user_agent,
-    get_warm_session,
-    log_stage,
-    STAGE_HTTP_BOT,
-    STAGE_PARSE_FAIL,
+    new_session,
+    get_with_retry,
 )
-
-# Domain used when exporting the warmed Playwright cookies back into the HTTP
-# session. Flipkart sets clearance cookies on this host.
-FK_DOMAIN = "flipkart.com"
-FK_BASE = "https://www.flipkart.com/"
+from fetch_manager import FetchManager
+from parser import dom_fingerprint, vote, confident_price
 
 # playwright-stealth hides the automation tells Playwright leaves in the DOM.
 # Guarded so tests/locales without the package still run (just less stealthy).
@@ -34,77 +27,47 @@ except ImportError:  # pragma: no cover - optional dependency
 REQUEST_RETRIES = 3
 PLAYWRIGHT_RETRIES = 2
 
+# Domain used when exporting the warmed Playwright cookies back into the HTTP
+# session. Flipkart sets clearance cookies on this host.
+FK_DOMAIN = "flipkart.com"
+FK_BASE = "https://www.flipkart.com/"
+
+# One FetchManager per process (keeps the cookie cache / proxy config shared).
+_fm = FetchManager(FK_DOMAIN, FK_BASE,
+                   http_retries=REQUEST_RETRIES, browser_retries=PLAYWRIGHT_RETRIES)
+
 
 def get_flipkart_price(url: str) -> int | None:
+    """Fetch via the central FetchManager, then run the deterministic
+    multi-strategy parser with a confidence gate (items 1-3, 10-12)."""
     if not url:
         return None
 
-    # Warm a curl_cffi session from the proactive cookie cache (refreshed on a
-    # 12h schedule). If Flipkart serves a bot-check to a cold session, the cached
-    # cookies let the first HTTP pass ride in as a returning, verified visitor.
-    warmed = get_warm_session(FK_DOMAIN, FK_BASE)
+    outcome = _fm.fetch(url)
+    if not outcome.ok:
+        print(f"    Flipkart fetch failed: {outcome.failure} ({outcome.legs})")
+        return None
 
-    saw_bot = False
-    for attempt in range(1, REQUEST_RETRIES + 1):
-        price, stage = _try_requests(url, attempt, session=warmed if attempt == 1 else None)
-        if price is not None:
-            return price
-        # A confirmed bot page won't improve by retrying HTTP — escalate to the
-        # browser now instead of burning the remaining HTTP attempts (item 3).
-        if stage == STAGE_HTTP_BOT:
-            saw_bot = True
-            break
-        # Timeout/error → small exp backoff, then the next HTTP attempt uses a
-        # fresh session internally (item 1/2). cap so we don't blow the 6h budget.
-        if attempt < REQUEST_RETRIES:
-            time.sleep(min(2 ** attempt, 8))
+    soup = BeautifulSoup(outcome.html, "lxml")
+    fp = dom_fingerprint(outcome.html)
+    is_product = _is_flipkart_product_page(soup)
+    if not is_product:
+        # Not a real product page (interstitial/empty) → refuse to parse a
+        # stray price, even if one is present.
+        print(f"    Flipkart: not a genuine product page (fp={fp}); skipping")
+        return None
 
-    if saw_bot:
-        print("    HTTP returned a bot page; skipping to Playwright fallback")
-    for attempt in range(1, PLAYWRIGHT_RETRIES + 1):
-        price = _try_playwright(url, attempt)
-        if price is not None:
-            return price
-        if attempt < PLAYWRIGHT_RETRIES:
-            time.sleep(2)
-    return None
+    candidates = [
+        ("jsonld", _extract_jsonld_price(soup)),
+        ("card_css", _extract_card_price(soup)),
+    ]
+    result = vote(candidates, is_product_page=is_product, fingerprint=fp)
+    print(f"    Flipkart parse: {result.reason}")
+    price = confident_price(result)
+    if price is None:
+        print(f"    Flipkart: confidence {result.confidence:.2f} < gate; dropping")
+    return price
 
-
-def _try_requests(url: str, attempt: int = 1, session: object = None) -> tuple[int | None, str]:
-    """Return (price, stage). `stage` is a STAGE_* constant from http_helper so
-    the caller can decide whether to retry HTTP or escalate to Playwright."""
-    try:
-        if session is None:
-            session = new_session()
-        result = get_with_retry(session, url, timeout=30, max_tries=2)
-        if not result.ok:
-            return None, result.stage
-
-        html = result.html
-        soup = BeautifulSoup(html, "lxml")
-
-        # Strategy 1: JSON-LD structured data (most reliable)
-        price = _extract_jsonld_price(soup)
-        if price:
-            return price, STAGE_HTTP_OK
-
-        # Strategy 2: Common Flipkart product card price selectors — only on a
-        # genuine product page. Flipkart serves a "Robot Check" / consent
-        # interstitial to bot-like traffic; its stray price widget would
-        # otherwise be mistaken for the product price.
-        if _is_flipkart_product_page(soup):
-            price = _extract_card_price(soup)
-            if price:
-                return price, STAGE_HTTP_OK
-
-        # No reliable price found — DO NOT fall back to the first "₹" in the
-        # HTML, as that often captures a variant, accessory, or sponsored price.
-        log_stage(STAGE_PARSE_FAIL, url)
-        return None, STAGE_PARSE_FAIL
-
-    except requests.RequestException as e:
-        print(f"  Flipkart requests error (attempt {attempt}): {e}")
-        return None, STAGE_HTTP_ERROR
 
 
 def _is_flipkart_product_page(soup: BeautifulSoup) -> bool:
