@@ -244,7 +244,9 @@ def update_price(product_id: str, amazon_price, flipkart_price, display_price) -
     return _mutate(mutations)
 
 
-def _merge_variant_marketplace_prices(target: dict, scraped: dict | None) -> None:
+def _merge_variant_marketplace_prices(target: dict, scraped: dict | None,
+                                  fallback_flipkart: float | None = None,
+                                  fallback_amazon: float | None = None) -> None:
     """Carry a scraped variant's per-marketplace price onto a Sanity variant.
 
     The scraped variant (from Flipkart or Amazon) carries either a
@@ -253,13 +255,21 @@ def _merge_variant_marketplace_prices(target: dict, scraped: dict | None) -> Non
     *without* touching the other marketplace's key, so a single-source
     run never wipes a price previously written by the other source.
 
-    Only non-None marketplace prices are written.
+    When the scraped variant has no marketplace key of its own (e.g. the
+    Rule-2 fallback-nudge path where no exact variant matched), we fall
+    back to the product-level `flipkartPrice`/`amazonPrice` so every
+    variant still gets a per-marketplace breakdown once the product has
+    been synced. Only non-None, positive prices are written, and we never
+    overwrite an existing marketplace price with a weaker fallback.
     """
     if not isinstance(scraped, dict):
-        return
+        scraped = {}
+    fallbacks = {"flipkartPrice": fallback_flipkart, "amazonPrice": fallback_amazon}
     for mk in ("flipkartPrice", "amazonPrice"):
         val = scraped.get(mk)
-        if isinstance(val, (int, float)) and val > 0:
+        if not (isinstance(val, (int, float)) and val > 0):
+            val = fallbacks.get(mk)
+        if isinstance(val, (int, float)) and val > 0 and target.get(mk) is None:
             target[mk] = int(val)
 
 
@@ -347,7 +357,11 @@ def update_price_and_variants(product_id: str, product_name: str,
         # Flipkart-only run leaves any existing amazonPrice intact and vice
         # versa. When both sources are scraped (source == "both"), both keys
         # end up populated on the same variant object.
-        _merge_variant_marketplace_prices(new_v, matched_scraped)
+        _merge_variant_marketplace_prices(
+            new_v, matched_scraped,
+            fallback_flipkart=flipkart_price,
+            fallback_amazon=amazon_price,
+        )
         updated_variants.append(new_v)
 
     # No real per-variant scrape available -> nudge the existing tiers so

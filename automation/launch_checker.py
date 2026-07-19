@@ -485,6 +485,28 @@ def sync_prices(dry_run: bool = False, brands: list[str] | None = None):
                     flip_details.get("variants", []),
                     amz_details.get("variants", []),
                 )
+                # BOTH-source product but no amazonUrl stored: Flipkart gave us a
+                # price, but we still want the Amazon price (and per-variant AZ
+                # breakdown). Re-resolve the Amazon listing ONCE so these products
+                # aren't stuck with only a Flipkart price.
+                if amz_price is None and flip_price is not None:
+                    brand_slug = (product.get("brandSlug") or brand).lower()
+                    try:
+                        listings = get_brand_listings(brand_slug, "amazon")
+                        for name, url in listings:
+                            if not is_match(product.get("name", ""), name):
+                                continue
+                            if not url_name_matches(product.get("name", ""), url):
+                                continue
+                            amz_details = get_amazon_details(url)
+                            amz_price = amz_details.get("price")
+                            if amz_details.get("variants"):
+                                scraped_variants = _merge_marketplace_variants(
+                                    scraped_variants, amz_details["variants"])
+                            print(f"  -> Amazon price recovered via re-search: {amz_price}")
+                            break
+                    except Exception as e:
+                        print(f"    Amazon re-search skipped for {product.get('name')}: {e}")
 
             # Cross-source fallback (bot-block resilience). A single-source brand
             # (Flipkart-only / Amazon-only) whose primary marketplace served a
