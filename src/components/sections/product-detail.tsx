@@ -438,7 +438,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
 
               {/* ── Sticky Mobile Footer / Static Desktop Actions ── */}
               <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/90 p-4 pb-6 backdrop-blur-xl md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none shadow-[0_-10px_20px_rgba(0,0,0,0.05)] md:shadow-none">
-                <div className="flex gap-4">
+                <div className="flex flex-col gap-2 sm:gap-3">
                   {enquiryOnly ? (
                     <Button
                       as="a"
@@ -447,72 +447,79 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                       href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(`Hi, I'm interested in ${product.name}. Please share the price.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full flex-1"
+                      className="w-full"
                     >
                       <MessageCircle className="h-5 w-5 mr-2" />
                       Enquire on WhatsApp
                     </Button>
                   ) : (
                     <>
-                      <Button
-                        as="a"
-                        variant="whatsapp"
-                        size="xl"
-                        href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(
-                          `Hi ${siteConfig.storeName}, I would like to enquire about the ${product.name}.`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-[0.5] rounded-2xl px-2 sm:px-4"
-                        title="Enquire on WhatsApp"
-                        suppressHydrationWarning
-                      >
-                        <MessageCircle className="h-5 w-5 sm:mr-2" />
-                        <span className="hidden sm:inline">WhatsApp</span>
-                      </Button>
+                      <div className="flex gap-3">
+                        <Button
+                          as="a"
+                          variant="whatsapp"
+                          size="xl"
+                          href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(
+                            `Hi ${siteConfig.storeName}, I would like to enquire about the ${product.name}.`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 rounded-2xl px-2 sm:px-4"
+                          title="Enquire on WhatsApp"
+                          suppressHydrationWarning
+                        >
+                          <MessageCircle className="h-5 w-5 sm:mr-2" />
+                          <span className="hidden sm:inline">WhatsApp</span>
+                          <span className="sm:hidden">Chat</span>
+                        </Button>
 
-                      <Button
-                        variant="primary"
-                        size="xl"
-                        as={Link}
-                        href={`/checkout?product=${product.slug}&ram=${encodeURIComponent(activeRam)}&storage=${encodeURIComponent(activeStorage)}&color=${encodeURIComponent(activeColor?.name ?? "")}`}
-                        className="flex-1 rounded-2xl"
-                      >
-                        <ShoppingCart className="h-5 w-5 mr-2" />
-                        Buy Now
-                      </Button>
+                        <Button
+                          variant="primary"
+                          size="xl"
+                          as={Link}
+                          href={`/checkout?product=${product.slug}&ram=${encodeURIComponent(activeRam)}&storage=${encodeURIComponent(activeStorage)}&color=${encodeURIComponent(activeColor?.name ?? "")}`}
+                          className="flex-1 rounded-2xl"
+                        >
+                          <ShoppingCart className="h-5 w-5 mr-2" />
+                          Buy Now
+                        </Button>
+                      </div>
+
+                      {(amazonUrl || flipkartUrl) && (
+                        <div className="flex gap-3">
+                          {amazonUrl ? (
+                            <Button
+                              as="a"
+                              variant="primary"
+                              size="xl"
+                              href={amazonUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 rounded-2xl"
+                            >
+                              <ExternalLink className="h-5 w-5 mr-2" />
+                              Amazon
+                            </Button>
+                          ) : null}
+
+                          {flipkartUrl ? (
+                            <Button
+                              as="a"
+                              variant="primary"
+                              size="xl"
+                              href={flipkartUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 rounded-2xl"
+                            >
+                              <ExternalLink className="h-5 w-5 mr-2" />
+                              Flipkart
+                            </Button>
+                          ) : null}
+                        </div>
+                      )}
                     </>
                   )}
-
-                  {amazonUrl ? (
-                    <Button
-                      as="a"
-                      variant="primary"
-                      size="xl"
-                      href={amazonUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 rounded-2xl"
-                    >
-                      <ExternalLink className="h-5 w-5 mr-2" />
-                      Buy on Amazon
-                    </Button>
-                  ) : null}
-
-                  {flipkartUrl ? (
-                    <Button
-                      as="a"
-                      variant="primary"
-                      size="xl"
-                      href={flipkartUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 rounded-2xl"
-                    >
-                      <ExternalLink className="h-5 w-5 mr-2" />
-                      Buy on Flipkart
-                    </Button>
-                  ) : null}
                 </div>
               </div>
             </div>
