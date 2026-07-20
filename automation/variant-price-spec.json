@@ -1,0 +1,10 @@
+{
+  "vivo-v70": [
+    { "ram": "8GB", "storage": "256GB", "price": 53999, "flipkartPrice": 53999 },
+    { "ram": "12GB", "storage": "256GB", "price": 56999, "flipkartPrice": 56999 }
+  ],
+  "iqoo-15": [
+    { "ram": "12GB", "storage": "256GB", "price": 69900, "flipkartPrice": 69900 },
+    { "ram": "16GB", "storage": "512GB", "price": 78500, "flipkartPrice": 78500 }
+  ]
+}
