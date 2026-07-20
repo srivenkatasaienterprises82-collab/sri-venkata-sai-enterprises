@@ -1,9 +1,9 @@
 {
   "poco-c85x": [
     {
-      "price": 13499,
       "ram": "4GB",
       "storage": "64GB",
+      "price": 13499,
       "flipkartPrice": 13499
     },
     {
@@ -15,154 +15,43 @@
   ],
   "poco-m7": [
     {
-      "price": 12499,
       "ram": "6GB",
       "storage": "128GB",
+      "price": 12499,
       "flipkartPrice": 12499
     },
     {
-      "price": 13499,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 13499,
       "flipkartPrice": 13499
     }
   ],
   "poco-m7-plus": [
     {
-      "price": 15499,
       "ram": "4GB",
       "storage": "128GB",
+      "price": 15499,
       "flipkartPrice": 15499
     },
     {
-      "price": 16999,
       "ram": "6GB",
       "storage": "128GB",
-      "flipkartPrice": 16999
-    },
-    {
-      "price": 17999,
-      "ram": "8GB",
-      "storage": "128GB",
-      "flipkartPrice": 17999
-    }
-  ],
-  "moto-edge-60-pro": [
-    {
-      "price": 29999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 29999
-    },
-    {
-      "price": 33999,
-      "ram": "12GB",
-      "storage": "256GB",
-      "flipkartPrice": 33999
-    },
-    {
-      "price": 37999,
-      "ram": "16GB",
-      "storage": "512GB",
-      "flipkartPrice": 37999
-    }
-  ],
-  "moto-edge-70-pro": [
-    {
-      "price": 39999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 39999
-    },
-    {
-      "price": 42999,
-      "ram": "12GB",
-      "storage": "256GB",
-      "flipkartPrice": 42999
-    }
-  ],
-  "moto-g06-power": [
-    {
-      "price": 13999,
-      "ram": "4GB",
-      "storage": "64GB",
-      "flipkartPrice": 13999
-    }
-  ],
-  "moto-g37": [
-    {
-      "price": 14999,
-      "ram": "4GB",
-      "storage": "64GB",
-      "flipkartPrice": 14999
-    }
-  ],
-  "moto-g37-power": [
-    {
-      "price": 15999,
-      "ram": "4GB",
-      "storage": "64GB",
-      "flipkartPrice": 15999
-    },
-    {
       "price": 16999,
-      "ram": "4GB",
-      "storage": "128GB",
       "flipkartPrice": 16999
     },
     {
-      "price": 21999,
       "ram": "8GB",
       "storage": "128GB",
-      "flipkartPrice": 21999
-    }
-  ],
-  "moto-g57-power": [
-    {
-      "price": 21999,
-      "ram": "8GB",
-      "storage": "128GB",
-      "flipkartPrice": 21999
-    }
-  ],
-  "moto-g67-power": [
-    {
-      "price": 18999,
-      "ram": "8GB",
-      "storage": "128GB",
-      "flipkartPrice": 18999
-    },
-    {
-      "price": 27999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 27999
-    },
-    {
-      "price": 29711,
-      "ram": "12GB",
-      "storage": "256GB"
-    }
-  ],
-  "moto-g96": [
-    {
-      "price": 20999,
-      "ram": "8GB",
-      "storage": "128GB",
-      "flipkartPrice": 20999
-    },
-    {
-      "price": 22999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 22999
+      "price": 17999,
+      "flipkartPrice": 17999
     }
   ],
   "poco-c71": [
     {
-      "price": 8999,
       "ram": "4GB",
       "storage": "64GB",
+      "price": 8999,
       "flipkartPrice": 8999
     },
     {
@@ -174,71 +63,231 @@
   ],
   "poco-c85": [
     {
-      "price": 15499,
       "ram": "4GB",
       "storage": "128GB",
+      "price": 15499,
       "flipkartPrice": 15499
     },
     {
-      "price": 16999,
       "ram": "6GB",
       "storage": "128GB",
+      "price": 16999,
       "flipkartPrice": 16999
     },
     {
-      "price": 19499,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 19499,
       "flipkartPrice": 19499
+    }
+  ],
+  "moto-edge-60-pro": [
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 29999,
+      "flipkartPrice": 29999
+    },
+    {
+      "ram": "12GB",
+      "storage": "256GB",
+      "price": 33999,
+      "flipkartPrice": 33999
+    },
+    {
+      "ram": "16GB",
+      "storage": "512GB",
+      "price": 37999,
+      "flipkartPrice": 37999
+    }
+  ],
+  "moto-edge-70-pro": [
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 39999,
+      "flipkartPrice": 39999
+    },
+    {
+      "ram": "12GB",
+      "storage": "256GB",
+      "price": 42999,
+      "flipkartPrice": 42999
+    }
+  ],
+  "moto-g06-power": [
+    {
+      "ram": "4GB",
+      "storage": "64GB",
+      "price": 13999,
+      "flipkartPrice": 13999
+    }
+  ],
+  "moto-g37": [
+    {
+      "ram": "4GB",
+      "storage": "64GB",
+      "price": 14999,
+      "flipkartPrice": 14999
+    }
+  ],
+  "moto-g37-power": [
+    {
+      "ram": "4GB",
+      "storage": "64GB",
+      "price": 15999,
+      "flipkartPrice": 15999
+    },
+    {
+      "ram": "4GB",
+      "storage": "128GB",
+      "price": 16999,
+      "flipkartPrice": 16999
+    },
+    {
+      "ram": "8GB",
+      "storage": "128GB",
+      "price": 21999,
+      "flipkartPrice": 21999
+    }
+  ],
+  "moto-g57-power": [
+    {
+      "ram": "8GB",
+      "storage": "128GB",
+      "price": 22999,
+      "flipkartPrice": 22999
+    }
+  ],
+  "moto-g67-power": [
+    {
+      "ram": "8GB",
+      "storage": "128GB",
+      "price": 18999,
+      "flipkartPrice": 18999
+    },
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 27999,
+      "flipkartPrice": 27999
+    }
+  ],
+  "moto-g96": [
+    {
+      "ram": "8GB",
+      "storage": "128GB",
+      "price": 20999,
+      "flipkartPrice": 20999
+    },
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 22999,
+      "flipkartPrice": 22999
+    }
+  ],
+  "moto-60-fusion": [
+    {
+      "ram": "8GB",
+      "storage": "128GB",
+      "price": 22999,
+      "flipkartPrice": 22999
+    },
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 24999,
+      "flipkartPrice": 24999
+    },
+    {
+      "ram": "12GB",
+      "storage": "256GB",
+      "price": 27999,
+      "flipkartPrice": 27999
+    }
+  ],
+  "moto-70-fusion": [
+    {
+      "ram": "8GB",
+      "storage": "128GB",
+      "price": 29999,
+      "flipkartPrice": 29999
+    },
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 32999,
+      "flipkartPrice": 32999
+    },
+    {
+      "ram": "12GB",
+      "storage": "256GB",
+      "price": 34999,
+      "flipkartPrice": 34999
+    },
+    {
+      "ram": "12GB",
+      "storage": "512GB",
+      "price": 37999,
+      "flipkartPrice": 37999
+    }
+  ],
+  "moto-edge-60": [
+    {
+      "ram": "12GB",
+      "storage": "256GB",
+      "price": 25999,
+      "flipkartPrice": 25999
     }
   ],
   "oneplus-13": [
     {
-      "price": 59999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 59999,
       "flipkartPrice": 59999
     },
     {
-      "price": 66999,
       "ram": "16GB",
       "storage": "512GB",
+      "price": 66999,
       "flipkartPrice": 66999
     }
   ],
   "oneplus-nord-5": [
     {
-      "price": 33999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 33999,
       "flipkartPrice": 33999
     },
     {
-      "price": 36999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 36999,
       "flipkartPrice": 36999
     }
   ],
   "oneplus-nord-6": [
     {
-      "price": 44999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 44999,
       "flipkartPrice": 44999
     },
     {
-      "price": 50999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 50999,
       "flipkartPrice": 50999
     }
   ],
   "oneplus-nord-ce6": [
     {
-      "price": 35999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 35999,
       "flipkartPrice": 35999
     },
     {
@@ -250,409 +299,147 @@
   ],
   "oneplus-nord-ce6-lite": [
     {
-      "price": 25999,
       "ram": "6GB",
       "storage": "128GB",
+      "price": 25999,
       "flipkartPrice": 25999
     },
     {
-      "price": 27999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 27999,
       "flipkartPrice": 27999
     },
     {
-      "price": 30999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 30999,
       "flipkartPrice": 30999
     }
   ],
   "oneplus-pad-go-2": [
     {
-      "price": 29999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 29999,
       "flipkartPrice": 29999
     },
     {
-      "price": 32999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 32999,
       "flipkartPrice": 32999
     }
   ],
   "oppo-reno-15": [
     {
-      "price": 47999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 47999,
       "flipkartPrice": 47999
     },
     {
-      "price": 50999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 50999,
       "flipkartPrice": 50999
     },
     {
-      "price": 55999,
       "ram": "12GB",
       "storage": "512GB",
+      "price": 55999,
       "flipkartPrice": 55999
     }
   ],
   "oppo-reno-15-pro-mini": [
     {
-      "price": 59999,
-      "ram": "12GB",
-      "storage": "256GB"
-    },
-    {
-      "price": 64999,
-      "ram": "12GB",
-      "storage": "512GB",
-      "flipkartPrice": 64999
-    },
-    {
       "ram": "8GB",
       "storage": "256GB",
       "price": 59999,
       "flipkartPrice": 59999
+    },
+    {
+      "ram": "12GB",
+      "storage": "512GB",
+      "price": 64999,
+      "flipkartPrice": 64999
     }
   ],
   "oppo-reno-15c": [
     {
-      "price": 41999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 41999,
       "flipkartPrice": 41999
     },
     {
+      "ram": "12GB",
+      "storage": "256GB",
       "price": 44999,
-      "ram": "12GB",
-      "storage": "256GB",
       "flipkartPrice": 44999
-    }
-  ],
-  "redmi-15a": [
-    {
-      "price": 14999,
-      "ram": "4GB",
-      "storage": "64GB",
-      "flipkartPrice": 14999
-    },
-    {
-      "price": 15999,
-      "ram": "4GB",
-      "storage": "128GB",
-      "flipkartPrice": 15999
-    },
-    {
-      "price": 16999,
-      "ram": "6GB",
-      "storage": "128GB",
-      "flipkartPrice": 16999
-    }
-  ],
-  "redmi-15c": [
-    {
-      "price": 16999,
-      "ram": "4GB",
-      "storage": "128GB",
-      "flipkartPrice": 16999
-    },
-    {
-      "price": 20999,
-      "ram": "8GB",
-      "storage": "128GB",
-      "flipkartPrice": 20999
-    },
-    {
-      "ram": "6GB",
-      "storage": "128GB",
-      "price": 18999,
-      "flipkartPrice": 18999
-    }
-  ],
-  "redmi-a4": [
-    {
-      "price": 11999,
-      "ram": "4GB",
-      "storage": "128GB",
-      "flipkartPrice": 11999
-    },
-    {
-      "ram": "4GB",
-      "storage": "64GB",
-      "price": 10999,
-      "flipkartPrice": 10999
-    },
-    {
-      "ram": "6GB",
-      "storage": "128GB",
-      "price": 12999,
-      "flipkartPrice": 12999
-    }
-  ],
-  "redmi-a5": [
-    {
-      "price": 8999,
-      "ram": "3GB",
-      "storage": "64GB",
-      "flipkartPrice": 8999
-    },
-    {
-      "ram": "4GB",
-      "storage": "128GB",
-      "price": 9999,
-      "flipkartPrice": 9999
-    }
-  ],
-  "redmi-a7-pro": [
-    {
-      "price": 13999,
-      "ram": "4GB",
-      "storage": "64GB",
-      "flipkartPrice": 13999
-    },
-    {
-      "price": 14999,
-      "ram": "4GB",
-      "storage": "128GB",
-      "flipkartPrice": 14999
-    }
-  ],
-  "infinix-gt-30-pro": [
-    {
-      "price": 29999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 29999
-    },
-    {
-      "price": 32999,
-      "ram": "12GB",
-      "storage": "256GB",
-      "flipkartPrice": 32999
-    }
-  ],
-  "infinix-gt-30": [
-    {
-      "price": 21999,
-      "ram": "8GB",
-      "storage": "128GB",
-      "flipkartPrice": 21999
-    },
-    {
-      "price": 23999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 23999
-    }
-  ],
-  "infinix-note-edge": [
-    {
-      "price": 24999,
-      "ram": "6GB",
-      "storage": "128GB",
-      "flipkartPrice": 24999
-    },
-    {
-      "price": 23999,
-      "ram": "8GB",
-      "storage": "128GB"
-    },
-    {
-      "price": 28999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 28999
-    }
-  ],
-  "infinix-smart-10": [
-    {
-      "price": 11999,
-      "ram": "4GB",
-      "storage": "64GB",
-      "flipkartPrice": 11999
-    }
-  ],
-  "infinix-smart-20": [
-    {
-      "price": 12999,
-      "ram": "4GB",
-      "storage": "64GB",
-      "flipkartPrice": 12999
-    },
-    {
-      "price": 13999,
-      "ram": "4GB",
-      "storage": "128GB",
-      "flipkartPrice": 13999
-    }
-  ],
-  "moto-60-fusion": [
-    {
-      "price": 22999,
-      "ram": "8GB",
-      "storage": "128GB",
-      "flipkartPrice": 22999
-    },
-    {
-      "price": 24999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 24999
-    },
-    {
-      "price": 27999,
-      "ram": "12GB",
-      "storage": "256GB",
-      "flipkartPrice": 27999
-    }
-  ],
-  "moto-70-fusion": [
-    {
-      "price": 29999,
-      "ram": "8GB",
-      "storage": "128GB",
-      "flipkartPrice": 29999
-    },
-    {
-      "price": 32999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 32999
-    },
-    {
-      "price": 34999,
-      "ram": "12GB",
-      "storage": "256GB",
-      "flipkartPrice": 34999
-    },
-    {
-      "price": 37999,
-      "ram": "12GB",
-      "storage": "512GB",
-      "flipkartPrice": 37999
-    }
-  ],
-  "moto-edge-60": [
-    {
-      "price": 25999,
-      "ram": "12GB",
-      "storage": "256GB",
-      "flipkartPrice": 25999
-    }
-  ],
-  "oppo-k13x": [
-    {
-      "price": 23999,
-      "ram": "6GB",
-      "storage": "128GB",
-      "flipkartPrice": 23999
-    },
-    {
-      "ram": "4GB",
-      "storage": "64GB",
-      "price": 17999,
-      "flipkartPrice": 17999
-    },
-    {
-      "ram": "4GB",
-      "storage": "128GB",
-      "price": 19999,
-      "flipkartPrice": 19999
-    },
-    {
-      "ram": "8GB",
-      "storage": "256GB",
-      "price": 29999,
-      "flipkartPrice": 29999
     }
   ],
   "oppo-k13": [
     {
-      "price": 24154,
-      "ram": "8GB",
-      "storage": "128GB"
-    },
-    {
-      "price": 39999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 39999,
       "flipkartPrice": 39999
     }
   ],
   "oppo-f33-pro": [
     {
-      "price": 40196,
-      "ram": "8GB",
-      "storage": "128GB"
-    },
-    {
-      "price": 39999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 39999,
       "flipkartPrice": 39999
     }
   ],
   "oppo-f33": [
     {
-      "price": 34999,
       "ram": "6GB",
       "storage": "128GB",
+      "price": 34999,
       "flipkartPrice": 34999
     },
     {
-      "price": 34999,
-      "ram": "8GB",
-      "storage": "128GB"
-    },
-    {
-      "price": 36999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 36999,
       "flipkartPrice": 36999
     }
   ],
   "oppo-f31-pro-plus": [
     {
-      "price": 43999,
-      "ram": "8GB",
-      "storage": "256GB",
-      "flipkartPrice": 43999
-    },
-    {
-      "price": 32999,
-      "ram": "12GB",
-      "storage": "256GB"
-    },
-    {
       "ram": "6GB",
       "storage": "128GB",
       "price": 39999,
       "flipkartPrice": 39999
+    },
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 43999,
+      "flipkartPrice": 43999
     }
   ],
   "oppo-a6x": [
     {
-      "price": 17999,
       "ram": "4GB",
       "storage": "64GB",
+      "price": 17999,
       "flipkartPrice": 17999
     },
     {
-      "price": 19999,
       "ram": "4GB",
       "storage": "128GB",
+      "price": 19999,
       "flipkartPrice": 19999
     },
     {
-      "price": 23999,
       "ram": "6GB",
       "storage": "128GB",
+      "price": 23999,
       "flipkartPrice": 23999
     },
     {
@@ -664,79 +451,69 @@
   ],
   "iqoo-15": [
     {
-      "price": 76999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 76999,
       "flipkartPrice": 76999
     },
     {
-      "price": 83999,
       "ram": "16GB",
       "storage": "512GB",
+      "price": 83999,
       "flipkartPrice": 83999
     }
   ],
   "iqoo-15r": [
     {
-      "price": 49999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 49999,
       "flipkartPrice": 49999
     },
     {
-      "price": 54999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 54999,
       "flipkartPrice": 54999
     },
     {
-      "price": 61999,
       "ram": "12GB",
       "storage": "512GB",
+      "price": 61999,
       "flipkartPrice": 61999
     }
   ],
   "iqoo-neo-10": [
     {
-      "price": 32990,
-      "ram": "8GB",
-      "storage": "128GB"
-    },
-    {
-      "price": 41999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 41999,
       "flipkartPrice": 41999
     },
     {
-      "price": 46999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 46999,
       "flipkartPrice": 46999
-    },
-    {
-      "price": 44889,
-      "ram": "16GB",
-      "storage": "512GB"
     }
   ],
   "iqoo-z10-lite": [
     {
-      "price": 18999,
       "ram": "4GB",
       "storage": "128GB",
+      "price": 18999,
       "flipkartPrice": 18999
     },
     {
-      "price": 20999,
       "ram": "6GB",
       "storage": "128GB",
+      "price": 20999,
       "flipkartPrice": 20999
     },
     {
-      "price": 23999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 23999,
       "flipkartPrice": 23999
     },
     {
@@ -748,15 +525,15 @@
   ],
   "iqoo-z10r": [
     {
-      "price": 22999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 22999,
       "flipkartPrice": 22999
     },
     {
-      "price": 24999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 24999,
       "flipkartPrice": 24999
     },
     {
@@ -768,158 +545,152 @@
   ],
   "iqoo-z11x": [
     {
-      "price": 24999,
       "ram": "6GB",
       "storage": "128GB",
+      "price": 24999,
       "flipkartPrice": 24999
     },
     {
-      "price": 27999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 27999,
       "flipkartPrice": 27999
     },
     {
-      "price": 30999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 30999,
       "flipkartPrice": 30999
     }
   ],
   "vivo-t5-pro": [
     {
-      "price": 35999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 35999,
       "flipkartPrice": 35999
     },
     {
-      "price": 39999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 39999,
       "flipkartPrice": 39999
     },
     {
-      "price": 39999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 39999,
       "flipkartPrice": 39999
     }
   ],
   "vivo-t5x": [
     {
-      "price": 24999,
       "ram": "6GB",
       "storage": "128GB",
+      "price": 24999,
       "flipkartPrice": 24999
     },
     {
-      "price": 27999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 27999,
       "flipkartPrice": 27999
     },
     {
-      "price": 30999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 30999,
       "flipkartPrice": 30999
     }
   ],
   "vivo-v70": [
     {
-      "price": 53999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 53999,
       "flipkartPrice": 53999
     },
     {
-      "price": 56999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 56999,
       "flipkartPrice": 56999
     }
   ],
   "vivo-v70-elite": [
     {
-      "price": 58999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 58999,
       "flipkartPrice": 58999
     },
     {
-      "price": 63999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 63999,
       "flipkartPrice": 63999
-    },
-    {
-      "price": 61999,
-      "ram": "12GB",
-      "storage": "512GB",
-      "flipkartPrice": 61999
     }
   ],
   "vivo-v70-fe": [
     {
-      "price": 41999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 41999,
       "flipkartPrice": 41999
     },
     {
-      "price": 45999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 45999,
       "flipkartPrice": 45999
     },
     {
-      "price": 46999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 46999,
       "flipkartPrice": 46999
     }
   ],
   "vivo-y05": [
     {
-      "price": 14999,
       "ram": "4GB",
       "storage": "64GB",
+      "price": 14999,
       "flipkartPrice": 14999
     }
   ],
   "vivo-y11": [
     {
-      "price": 16999,
       "ram": "4GB",
       "storage": "64GB",
+      "price": 16999,
       "flipkartPrice": 16999
     },
     {
-      "price": 18999,
       "ram": "4GB",
       "storage": "128GB",
+      "price": 18999,
       "flipkartPrice": 18999
     }
   ],
   "vivo-y31": [
     {
-      "price": 19999,
       "ram": "4GB",
       "storage": "128GB",
+      "price": 19999,
       "flipkartPrice": 19999
-    },
-    {
-      "price": 25999,
-      "ram": "6GB",
-      "storage": "128GB",
-      "flipkartPrice": 25999
     },
     {
       "ram": "6GB",
       "storage": "256GB",
       "price": 28999,
       "flipkartPrice": 28999
+    },
+    {
+      "ram": "6GB",
+      "storage": "128GB",
+      "price": 25999,
+      "flipkartPrice": 25999
     }
   ],
   "vivo-y51-pro": [
@@ -938,88 +709,246 @@
   ],
   "vivo-t4": [
     {
-      "price": 24999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 24999,
       "flipkartPrice": 24999
     },
     {
-      "price": 26999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 26999,
       "flipkartPrice": 26999
     },
     {
-      "price": 28999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 28999,
       "flipkartPrice": 28999
     }
   ],
   "vivo-t4-lite": [
     {
-      "price": 16999,
-      "ram": "4GB",
-      "storage": "64GB",
-      "flipkartPrice": 16999
-    },
-    {
-      "price": 18999,
       "ram": "4GB",
       "storage": "128GB",
+      "price": 18999,
       "flipkartPrice": 18999
     },
     {
-      "price": 20999,
       "ram": "6GB",
       "storage": "128GB",
+      "price": 20999,
       "flipkartPrice": 20999
     },
     {
-      "price": 23999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 23999,
       "flipkartPrice": 23999
+    },
+    {
+      "ram": "4GB",
+      "storage": "64GB",
+      "price": 16999,
+      "flipkartPrice": 16999
     }
   ],
   "vivo-t4-pro": [
     {
-      "price": 27999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 27999,
       "flipkartPrice": 27999
     },
     {
-      "price": 29999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 29999,
       "flipkartPrice": 29999
     },
     {
-      "price": 31999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 31999,
       "flipkartPrice": 31999
     }
   ],
   "vivo-t4r": [
     {
-      "price": 22999,
       "ram": "8GB",
       "storage": "128GB",
+      "price": 22999,
       "flipkartPrice": 22999
     },
     {
-      "price": 24999,
       "ram": "8GB",
       "storage": "256GB",
+      "price": 24999,
       "flipkartPrice": 24999
     },
     {
-      "price": 26999,
       "ram": "12GB",
       "storage": "256GB",
+      "price": 26999,
       "flipkartPrice": 26999
+    }
+  ],
+  "redmi-15a": [
+    {
+      "ram": "4GB",
+      "storage": "64GB",
+      "price": 14999,
+      "flipkartPrice": 14999
+    },
+    {
+      "ram": "4GB",
+      "storage": "128GB",
+      "price": 15999,
+      "flipkartPrice": 15999
+    },
+    {
+      "ram": "6GB",
+      "storage": "128GB",
+      "price": 16999,
+      "flipkartPrice": 16999
+    }
+  ],
+  "redmi-15c": [
+    {
+      "ram": "4GB",
+      "storage": "128GB",
+      "price": 16999,
+      "flipkartPrice": 16999
+    },
+    {
+      "ram": "6GB",
+      "storage": "128GB",
+      "price": 18999,
+      "flipkartPrice": 18999
+    },
+    {
+      "ram": "8GB",
+      "storage": "128GB",
+      "price": 20999,
+      "flipkartPrice": 20999
+    }
+  ],
+  "redmi-a4": [
+    {
+      "ram": "4GB",
+      "storage": "64GB",
+      "price": 10999,
+      "flipkartPrice": 10999
+    },
+    {
+      "ram": "4GB",
+      "storage": "128GB",
+      "price": 11999,
+      "flipkartPrice": 11999
+    },
+    {
+      "ram": "6GB",
+      "storage": "128GB",
+      "price": 12999,
+      "flipkartPrice": 12999
+    }
+  ],
+  "redmi-a5": [
+    {
+      "ram": "3GB",
+      "storage": "64GB",
+      "price": 8999,
+      "flipkartPrice": 8999
+    },
+    {
+      "ram": "4GB",
+      "storage": "128GB",
+      "price": 9999,
+      "flipkartPrice": 9999
+    }
+  ],
+  "redmi-a7-pro": [
+    {
+      "ram": "4GB",
+      "storage": "64GB",
+      "price": 13999,
+      "flipkartPrice": 13999
+    },
+    {
+      "ram": "4GB",
+      "storage": "128GB",
+      "price": 14999,
+      "flipkartPrice": 14999
+    }
+  ],
+  "infinix-gt-30-pro": [
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 29999,
+      "flipkartPrice": 29999
+    },
+    {
+      "ram": "12GB",
+      "storage": "256GB",
+      "price": 32999,
+      "flipkartPrice": 32999
+    }
+  ],
+  "infinix-gt-30": [
+    {
+      "ram": "8GB",
+      "storage": "128GB",
+      "price": 21999,
+      "flipkartPrice": 21999
+    },
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 23999,
+      "flipkartPrice": 23999
+    }
+  ],
+  "infinix-note-edge": [
+    {
+      "ram": "6GB",
+      "storage": "128GB",
+      "price": 24999,
+      "flipkartPrice": 24999
+    },
+    {
+      "ram": "8GB",
+      "storage": "256GB",
+      "price": 26999,
+      "flipkartPrice": 26999
+    },
+    {
+      "ram": "12GB",
+      "storage": "256GB",
+      "price": 28999,
+      "flipkartPrice": 28999
+    }
+  ],
+  "infinix-smart-10": [
+    {
+      "ram": "4GB",
+      "storage": "64GB",
+      "price": 11999,
+      "flipkartPrice": 11999
+    }
+  ],
+  "infinix-smart-20": [
+    {
+      "ram": "4GB",
+      "storage": "64GB",
+      "price": 12999,
+      "flipkartPrice": 12999
+    },
+    {
+      "ram": "4GB",
+      "storage": "128GB",
+      "price": 13999,
+      "flipkartPrice": 13999
     }
   ]
 }
