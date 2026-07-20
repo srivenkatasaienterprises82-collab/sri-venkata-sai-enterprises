@@ -77,10 +77,11 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const matchingVariant = product.variants.find(
     (variant) => (variant.ram ?? "") === activeRam && (variant.storage ?? "") === activeStorage,
   );
-  // The storefront shows the per-variant price as the headline price so that
-  // clicking a different RAM/Storage combo actually changes the number. The
-  // live Flipkart price is shown as supplementary info (see the Flipkart box
-  // below) and only falls back to the headline when a variant has no price.
+  // The headline price is the per-variant LIVE price (written by the 6h
+  // Flipkart/Amazon sync) so it changes when the user switches RAM/Storage.
+  // The sync writes the same `flipkartPrice` to every variant of a product,
+  // so `variant.price` (the genuine per-config live price) is the field that
+  // actually differs between variants and must drive the headline.
   const displayPrice =
     matchingVariant?.price ??
     activeVariant?.price ??
@@ -88,12 +89,14 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
     product.flipkartPrice ??
     product.price;
   const displayOriginalPrice = matchingVariant?.originalPrice ?? activeVariant?.originalPrice ?? product.originalPrice;
-  // Per-variant marketplace prices: each RAM/Storage combo can carry its
-  // own Flipkart and/or Amazon price (written by the 6h price-sync). Show
-  // them so the user sees the split + the lowest deal, and so the "Buy Now"
-  // link opens the correct configuration.
-  const variantFlipkartPrice = matchingVariant?.flipkartPrice;
-  const variantAmazonPrice = matchingVariant?.amazonPrice;
+  // Marketplace source for the headline price, used to label it
+  // ("Flipkart Price" / "Amazon Price"). Prefer the variant's own source.
+  const liveSource = matchingVariant?.amazonPrice
+    ? "Amazon"
+    : matchingVariant?.flipkartPrice ?? matchingVariant?.flipkartUrl ?? product.flipkartUrl
+      ? "Flipkart"
+      : null;
+  // Per-variant marketplace buy links (open the correct configuration).
   const amazonUrl = matchingVariant?.amazonUrl ?? product.amazonUrl;
   const flipkartUrl = matchingVariant?.flipkartUrl ?? product.flipkartUrl;
 
@@ -303,32 +306,29 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                 </span>
               </div>
 
-              <div className="mb-10 flex items-end gap-3">
+              <div className="mb-10">
                 {enquiryOnly ? (
                   <span className="text-3xl font-extrabold text-slate-900">Price on Enquiry</span>
                 ) : displayPrice ? (
                   <>
-                    <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{formatPrice(displayPrice)}</span>
-                    {displayOriginalPrice && (
-                      <span className="mb-1.5 text-lg font-medium text-slate-400 line-through">
-                        {formatPrice(displayOriginalPrice)}
-                      </span>
+                    {liveSource && (
+                      <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        {liveSource} Price
+                      </p>
                     )}
+                    <div className="flex items-end gap-3">
+                      <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{formatPrice(displayPrice)}</span>
+                      {displayOriginalPrice && (
+                        <span className="mb-1.5 text-lg font-medium text-slate-400 line-through">
+                          {formatPrice(displayOriginalPrice)}
+                        </span>
+                      )}
+                    </div>
                   </>
                 ) : (
                   <span className="text-3xl font-extrabold text-slate-900">Price on Enquiry</span>
                 )}
               </div>
-
-              {/* Live Flipkart price for the selected variant (single source) */}
-              {!enquiryOnly && variantFlipkartPrice ? (
-                <div className="mb-8">
-                  <div className="rounded-xl border border-slate-200 bg-white p-3 text-center max-w-[220px]">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Flipkart Price</p>
-                    <p className="text-lg font-bold text-slate-900">{formatPrice(variantFlipkartPrice)}</p>
-                  </div>
-                </div>
-              ) : null}
 
               {/* Color Selector */}
               <div className="mb-10">
