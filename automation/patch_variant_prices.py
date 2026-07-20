@@ -93,9 +93,22 @@ def patch_variants(slug, spec_variants):
         print(f"  SKIP {slug}: no variant matched the spec")
         return False
 
+    # Also correct the product-level marketplace price so cards / meta title
+    # reflect the verified minimum tier (the 6h cron may have collapsed it to
+    # a single scraped value). Use the cheapest verified variant's price.
+    fk_prices = [
+        v.get("flipkartPrice") for v in updated
+        if isinstance(v.get("flipkartPrice"), (int, float)) and v["flipkartPrice"] > 0
+    ]
+    set_fields = {"variants": updated}
+    if fk_prices:
+        min_fk = int(min(fk_prices))
+        set_fields["flipkartPrice"] = min_fk
+        set_fields["price"] = min_fk
+
     mutation = {
         "mutations": [
-            {"patch": {"id": doc["_id"], "set": {"variants": updated}}}
+            {"patch": {"id": doc["_id"], "set": set_fields}}
         ]
     }
     r = requests.post(f"{BASE}/data/mutate/{DATASET}", headers=HEADERS, json=mutation, timeout=30)

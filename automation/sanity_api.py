@@ -308,6 +308,25 @@ def update_price_and_variants(product_id: str, product_name: str,
     if flipkart_price is not None:
         set_fields["flipkartPrice"] = flipkart_price
 
+    # If the product already carries VERIFIED per-variant marketplace prices
+    # (written by the variant-price-fix spec), do NOT let a collapsed single
+    # product-level scrape overwrite them. The cron only ever scrapes one
+    # price, so writing it onto every variant would collapse all tiers to a
+    # single value and undo the verified per-variant prices. In that case we
+    # keep the product-level marketplace fields untouched.
+    has_verified_variants = any(
+        isinstance(v.get("flipkartPrice"), (int, float)) and v["flipkartPrice"] > 0
+        or isinstance(v.get("amazonPrice"), (int, float)) and v["amazonPrice"] > 0
+        for v in existing_variants
+    )
+    if has_verified_variants:
+        set_fields.pop("flipkartPrice", None)
+        set_fields.pop("amazonPrice", None)
+        print(
+            f"    PROTECTED: {product_name} keeps verified per-variant prices; "
+            f"skipping collapsed product-level marketplace overwrite"
+        )
+
     # Update variants array with scraped prices (or fallback to display_price)
     updated_variants = []
     applied_scraped = False
@@ -378,7 +397,8 @@ def update_price_and_variants(product_id: str, product_name: str,
     # VARIANT_SCALE_BLEND damps the move so prices partially match Flipkart/
     # Amazon rather than snapping exactly to them.
     nudged = False
-    if not applied_scraped and display_price is not None and updated_variants:
+    if (not applied_scraped and display_price is not None and updated_variants
+            and not has_verified_variants):
         priced = [v for v in updated_variants if isinstance(v.get("price"), (int, float))]
         if priced:
             base = min(v["price"] for v in priced)
