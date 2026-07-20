@@ -57,9 +57,6 @@ def patch_variants(slug, spec_variants):
         print(f"  SKIP {slug}: not found in Sanity")
         return False
     existing = doc.get("variants") or []
-    if not existing:
-        print(f"  SKIP {slug}: no variants to patch")
-        return False
 
     # Build lookup of desired per (ram, storage)
     desired = {}
@@ -78,7 +75,19 @@ def patch_variants(slug, spec_variants):
             if isinstance(spec.get("flipkartPrice"), (int, float)) and spec["flipkartPrice"] > 0:
                 nv["flipkartPrice"] = int(spec["flipkartPrice"])
             changed += 1
+            desired.pop(key, None)  # consumed; any leftovers are NEW tiers
         updated.append(nv)
+
+    # Append any spec variants not already present in Sanity (new tiers).
+    for key, spec in desired.items():
+        nv = {"ram": spec.get("ram"), "storage": spec.get("storage")}
+        if isinstance(spec.get("price"), (int, float)) and spec["price"] > 0:
+            nv["price"] = int(spec["price"])
+        if isinstance(spec.get("flipkartPrice"), (int, float)) and spec["flipkartPrice"] > 0:
+            nv["flipkartPrice"] = int(spec["flipkartPrice"])
+        updated.append(nv)
+        changed += 1
+        print(f"    ADDED {slug}: ({spec.get('ram')},{spec.get('storage')})")
 
     if changed == 0:
         print(f"  SKIP {slug}: no variant matched the spec")
