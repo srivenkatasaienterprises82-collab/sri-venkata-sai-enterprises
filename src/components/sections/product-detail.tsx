@@ -77,23 +77,25 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const matchingVariant = product.variants.find(
     (variant) => (variant.ram ?? "") === activeRam && (variant.storage ?? "") === activeStorage,
   );
-  // The headline price is the per-variant LIVE price (written by the 6h
-  // Flipkart/Amazon sync) so it changes when the user switches RAM/Storage.
-  // The sync writes the same `flipkartPrice` to every variant of a product,
-  // so `variant.price` (the genuine per-config live price) is the field that
-  // actually differs between variants and must drive the headline.
+  // The headline price is the LIVE marketplace price (Flipkart/Amazon) written
+  // by the 6h sync. We prefer the SELECTED variant's own live price (so the
+  // number changes when the user switches RAM/Storage) and fall back to the
+  // product-level `flipkartPrice` (the real price shown on the Flipkart PDP,
+  // verified live). `variant.price` is only a last-resort fallback.
   const displayPrice =
+    matchingVariant?.flipkartPrice ??
+    matchingVariant?.amazonPrice ??
+    product.flipkartPrice ??
+    product.amazonPrice ??
     matchingVariant?.price ??
     activeVariant?.price ??
-    matchingVariant?.flipkartPrice ??
-    product.flipkartPrice ??
     product.price;
   const displayOriginalPrice = matchingVariant?.originalPrice ?? activeVariant?.originalPrice ?? product.originalPrice;
   // Marketplace source for the headline price, used to label it
-  // ("Flipkart Price" / "Amazon Price"). Prefer the variant's own source.
-  const liveSource = matchingVariant?.amazonPrice
+  // ("Flipkart Price" / "Amazon Price").
+  const liveSource = product.amazonPrice && !product.flipkartPrice
     ? "Amazon"
-    : matchingVariant?.flipkartPrice ?? matchingVariant?.flipkartUrl ?? product.flipkartUrl
+    : product.flipkartPrice ?? matchingVariant?.flipkartPrice ?? product.flipkartUrl
       ? "Flipkart"
       : null;
   // Per-variant marketplace buy links (open the correct configuration).
