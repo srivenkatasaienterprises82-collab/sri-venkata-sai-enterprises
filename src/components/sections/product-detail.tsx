@@ -77,27 +77,39 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const matchingVariant = product.variants.find(
     (variant) => (variant.ram ?? "") === activeRam && (variant.storage ?? "") === activeStorage,
   );
-  // The headline price is the LIVE marketplace price (Flipkart/Amazon) written
-  // by the 6h sync. We prefer the SELECTED variant's own live price (so the
-  // number changes when the user switches RAM/Storage) and fall back to the
-  // product-level `flipkartPrice` (the real price shown on the Flipkart PDP,
-  // verified live). `variant.price` is only a last-resort fallback.
+  // The headline price must CHANGE when the user clicks a different RAM/Storage
+  // variant. The selected variant's own price is the per-variant source of truth
+  // (always present in the data), so it takes top priority. We then layer the
+  // LIVE marketplace price (per-variant flipkartPrice/amazonPrice when the 6h
+  // sync has written one for THIS exact variant, then the product-level
+  // flipkartPrice) as a fallback so the number reflects the marketplace when no
+  // per-variant data differs. The key is that the selected *variant* price is
+  // evaluated BEFORE the product-level marketplace price, otherwise every
+  // variant would show the same product-level price and never change on click.
   const displayPrice =
+    matchingVariant?.price ??
     matchingVariant?.flipkartPrice ??
     matchingVariant?.amazonPrice ??
     product.flipkartPrice ??
     product.amazonPrice ??
-    matchingVariant?.price ??
     activeVariant?.price ??
     product.price;
   const displayOriginalPrice = matchingVariant?.originalPrice ?? activeVariant?.originalPrice ?? product.originalPrice;
   // Marketplace source for the headline price, used to label it
-  // ("Flipkart Price" / "Amazon Price").
-  const liveSource = product.amazonPrice && !product.flipkartPrice
-    ? "Amazon"
-    : product.flipkartPrice ?? matchingVariant?.flipkartPrice ?? product.flipkartUrl
-      ? "Flipkart"
-      : null;
+  // ("Flipkart Price" / "Amazon Price"). We mirror the exact priority used to
+  // compute displayPrice so the label matches the number actually shown.
+  // When the visible price is just the (variant) base price with no live
+  // marketplace price available, we leave the label null and the UI shows the
+  // plain price without a misleading "Flipkart Price" tag.
+  const liveSource = matchingVariant?.flipkartPrice
+    ? "Flipkart"
+    : matchingVariant?.amazonPrice
+      ? "Amazon"
+      : product.flipkartPrice
+        ? "Flipkart"
+        : product.amazonPrice
+          ? "Amazon"
+          : null;
   // Per-variant marketplace buy links (open the correct configuration).
   const amazonUrl = matchingVariant?.amazonUrl ?? product.amazonUrl;
   const flipkartUrl = matchingVariant?.flipkartUrl ?? product.flipkartUrl;
