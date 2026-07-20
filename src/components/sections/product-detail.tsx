@@ -77,15 +77,15 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const matchingVariant = product.variants.find(
     (variant) => (variant.ram ?? "") === activeRam && (variant.storage ?? "") === activeStorage,
   );
-  // The storefront shows ONLY the live Flipkart price (we never surface a
-  // competing Amazon price for Flipkart-sourced products). Prefer the
-  // selected variant's Flipkart price, then the product-level Flipkart price,
-  // then fall back to the variant's own price.
+  // The storefront shows the per-variant price as the headline price so that
+  // clicking a different RAM/Storage combo actually changes the number. The
+  // live Flipkart price is shown as supplementary info (see the Flipkart box
+  // below) and only falls back to the headline when a variant has no price.
   const displayPrice =
-    matchingVariant?.flipkartPrice ??
-    product.flipkartPrice ??
     matchingVariant?.price ??
     activeVariant?.price ??
+    matchingVariant?.flipkartPrice ??
+    product.flipkartPrice ??
     product.price;
   const displayOriginalPrice = matchingVariant?.originalPrice ?? activeVariant?.originalPrice ?? product.originalPrice;
   // Per-variant marketplace prices: each RAM/Storage combo can carry its
