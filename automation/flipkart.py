@@ -550,32 +550,59 @@ def _extract_variants_from_next_data(soup: BeautifulSoup) -> list:
 
 
 def _find_price(node):
-    """Recursively find the first price-like number (₹1000–₹300000) in a
-    JSON subtree. Returns an int or None. Excludes "X GB / Y GB" label strings
-    so a variant's own name can't be mistaken for its price.
+    """Find the price that BELONGS to a single variant object.
+
+    Critical fix: this must NOT recursively scan the whole subtree. Flipkart's
+    inline JSON nests the *product-level* price somewhere deep inside each
+    variant object, so a recursive search always returns that one shared price
+    for every variant — collapsing all per-variant prices to a single value
+    (e.g. vivo-v70 got ₹53,999 on every variant). Instead we only inspect the
+    variant object's OWN direct scalar fields, preferring keys whose name looks
+    price-like (price/value/mrp/sellingPrice/offerPrice), then any other scalar
+    that looks like a price. We deliberately skip lists/dicts so a nested
+    product blob can't leak its price in.
     """
-    if isinstance(node, (int, float)):
-        if 1000 <= float(node) <= 300000:
-            return int(node)
+    if isinstance(node, dict):
+        # Preferred: explicit price-like sibling keys (checked first). A price
+        # may be nested one level deep as {value: 53999} (Flipkart's common
+        # shape) — we peek exactly one level into those keys and no deeper, so
+        # a distant product-level price blob can't leak in.
+        for key in ("price", "value", "mrp", "mrpPrice", "sellingPrice",
+                    "offerPrice", "finalPrice", "discountedPrice", "cost"):
+            if key in node:
+                p = _scalar_price(node[key])
+                if p is not None:
+                    return p
+                if isinstance(node[key], dict):
+                    for v in node[key].values():
+                        p = _scalar_price(v)
+                        if p is not None:
+                            return p
+        # Fallback: any direct scalar field that looks like a price.
+        for v in node.values():
+            p = _scalar_price(v)
+            if p is not None:
+                return p
+    # A bare scalar (int/float/str) passed directly.
+    return _scalar_price(node)
+
+
+def _scalar_price(value):
+    """Price-like check for a single scalar value (no recursion)."""
+    if isinstance(value, bool):
         return None
-    if isinstance(node, str):
-        s = node.strip()
+    if isinstance(value, (int, float)):
+        if 1000 <= float(value) <= 300000:
+            return int(value)
+        return None
+    if isinstance(value, str):
+        s = value.strip()
         if "gb" in s.lower():
             return None
         digits = re.sub(r"[^\d]", "", s)
         if digits and 1000 <= int(digits) <= 300000:
             return int(digits)
         return None
-    if isinstance(node, dict):
-        for v in node.values():
-            p = _find_price(v)
-            if p is not None:
-                return p
-    if isinstance(node, list):
-        for v in node:
-            p = _find_price(v)
-            if p is not None:
-                return p
     return None
 
 
