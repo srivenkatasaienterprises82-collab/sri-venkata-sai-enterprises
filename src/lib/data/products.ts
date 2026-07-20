@@ -512,10 +512,19 @@ export function getFlagshipProducts(): Product[] {
 }
 
 export function getStartingPrice(product: Product): number | undefined {
-  const prices = product.variants
+  // Prefer live marketplace prices (per-variant, then product-level) so the
+  // displayed "from" price reflects the real Flipkart/Amazon price, never the
+  // stale seed `price`.
+  const marketPrices = product.variants
+    .flatMap((v) => [v.flipkartPrice, v.amazonPrice])
+    .filter((pr): pr is number => typeof pr === "number" && pr > 0);
+  if (marketPrices.length) return Math.min(...marketPrices);
+  if (typeof product.flipkartPrice === "number" && product.flipkartPrice > 0) return product.flipkartPrice;
+  if (typeof product.amazonPrice === "number" && product.amazonPrice > 0) return product.amazonPrice;
+  const seedPrices = product.variants
     .map((v) => v.price)
     .filter((pr): pr is number => typeof pr === "number");
-  if (prices.length) return Math.min(...prices);
+  if (seedPrices.length) return Math.min(...seedPrices);
   return product.price;
 }
 
