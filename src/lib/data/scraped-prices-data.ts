@@ -1,7 +1,6 @@
 // AUTO-GENERATED from scraped-prices.tsv by scripts/build-scraped-prices-data.ts.
 // Live Flipkart/Amazon price + variant + color data. Do not edit by hand.
 // Applied at module load via applyScrapedPriceOverrides (src/lib/data/products.ts).
-
 export interface ScrapedPriceVariant {
   ram: string;
   storage: string;
@@ -370,26 +369,26 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "8GB",
         "storage": "128GB",
-        "price": 32990,
+        "price": 28990,
         "originalPrice": 36999
       },
       {
         "ram": "8GB",
         "storage": "256GB",
-        "price": 41999,
+        "price": 30990,
         "originalPrice": 45999
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 33990,
+        "originalPrice": 49999
       },
       {
         "ram": "16GB",
         "storage": "512GB",
         "price": 44889,
         "originalPrice": 45999
-      },
-      {
-        "ram": "12GB",
-        "storage": "256GB",
-        "price": 46999,
-        "originalPrice": 49999
       }
     ]
   },
@@ -401,7 +400,7 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "16GB",
         "storage": "512GB",
-        "price": 69326,
+        "price": 81999,
         "originalPrice": 74999
       },
       {
@@ -499,7 +498,7 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "6GB",
         "storage": "128GB",
-        "price": 28000,
+        "price": 21999,
         "originalPrice": 28999
       },
       {
@@ -745,6 +744,35 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
         "storage": "64GB",
         "price": 9888,
         "originalPrice": 11499
+      }
+    ]
+  },
+  "moto-60-fusion": {
+    "colorNames": [
+      "PANTONE Slipstream",
+      "PANTONE Mykonos Blue",
+      "PANTONE Amazonite",
+      "PANTONE Zephry",
+      "PANTONE Zephyr"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 22999,
+        "originalPrice": 25999
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 24999,
+        "originalPrice": 24999
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 27999,
+        "originalPrice": 37999
       }
     ]
   },
