@@ -99,7 +99,7 @@ export const product = defineType({
           fields: [
             defineField({ name: "ram", title: "RAM", type: "string" }),
             defineField({ name: "storage", title: "Storage", type: "string" }),
-            defineField({ name: "price", title: "Price (₹)", type: "number" }),
+            defineField({ name: "price", title: "Price (₹)", type: "number", validation: (r) => r.required().min(1).error('Variant price is required — without it the website cannot show a price change when users switch variants.') }),
             defineField({ name: "originalPrice", title: "Original Price (₹)", type: "number" }),
             defineField({ name: "amazonPrice", title: "Amazon Price (₹)", type: "number" }),
             defineField({ name: "flipkartPrice", title: "Flipkart Price (₹)", type: "number" }),

@@ -66,14 +66,24 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
     (variant) => normKey(variant.ram) === normKey(activeRam) && normKey(variant.storage) === normKey(activeStorage),
   );
 
+  // ── Price source tracking ──
+  // True when the selected variant has NO prices of its own, so the
+  // display falls back to product-level price. The "Starting Price"
+  // label tells the user/editor the price didn't change because the
+  // variant data is missing its own price, not because of a code bug.
+  const isFallbackPrice = !matchingVariant?.flipkartPrice
+    && !matchingVariant?.amazonPrice
+    && !matchingVariant?.price;
+
   const displayPrice =
     matchingVariant?.flipkartPrice ??
     matchingVariant?.amazonPrice ??
+    matchingVariant?.price ??
     product.flipkartPrice ??
     product.amazonPrice ??
     product.price;
   const displayOriginalPrice =
-    matchingVariant?.flipkartPrice || matchingVariant?.amazonPrice
+    matchingVariant?.flipkartPrice || matchingVariant?.amazonPrice || matchingVariant?.price
       ? matchingVariant?.originalPrice
       : (product.flipkartPrice || product.amazonPrice)
         ? product.originalPrice
@@ -82,11 +92,15 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
     ? "Flipkart"
     : matchingVariant?.amazonPrice
       ? "Amazon"
-      : product.flipkartPrice
-        ? "Flipkart"
-        : product.amazonPrice
-          ? "Amazon"
-          : null;
+      : matchingVariant?.price
+        ? "Store"
+        : product.flipkartPrice
+          ? "Flipkart"
+          : product.amazonPrice
+            ? "Amazon"
+            : isFallbackPrice
+              ? "Starting"
+              : null;
   const amazonUrl = matchingVariant?.amazonUrl ?? product.amazonUrl;
   const flipkartUrl = matchingVariant?.flipkartUrl ?? product.flipkartUrl;
 
