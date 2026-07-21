@@ -28,6 +28,7 @@ export const brands: Brand[] = [
   { name: "Narzo", slug: "narzo", featured: true, logo: "/images/brand-logos/narzo logo.png" },
   { name: "HMD", slug: "hmd", featured: false },
   { name: "CMF", slug: "cmf", featured: false },
+  { name: "Nothing", slug: "nothing", featured: true, logo: "/images/brand-logos/nothing logo.png" },
   { name: "Jio", slug: "jio", featured: false },
 ];
 
