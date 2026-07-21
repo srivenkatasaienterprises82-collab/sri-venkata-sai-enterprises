@@ -10,55 +10,83 @@ import { siteConfig } from "@/lib/data/siteConfig";
 import { Button } from "@/components/ui/button";
 
 export function ProductDetail({ product, galleryImages }: { product: Product; galleryImages?: string[] }) {
-  const [activeVariant] = useState(product.variants[0] ?? null);
   const [activeColor, setActiveColor] = useState(product.colors[0] ?? null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [activeRam, setActiveRam] = useState(product.ramOptions?.[0] ?? product.variants[0]?.ram ?? "");
-  const [activeStorage, setActiveStorage] = useState(product.storageOptions?.[0] ?? product.variants[0]?.storage ?? "");
+  const initialRamRaw = product.ramOptions?.[0]
+    ?? (product.variants[0]?.ram && product.variants[0].ram !== "N/A"
+      ? product.variants[0].ram
+      : "")
+    ?? "";
+  const initialStorageRaw = product.storageOptions?.[0]
+    ?? product.variants[0]?.storage
+    ?? "";
+  const [activeRam, setActiveRam] = useState(initialRamRaw);
+  const [activeStorage, setActiveStorage] = useState(initialStorageRaw);
 
-  // Sanity products (e.g. iPhones) often arrive with empty `ramOptions` /
-  // `storageOptions` arrays even though their `variants` DO carry ram/storage.
-  // Derive the option lists from the variants so the selector actually renders
-  // — otherwise the price can never change on variant click. Mirrors the
-  // derivation in src/lib/data/products.ts (used for the static fallback).
+  const normKey = (v?: string | null) => (!v || v === "N/A") ? "" : v.replace(/\s+/g, "");
+
   const ramOptions = product.ramOptions?.length
     ? product.ramOptions
-    : Array.from(new Set(product.variants.map((v) => v.ram).filter((r): r is string => !!r)));
+    : Array.from(new Set(product.variants.map((v) => v.ram).filter((r): r is string => !!r && r !== "N/A")));
   const storageOptions = product.storageOptions?.length
     ? product.storageOptions
     : Array.from(new Set(product.variants.map((v) => v.storage).filter((s): s is string => !!s)));
-  
+
   const enquiryOnly = isPriceOnEnquiry(product);
-  // Keep hasProductPrice for the JSON-LD structured data (schemaOffers).
-  // Some products have a single price (accessories/earbuds), others have per-variant pricing.
   const hasProductPrice = typeof product.price === "number" && Number.isFinite(product.price);
-  // Always prefer the selected variant's price over the product-level price.
-  // This ensures the price updates when the user clicks a different variant button.
-  // iPhones have ram: "N/A" or ram: "" — normalise both to "" so the match works.
-  const normRam = (r?: string | null) => (!r || r === "N/A") ? "" : r;
+
+  const resolveVariant = (ram: string, storage: string) => {
+    const nRam = normKey(ram);
+    const nStorage = normKey(storage);
+    const exact = product.variants.find(
+      (v) => normKey(v.ram) === nRam && normKey(v.storage) === nStorage
+    );
+    if (exact) return exact;
+    const sameRam = product.variants.find((v) => normKey(v.ram) === nRam);
+    if (sameRam) return sameRam;
+    const sameStorage = product.variants.find((v) => normKey(v.storage) === nStorage);
+    if (sameStorage) return sameStorage;
+    return product.variants[0] ?? null;
+  };
+
+  const selectRam = (ram: string) => {
+    const v = resolveVariant(ram, activeStorage);
+    setActiveRam(ram);
+    setActiveStorage(v?.storage ?? initialStorageRaw);
+  };
+
+  const selectStorage = (storage: string) => {
+    const v = resolveVariant(activeRam, storage);
+    setActiveRam(v?.ram ?? initialRamRaw);
+    setActiveStorage(v?.storage ?? initialStorageRaw);
+  };
+
   const matchingVariant = product.variants.find(
-    (variant) => normRam(variant.ram) === normRam(activeRam) && (variant.storage ?? "") === activeStorage,
+    (variant) => normKey(variant.ram) === normKey(activeRam) && normKey(variant.storage) === normKey(activeStorage),
   );
-  // The storefront shows the live price for the SELECTED variant.
-  // Priority: selected variant's Flipkart price → selected variant's own price
-  // → product-level Flipkart price → product-level price → first variant's price.
-  // We check matchingVariant?.price BEFORE product.flipkartPrice because the
-  // price-sync automation writes a product-level flipkartPrice that would
-  // override per-variant prices, preventing the display from updating on click.
+
   const displayPrice =
     matchingVariant?.flipkartPrice ??
-    matchingVariant?.price ??
+    matchingVariant?.amazonPrice ??
     product.flipkartPrice ??
-    product.price ??
-    activeVariant?.price;
-  const displayOriginalPrice = matchingVariant?.originalPrice ?? activeVariant?.originalPrice ?? product.originalPrice;
-  // Per-variant marketplace prices: each RAM/Storage combo can carry its
-  // own Flipkart and/or Amazon price (written by the 6h price-sync). Show
-  // them so the user sees the split + the lowest deal, and so the "Buy Now"
-  // link opens the correct configuration.
-  const variantFlipkartPrice = matchingVariant?.flipkartPrice;
-  const variantAmazonPrice = matchingVariant?.amazonPrice;
+    product.amazonPrice ??
+    product.price;
+  const displayOriginalPrice =
+    matchingVariant?.flipkartPrice || matchingVariant?.amazonPrice
+      ? matchingVariant?.originalPrice
+      : (product.flipkartPrice || product.amazonPrice)
+        ? product.originalPrice
+        : product.originalPrice;
+  const liveSource = matchingVariant?.flipkartPrice
+    ? "Flipkart"
+    : matchingVariant?.amazonPrice
+      ? "Amazon"
+      : product.flipkartPrice
+        ? "Flipkart"
+        : product.amazonPrice
+          ? "Amazon"
+          : null;
   const amazonUrl = matchingVariant?.amazonUrl ?? product.amazonUrl;
   const flipkartUrl = matchingVariant?.flipkartUrl ?? product.flipkartUrl;
 
@@ -82,8 +110,8 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
         .filter((v) => v.price)
         .map((v) => ({
           "@type": "Offer",
-          sku: `${product.slug}-${v.ram}-${v.storage}`,
-          name: `${product.name} ${v.ram} ${v.storage}`,
+          sku: "${product.slug}-${v.ram}-${v.storage}",
+          name: "${product.name} ${v.ram} ${v.storage}",
           price: v.price!,
           priceCurrency: "INR",
           availability: product.stock === "inStock"
@@ -104,14 +132,12 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollLeft = e.currentTarget.scrollLeft;
     const width = e.currentTarget.clientWidth;
-    // adding a small offset so it doesn't jump prematurely
     const index = Math.round((scrollLeft + 10) / width);
     if (index !== activeImageIndex && index >= 0 && index < images.length) {
       setActiveImageIndex(index);
     }
   };
 
-  // Build JSON-LD Product schema
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -123,14 +149,13 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
     offers: schemaOffers,
     aggregateRating: {
       "@type": "AggregateRating",
-      // Store-wide rating sourced from Justdial (see siteConfig.ratingSourceUrl).
       ratingValue: siteConfig.ratingValue,
       reviewCount: siteConfig.reviewCount,
       sameAs: siteConfig.ratingSourceUrl,
     },
   };
 
-  return (
+return (
     <>
       <script
         type="application/ld+json"
@@ -268,32 +293,29 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                 </span>
               </div>
 
-              <div className="mb-10 flex items-end gap-3">
+              <div className="mb-10">
                 {enquiryOnly ? (
                   <span className="text-3xl font-extrabold text-slate-900">Price on Enquiry</span>
                 ) : displayPrice ? (
                   <>
-                    <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{formatPrice(displayPrice)}</span>
-                    {displayOriginalPrice && (
-                      <span className="mb-1.5 text-lg font-medium text-slate-400 line-through">
-                        {formatPrice(displayOriginalPrice)}
-                      </span>
+                    {liveSource && (
+                      <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        {liveSource} Price
+                      </p>
                     )}
+                    <div className="flex items-end gap-3">
+                      <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{formatPrice(displayPrice)}</span>
+                      {displayOriginalPrice && (
+                        <span className="mb-1.5 text-lg font-medium text-slate-400 line-through">
+                          {formatPrice(displayOriginalPrice)}
+                        </span>
+                      )}
+                    </div>
                   </>
                 ) : (
                   <span className="text-3xl font-extrabold text-slate-900">Price on Enquiry</span>
                 )}
               </div>
-
-              {/* Live Flipkart price for the selected variant (single source) */}
-              {!enquiryOnly && variantFlipkartPrice ? (
-                <div className="mb-8">
-                  <div className="rounded-xl border border-slate-200 bg-white p-3 text-center max-w-[220px]">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Flipkart Price</p>
-                    <p className="text-lg font-bold text-slate-900">{formatPrice(variantFlipkartPrice)}</p>
-                  </div>
-                </div>
-              ) : null}
 
               {/* Color Selector */}
               <div className="mb-10">
@@ -330,8 +352,8 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                         {ramOptions.map((ram) => (
                           <button
                             key={ram}
-                            onClick={() => setActiveRam(ram)}
-                            className={`rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all ${activeRam === ram ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+                            onClick={() => selectRam(ram)}
+                            className={`rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all ${normKey(activeRam) === normKey(ram) ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
                           >
                             {ram}
                           </button>
@@ -347,8 +369,8 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                         {storageOptions.map((storage) => (
                           <button
                             key={storage}
-                            onClick={() => setActiveStorage(storage)}
-                            className={`rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all ${activeStorage === storage ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+                            onClick={() => selectStorage(storage)}
+                            className={`rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all ${normKey(activeStorage) === normKey(storage) ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
                           >
                             {storage}
                           </button>
@@ -403,7 +425,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
 
               {/* ── Sticky Mobile Footer / Static Desktop Actions ── */}
               <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/90 p-4 pb-6 backdrop-blur-xl md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none shadow-[0_-10px_20px_rgba(0,0,0,0.05)] md:shadow-none">
-                <div className="flex gap-4">
+                <div className="flex flex-col gap-2 sm:gap-3">
                   {enquiryOnly ? (
                     <Button
                       as="a"
@@ -412,72 +434,79 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
                       href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(`Hi, I'm interested in ${product.name}. Please share the price.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full flex-1"
+                      className="w-full"
                     >
                       <MessageCircle className="h-5 w-5 mr-2" />
                       Enquire on WhatsApp
                     </Button>
                   ) : (
                     <>
-                      <Button
-                        as="a"
-                        variant="whatsapp"
-                        size="xl"
-                        href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(
-                          `Hi ${siteConfig.storeName}, I would like to enquire about the ${product.name}.`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-[0.5] rounded-2xl px-2 sm:px-4"
-                        title="Enquire on WhatsApp"
-                        suppressHydrationWarning
-                      >
-                        <MessageCircle className="h-5 w-5 sm:mr-2" />
-                        <span className="hidden sm:inline">WhatsApp</span>
-                      </Button>
+                      <div className="flex gap-3">
+                        <Button
+                          as="a"
+                          variant="whatsapp"
+                          size="xl"
+                          href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(
+                            `Hi ${siteConfig.storeName}, I would like to enquire about the ${product.name}.`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 rounded-2xl px-2 sm:px-4"
+                          title="Enquire on WhatsApp"
+                          suppressHydrationWarning
+                        >
+                          <MessageCircle className="h-5 w-5 sm:mr-2" />
+                          <span className="hidden sm:inline">WhatsApp</span>
+                          <span className="sm:hidden">Chat</span>
+                        </Button>
 
-                      <Button
-                        variant="primary"
-                        size="xl"
-                        as={Link}
-                        href={`/checkout?product=${product.slug}&ram=${encodeURIComponent(activeRam)}&storage=${encodeURIComponent(activeStorage)}&color=${encodeURIComponent(activeColor?.name ?? "")}`}
-                        className="flex-1 rounded-2xl"
-                      >
-                        <ShoppingCart className="h-5 w-5 mr-2" />
-                        Buy Now
-                      </Button>
+                        <Button
+                          variant="primary"
+                          size="xl"
+                          as={Link}
+                          href={`/checkout?product=${product.slug}&ram=${encodeURIComponent(activeRam)}&storage=${encodeURIComponent(activeStorage)}&color=${encodeURIComponent(activeColor?.name ?? "")}`}
+                          className="flex-1 rounded-2xl"
+                        >
+                          <ShoppingCart className="h-5 w-5 mr-2" />
+                          Buy Now
+                        </Button>
+                      </div>
+
+                      {(amazonUrl || flipkartUrl) && (
+                        <div className="flex gap-3">
+                          {amazonUrl ? (
+                            <Button
+                              as="a"
+                              variant="primary"
+                              size="xl"
+                              href={amazonUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 rounded-2xl"
+                            >
+                              <ExternalLink className="h-5 w-5 mr-2" />
+                              Amazon
+                            </Button>
+                          ) : null}
+
+                          {flipkartUrl ? (
+                            <Button
+                              as="a"
+                              variant="primary"
+                              size="xl"
+                              href={flipkartUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 rounded-2xl"
+                            >
+                              <ExternalLink className="h-5 w-5 mr-2" />
+                              Flipkart
+                            </Button>
+                          ) : null}
+                        </div>
+                      )}
                     </>
                   )}
-
-                  {amazonUrl ? (
-                    <Button
-                      as="a"
-                      variant="primary"
-                      size="xl"
-                      href={amazonUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 rounded-2xl"
-                    >
-                      <ExternalLink className="h-5 w-5 mr-2" />
-                      Buy on Amazon
-                    </Button>
-                  ) : null}
-
-                  {flipkartUrl ? (
-                    <Button
-                      as="a"
-                      variant="primary"
-                      size="xl"
-                      href={flipkartUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 rounded-2xl"
-                    >
-                      <ExternalLink className="h-5 w-5 mr-2" />
-                      Buy on Flipkart
-                    </Button>
-                  ) : null}
                 </div>
               </div>
             </div>

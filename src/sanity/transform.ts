@@ -13,6 +13,29 @@ import type {
 } from "./types";
 import { resolveImage } from "./lib/image";
 
+function deriveRamOptions(variants: any[] | null | undefined): string[] {
+  if (!variants?.length) return [];
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const v of variants) {
+    const ram = v?.ram;
+    // Skip empty/N/A/placeholder RAM — iPhones expose storage-only variants.
+    if (ram && ram !== "N/A" && !seen.has(ram)) { seen.add(ram); result.push(ram); }
+  }
+  return result;
+}
+
+function deriveStorageOptions(variants: any[] | null | undefined): string[] {
+  if (!variants?.length) return [];
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const v of variants) {
+    const storage = v?.storage;
+    if (storage && storage !== "N/A" && !seen.has(storage)) { seen.add(storage); result.push(storage); }
+  }
+  return result;
+}
+
 export function toProduct(s: SanityProduct): Product {
   // Map stock status value safely
   let stockStatus: StockStatus = "inStock";

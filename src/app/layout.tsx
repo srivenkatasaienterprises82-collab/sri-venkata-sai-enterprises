@@ -74,7 +74,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body suppressHydrationWarning className="min-h-screen bg-white text-slate-900 antialiased">
+      <body suppressHydrationWarning className="min-h-screen max-w-full overflow-x-hidden bg-white text-slate-900 antialiased">
         <SkipLink />
         <SiteChrome settings={settings}>{children}</SiteChrome>
         {isDraftMode && process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && <SanityLive />}

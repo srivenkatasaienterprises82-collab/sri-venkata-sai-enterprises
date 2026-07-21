@@ -1,0 +1,29 @@
+name: Variant Price Fix
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix-variant-prices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # patch_variant_prices.py only needs requests; installing the full
+          # requirements.txt pulls curl_cffi (needs libcurl build deps) which
+          # fails on a bare runner and aborts the whole job before patching.
+          pip install requests
+      - name: Patch per-variant prices
+        env:
+          SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
+          SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
+        run: python automation/patch_variant_prices.py automation/variant-price-spec.json

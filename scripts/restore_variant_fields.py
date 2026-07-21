@@ -77,19 +77,23 @@ def main():
         # counts differ.
         use_index = len(static_variants) == len(san_variants)
         for i, v in enumerate(san_variants):
-            if v.get("ram") and v.get("storage"):
-                continue  # already has ram/storage; nothing to restore
-            if use_index:
-                match = static_variants[i]
-            else:
-                live_price = v.get("price")
-                match = price_to_static.get(live_price)
-                if not match and price_to_static:
-                    match = min(price_to_static.values(),
-                                key=lambda s: abs((s["price"] or 0) - (live_price or 0)))
-            if match:
-                v["ram"] = match["ram"]
-                v["storage"] = match["storage"]
+            # Always restore ram/storage from static when the static value is
+            # more meaningful (a real ram/storage, not "N/A"/empty). This
+            # repairs corruption where Sanity carried "N/A" ram or a duplicated
+            # storage that the earlier "skip if present" guard left untouched.
+            match = static_variants[i] if use_index else (
+                price_to_static.get(v.get("price")) or min(
+                    price_to_static.values(),
+                    key=lambda s: abs((s["price"] or 0) - (v.get("price") or 0)),
+                ) if price_to_static else None
+            )
+            if not match:
+                continue
+            new_ram = match["ram"] or ""
+            new_storage = match["storage"] or ""
+            if v.get("ram") != new_ram or v.get("storage") != new_storage:
+                v["ram"] = new_ram
+                v["storage"] = new_storage
                 if match.get("originalPrice") and not v.get("originalPrice"):
                     v["originalPrice"] = match["originalPrice"]
                 changed = True
