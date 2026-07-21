@@ -35,10 +35,10 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   const hasProductPrice = typeof product.price === "number" && Number.isFinite(product.price);
   // Always prefer the selected variant's price over the product-level price.
   // This ensures the price updates when the user clicks a different variant button.
-  // A variant whose `ram` is null (common for iPhones) should match an empty
-  // activeRam selection. Normalise null -> "" on both sides.
+  // iPhones have ram: "N/A" or ram: "" — normalise both to "" so the match works.
+  const normRam = (r?: string | null) => (!r || r === "N/A") ? "" : r;
   const matchingVariant = product.variants.find(
-    (variant) => (variant.ram ?? "") === activeRam && (variant.storage ?? "") === activeStorage,
+    (variant) => normRam(variant.ram) === normRam(activeRam) && (variant.storage ?? "") === activeStorage,
   );
   // The storefront shows the live price for the SELECTED variant.
   // Priority: selected variant's Flipkart price → selected variant's own price
