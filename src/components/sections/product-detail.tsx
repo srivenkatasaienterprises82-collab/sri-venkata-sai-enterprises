@@ -24,7 +24,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   // derivation in src/lib/data/products.ts (used for the static fallback).
   const ramOptions = product.ramOptions?.length
     ? product.ramOptions
-    : Array.from(new Set(product.variants.map((v) => v.ram).filter((r): r is string => !!r)));
+    : Array.from(new Set(product.variants.map((v) => normRam(v.ram)).filter((r): r is string => !!r)));
   const storageOptions = product.storageOptions?.length
     ? product.storageOptions
     : Array.from(new Set(product.variants.map((v) => v.storage).filter((s): s is string => !!s)));
@@ -75,7 +75,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
   // A variant whose `ram` is null (common for iPhones) should match an empty
   // activeRam selection. Normalise null -> "" on both sides.
   const matchingVariant = product.variants.find(
-    (variant) => (variant.ram ?? "") === activeRam && (variant.storage ?? "") === activeStorage,
+    (variant) => normRam(variant.ram) === activeRam && (variant.storage ?? "") === activeStorage,
   );
   // Show ONLY the live marketplace price (Flipkart / Amazon) — never the stale
   // seed `price`. Prefer the SELECTED variant's own per-variant marketplace
