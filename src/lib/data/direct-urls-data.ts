@@ -2330,6 +2330,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "iqoo-15": {
     "brand": "iQOO",
     "name": "iQOO 15",
+    "amazonUrl": "https://www.amazon.in/iQOO-Storage-Fastest-Snapdragon-Processor/dp/B0FYGBSKFB",
     "colorNames": [
       "Alpha",
       "Legend",
@@ -2362,6 +2363,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "iqoo-15r": {
     "brand": "iQOO",
     "name": "iQOO 15R",
+    "amazonUrl": "https://www.amazon.in/iQOO-Snapdragon%C2%AE-Processor-Slimmest-Smartphone/dp/B0GL83ZTP8",
     "colorNames": [
       "Raging Blue",
       "MoonKnight",
@@ -2379,6 +2381,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "iqoo-neo-10": {
     "brand": "iQOO",
     "name": "iQOO Neo 10",
+    "amazonUrl": "https://www.amazon.in/iQOO-Processor-Snapdragon-Supercomputing-FlashCharge/dp/B0GXZ1VC4J",
     "colorNames": [
       "Inferno Red",
       "Titanium Chrome",
@@ -2409,6 +2412,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "iqoo-z10-lite": {
     "brand": "iQOO",
     "name": "iQOO Z10 Lite",
+    "amazonUrl": "https://www.amazon.in/iQOO-Lite-Titanium-Blue-Storage/dp/B0H1JG89ZB",
     "colorNames": [
       "Storm Black",
       "Cyber Blue"
@@ -2431,6 +2435,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "iqoo-z10r": {
     "brand": "iQOO",
     "name": "iQOO Z10R",
+    "amazonUrl": "https://www.amazon.in/iQOO-Aquamarine-Quad-Curved-Dimensity-Processor/dp/B0FHB5V36G",
     "colorNames": [
       "Storm Black",
       "Cyber Blue"
@@ -2453,6 +2458,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "iqoo-z11x": {
     "brand": "iQOO",
     "name": "iQOO Z11x",
+    "amazonUrl": "https://www.amazon.in/iQOO-Prismatic-Dimensity-7400-Turbo-Processor/dp/B0GP8XYL7H",
     "colorNames": [
       "Storm Black",
       "Cyber Blue",

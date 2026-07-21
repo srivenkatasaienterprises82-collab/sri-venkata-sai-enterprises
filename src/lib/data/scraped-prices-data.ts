@@ -564,19 +564,19 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "8GB",
         "storage": "128GB",
-        "price": 45499,
+        "price": 45299,
         "originalPrice": 59999
       },
       {
         "ram": "8GB",
         "storage": "256GB",
-        "price": 52830,
+        "price": 52729,
         "originalPrice": 65999
       },
       {
         "ram": "8GB",
         "storage": "512GB",
-        "price": 63500,
+        "price": 62499,
         "originalPrice": 77999
       }
     ]
@@ -989,13 +989,13 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "",
         "storage": "256GB",
-        "price": 75905,
-        "originalPrice": 82900
+        "price": 79900,
+        "originalPrice": 89900
       },
       {
         "ram": "",
         "storage": "512GB",
-        "price": 102900
+        "price": 94900
       }
     ]
   },
@@ -1008,19 +1008,19 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "",
         "storage": "256GB",
-        "price": 123900,
+        "price": 119900,
         "originalPrice": 134900
       },
       {
         "ram": "",
         "storage": "512GB",
-        "price": 152900,
+        "price": 134900,
         "originalPrice": 154900
       },
       {
         "ram": "",
         "storage": "1TB",
-        "price": 172900,
+        "price": 159900,
         "originalPrice": 174900
       }
     ]
@@ -1041,19 +1041,19 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "",
         "storage": "512GB",
-        "price": 167900,
+        "price": 154900,
         "originalPrice": 169900
       },
       {
         "ram": "",
         "storage": "1TB",
-        "price": 187900,
+        "price": 179900,
         "originalPrice": 189900
       },
       {
         "ram": "",
         "storage": "2TB",
-        "price": 227900,
+        "price": 204900,
         "originalPrice": 229900
       }
     ]
@@ -1069,18 +1069,18 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "",
         "storage": "256GB",
-        "price": 80499,
+        "price": 89900,
         "originalPrice": 119900
       },
       {
         "ram": "",
         "storage": "512GB",
-        "price": 139900
+        "price": 104900
       },
       {
         "ram": "",
         "storage": "1TB",
-        "price": 159900
+        "price": 129900
       }
     ]
   },
@@ -1118,7 +1118,7 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "16GB",
         "storage": "512GB",
-        "price": 65881,
+        "price": 64999,
         "originalPrice": 79999
       }
     ]
@@ -1140,7 +1140,7 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "12GB",
         "storage": "256GB",
-        "price": 49295,
+        "price": 47999,
         "originalPrice": 52999
       }
     ]
@@ -1891,6 +1891,31 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       }
     ]
   },
+  "nothing-phone-4a": {
+    "colorNames": [
+      "White"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 34999,
+        "originalPrice": 39999
+      },
+      {
+        "ram": "8GB",
+        "storage": "256GB",
+        "price": 37999,
+        "originalPrice": 42999
+      },
+      {
+        "ram": "12GB",
+        "storage": "256GB",
+        "price": 40999,
+        "originalPrice": 45999
+      }
+    ]
+  },
   "redmi-a7-pro": {
     "colorNames": [
       "Black",
@@ -2324,6 +2349,6 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
         "storage": "64GB",
         "price": 11999
       }
-    ]
+    ],
   }
 };
