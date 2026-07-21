@@ -16,7 +16,8 @@
     "direct-urls:check": "tsx scripts/check-direct-urls.ts",
     "direct-urls:patch:sanity": "tsx scripts/patch-direct-urls.ts",
     "test:py": "pytest tests -q",
-    "variant-prices:check": "tsx scripts/check-missing-variant-prices.ts"
+    "variant-prices:check": "tsx scripts/check-missing-variant-prices.ts",
+    "variant-prices:fix": "tsx scripts/fix-missing-variant-prices.ts"
   },
   "dependencies": {
     "@portabletext/react": "^6.2.0",
