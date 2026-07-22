@@ -369,13 +369,13 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "8GB",
         "storage": "128GB",
-        "price": 28990,
+        "price": 32990,
         "originalPrice": 36999
       },
       {
         "ram": "8GB",
         "storage": "256GB",
-        "price": 30990,
+        "price": 41999,
         "originalPrice": 45999
       },
       {
@@ -400,13 +400,13 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "16GB",
         "storage": "512GB",
-        "price": 81999,
+        "price": 69326,
         "originalPrice": 74999
       },
       {
         "ram": "12GB",
         "storage": "256GB",
-        "price": 73989,
+        "price": 76999,
         "originalPrice": 76999
       }
     ]
@@ -420,13 +420,13 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "8GB",
         "storage": "256GB",
-        "price": 44999,
+        "price": 49999,
         "originalPrice": 56999
       },
       {
         "ram": "12GB",
         "storage": "256GB",
-        "price": 47999,
+        "price": 54999,
         "originalPrice": 56999
       },
       {
@@ -492,13 +492,13 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "8GB",
         "storage": "128GB",
-        "price": 27548,
+        "price": 27999,
         "originalPrice": 30999
       },
       {
         "ram": "6GB",
         "storage": "128GB",
-        "price": 21999,
+        "price": 24999,
         "originalPrice": 28999
       },
       {
@@ -759,19 +759,19 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "8GB",
         "storage": "128GB",
-        "price": 22999,
+        "price": 20900,
         "originalPrice": 25999
       },
       {
         "ram": "8GB",
         "storage": "256GB",
-        "price": 24999,
+        "price": 21990,
         "originalPrice": 24999
       },
       {
         "ram": "12GB",
         "storage": "256GB",
-        "price": 27999,
+        "price": 27990,
         "originalPrice": 37999
       }
     ]
@@ -1140,7 +1140,7 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "12GB",
         "storage": "256GB",
-        "price": 47999,
+        "price": 54999,
         "originalPrice": 52999
       }
     ]
@@ -1925,12 +1925,12 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "4GB",
         "storage": "64GB",
-        "price": 11499
+        "price": 12715
       },
       {
         "ram": "4GB",
         "storage": "128GB",
-        "price": 12499
+        "price": 14999
       }
     ]
   },
@@ -1970,7 +1970,7 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "4GB",
         "storage": "128GB",
-        "price": 15491,
+        "price": 16999,
         "originalPrice": 22490
       },
       {
@@ -1990,13 +1990,13 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "4GB",
         "storage": "64GB",
-        "price": 14249,
+        "price": 14779,
         "originalPrice": 16999
       },
       {
         "ram": "4GB",
         "storage": "128GB",
-        "price": 15199,
+        "price": 15709,
         "originalPrice": 17999
       },
       {
@@ -2184,7 +2184,7 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       {
         "ram": "6GB",
         "storage": "128GB",
-        "price": 21999,
+        "price": 24999,
         "originalPrice": 24999
       },
       {

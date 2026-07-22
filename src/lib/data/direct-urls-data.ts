@@ -6,6 +6,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "airpods-4": {
     "brand": "Apple",
     "name": "Apple AirPods 4",
+    
+    "amazonUrl": "https://www.amazon.in/Apple-Bluetooth-Headphones-Personalised-Effortless/dp/B0DGJLL7V1",
+    "flipkartUrl": "https://www.flipkart.com/apple-airpods-4-wireless-earbuds-personalised-spatial-audio-sweat-water-resistant-bluetooth/p/itmdf102348be4b9",
     "colorNames": [
       "White (Standard)"
     ],
@@ -140,6 +143,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "pixel-10": {
     "brand": "Google",
     "name": "Google Pixel 10",
+    
+    "flipkartUrl": "https://www.flipkart.com/google-pixel-10-frost-256-gb/p/itm180af25bcc197",
     "colorNames": [
       "Indigo",
       "Frost",
@@ -164,7 +169,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "pixel-10a": {
     "brand": "Google",
     "name": "Google Pixel 10a",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/google-pixel-10a-lavender-256-gb/p/itmba3073a0f391e",
+"colorNames": [
       "Obsidian",
       "Porcelain",
       "Aloe",
@@ -211,7 +217,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "infinix-gt-30": {
     "brand": "Infinix",
     "name": "Infinix GT 30",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-5g-cyber-blue-128-cyber-blue-gb/p/itmcda81613113c6",
+"colorNames": [
       "Pulse Green",
       "Cyber Blue",
       "Blade White"
@@ -234,7 +241,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "infinix-gt-30-pro": {
     "brand": "Infinix",
     "name": "Infinix GT 30 Pro",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/infinix-gt-30-pro-5g-dark-flare-256-gb/p/itmd4bc1852572b9",
+"colorNames": [
       "Dark Flare",
       "Blade White",
       "Shadow Ash"
@@ -282,7 +290,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "infinix-smart-10": {
     "brand": "Infinix",
     "name": "Infinix Smart 10",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/infinix-smart-10-titanium-silver-64-gb/p/itm0bde9cee1963a",
+"colorNames": [
       "Black",
       "Blue",
       "Green"
@@ -305,7 +314,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "infinix-smart-20": {
     "brand": "Infinix",
     "name": "Infinix Smart 20",
-    "colorNames": [
+"colorNames": [
       "Sunlit Orange",
       "Black",
       "Blue"
@@ -328,7 +337,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "moto-60-fusion": {
     "brand": "Motorola",
     "name": "Motorola 60 Fusion",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-fusion-5g-pantone-zephyr-256-gb/p/itmc9dbbd784b6bc",
+"colorNames": [
       "Eclipse Black",
       "Marshmallow Blue"
     ],
@@ -350,7 +360,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "moto-70-fusion": {
     "brand": "Motorola",
     "name": "Motorola 70 Fusion",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-fusion-pantone-country-air-128-gb/p/itmbae68fc092d22",
+"colorNames": [
       "Koala Grey",
       "Ballad Blue"
     ],
@@ -372,7 +383,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "moto-edge-60": {
     "brand": "Motorola",
     "name": "Motorola Edge 60",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-5g/p/itm18a81b952d716",
+"colorNames": [
       "Koala Grey",
       "Ballad Blue",
       "Pantone Nautical Blue"
@@ -395,7 +407,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "moto-edge-60-pro": {
     "brand": "Motorola",
     "name": "Motorola Edge 60 Pro",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/motorola-edge-60-pro-pantone-shadow-256-gb/p/itme4f8c6dd0e2db",
+"colorNames": [
       "Pantone Nautical Blue",
       "Pantone Gibraltar Sea"
     ],
@@ -417,7 +430,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "moto-edge-70-pro": {
     "brand": "Motorola",
     "name": "Motorola Edge 70 Pro",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/motorola-edge-70-pro-pantone-tea-256-gb/p/itm8e1524c8da543",
+"colorNames": [
       "Pantone Lily White",
       "Pantone Titan",
       "Pantone Tea",
@@ -442,7 +456,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "moto-g06-power": {
     "brand": "Motorola",
     "name": "Motorola Moto G06 Power",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/motorola-g06-power-pantone-tapestry-64-gb/p/itm29390fa68401d",
+"colorNames": [
       "Sage Green",
       "Meteor Grey"
     ],
@@ -508,7 +523,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "moto-g57-power": {
     "brand": "Motorola",
     "name": "Motorola Moto G57 Power",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/motorola-g57-power-5g-snapdragon-pantone-regatta-128-gb/p/itmdab5f9f1bf87b",
+"colorNames": [
       "Sage Green",
       "Meteor Grey"
     ],
@@ -530,7 +546,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "moto-g67-power": {
     "brand": "Motorola",
     "name": "Motorola Moto G67 Power",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/motorola-g67-power-5g-snapdragon-pantone-cilantro-128-gb/p/itmb96be3c1b56cd",
+"colorNames": [
       "Ocean Blue",
       "Charcoal Black"
     ],
@@ -708,7 +725,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oneplus-13": {
     "brand": "OnePlus",
     "name": "OnePlus 13",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/OnePlus-13-256GB-Midnight-Ocean/dp/B0DPS7FB4J",
+    "flipkartUrl": "https://www.flipkart.com/oneplus-13-black-eclipse-256-gb/p/itmb4659fd2a037f",
+"colorNames": [
       "Midnight Ocean",
       "Arctic Dawn",
       "Black Eclipse"
@@ -737,6 +756,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oneplus-z2-anc": {
     "brand": "OnePlus",
     "name": "OnePlus Buds Z2 ANC",
+    
+    "flipkartUrl": "https://www.flipkart.com/oneplus-buds-z2-active-noise-cancellation-bluetooth/p/itm88b7c4b3f5397",
     "colorNames": [
       "Black",
       "White"
@@ -770,6 +791,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oneplus-nord-5": {
     "brand": "OnePlus",
     "name": "OnePlus Nord 5",
+    
+    "flipkartUrl": "https://www.flipkart.com/oneplus-nord-55g-marble-sands-256-gb/p/itmfd2cc9a18a7be",
     "colorNames": [
       "Marble Sands",
       "Phantom Grey",
@@ -793,7 +816,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oneplus-nord-6": {
     "brand": "OnePlus",
     "name": "OnePlus Nord 6",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oneplus-nord-6-fresh-mint-256-gb/p/itmc49f71cdc4080",
+"colorNames": [
       "Stormy Black",
       "Misty Green"
     ],
@@ -821,7 +845,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oneplus-nord-ce6": {
     "brand": "OnePlus",
     "name": "OnePlus Nord CE6",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oneplus-nord-ce6-pitch-black-128-gb/p/itmd7b224b18cb05",
+"colorNames": [
       "Dark Chrome",
       "Cloud Trinity"
     ],
@@ -843,7 +868,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oneplus-nord-ce6-lite": {
     "brand": "OnePlus",
     "name": "OnePlus Nord CE6 Lite",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oneplus-nord-ce6-lite-vivid-mint-128-gb/p/itm21e965b5b799d",
+"colorNames": [
       "Pastel Lime",
       "Aqua Surge"
     ],
@@ -887,7 +913,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-a6x": {
     "brand": "Oppo",
     "name": "Oppo A6x",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oppo-a6x-5g-ice-blue-64-gb/p/itmdf1381e11e8a7",
+"colorNames": [
       "Starlight White",
       "Midnight Black",
       "Ocean Blue"
@@ -910,6 +937,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-f31-pro-plus": {
     "brand": "Oppo",
     "name": "Oppo F31 Pro Plus",
+    
+    "amazonUrl": "https://www.amazon.in/Oppo-Gemstone-Blue-256GB-Storage/dp/B0FP8MCBT8",
     "colorNames": [
       "Astral Blue",
       "Stellar Black"
@@ -932,6 +961,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-f33": {
     "brand": "Oppo",
     "name": "Oppo F33",
+    
+    "flipkartUrl": "https://www.flipkart.com/oppo-f33-5g-forest-green-128-gb/p/itm8c5d4a65602fd",
     "colorNames": [
       "Misty Forest",
       "Passion Red",
@@ -955,7 +986,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-f33-pro": {
     "brand": "Oppo",
     "name": "Oppo F33 Pro",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oppo-f33-pro-5g-misty-forest-256-gb/p/itme0e9af182d309",
+"colorNames": [
       "Misty Forest",
       "Passion Red",
       "Starry Blue"
@@ -978,7 +1010,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-k13": {
     "brand": "Oppo",
     "name": "Oppo K13",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oppo-k13-5g-7000mah-80w-supervooc-charger-in-the-box-prism-black-128-gb/p/itm6f2ebf6d205cf",
+"colorNames": [
       "Iron Grey",
       "Ice Blue"
     ],
@@ -1000,7 +1033,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-k13x": {
     "brand": "Oppo",
     "name": "Oppo K13x",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oppo-k13x-5g-6000mah-45w-supervooc-charger-ai-midnight-violet-128-gb/p/itm62b2e62fbb43e",
+"colorNames": [
       "Iron Grey",
       "Ice Blue"
     ],
@@ -1022,7 +1056,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-k14": {
     "brand": "Oppo",
     "name": "Oppo K14",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oppo-k14-5g-prism-violet-128-gb/p/itm2a5cc1d23c2af",
+"colorNames": [
       "Iron Grey",
       "Ice Blue",
       "Sunset Orange"
@@ -1045,7 +1080,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-k14x": {
     "brand": "Oppo",
     "name": "Oppo K14x",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oppo-k14x-5g-icy-blue-64-gb/p/itm188c7a4b69292",
+"colorNames": [
       "Iron Grey",
       "Ice Blue"
     ],
@@ -1067,7 +1103,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-reno-15": {
     "brand": "Oppo",
     "name": "Oppo Reno 15",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/oppo-reno15-5g-aurora-blue-256-gb/p/itm37cc91d1c2807",
+"colorNames": [
       "Silver Moon",
       "Midnight Black",
       "Aurora Green"
@@ -1096,6 +1133,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "oppo-reno-15-pro-mini": {
     "brand": "Oppo",
     "name": "Oppo Reno 15 Pro Mini",
+    
+    "amazonUrl": "https://www.amazon.in/Reno15Pro-Glacier-Storage-Additional-Exchange/dp/B0G8YX1HVK",
     "colorNames": [
       "Space Silver",
       "Cosmic Black"
@@ -1146,7 +1185,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "poco-c71": {
     "brand": "POCO",
     "name": "POCO C71",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/poco-c71-desert-gold-64-gb/p/itme3dc58af6a04b",
+"colorNames": [
       "Power Black",
       "Coral Green",
       "Ice Blue"
@@ -1169,7 +1209,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "poco-c85": {
     "brand": "POCO",
     "name": "POCO C85",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/poco-c85-5g-mystic-purple-128-gb/p/itm74e2143a5de24",
+"colorNames": [
       "Power Black",
       "Coral Green"
     ],
@@ -1214,7 +1255,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "poco-m7": {
     "brand": "POCO",
     "name": "POCO M7",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/poco-m7-5g/p/itmf030852464eef",
+"colorNames": [
       "Graphite Black",
       "Aurora Green",
       "Ice Blue"
@@ -1237,7 +1279,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "poco-m7-plus": {
     "brand": "POCO",
     "name": "POCO M7 Plus",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/poco-m7-plus-5g-chrome-silver-128-gb/p/itm2fbc82f08965c",
+"colorNames": [
       "Graphite Black",
       "Aurora Green"
     ],
@@ -1259,7 +1302,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-15": {
     "brand": "Realme",
     "name": "Realme 15",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/realme-15-5g-silk-pink-256-gb/p/itme9581fbd0e97a",
+"colorNames": [
       "Speed Green",
       "Racing Black"
     ],
@@ -1281,7 +1325,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-15t": {
     "brand": "Realme",
     "name": "Realme 15T",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/realme-15t-5g-flowing-silver-128-gb/p/itm3f28d98da183c",
+"colorNames": [
       "Speed Green",
       "Racing Black"
     ],
@@ -1303,7 +1348,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-15x": {
     "brand": "Realme",
     "name": "Realme 15x",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/realme-15x-5g-aqua-blue-128-gb/p/itmcf22f2a57724f",
+"colorNames": [
       "Speed Green",
       "Racing Black",
       "Champion Gold"
@@ -1326,7 +1372,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-16": {
     "brand": "Realme",
     "name": "Realme 16",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/realme-Smartphone-6-57-inch-Front50MP-Dimensity/dp/B0GTV1784Z",
+    "flipkartUrl": "https://www.flipkart.com/realme-16-5g-air-black-256-gb/p/itm7b0c4cd95742b",
+"colorNames": [
       "Pebble Grey",
       "Master Gold",
       "Orchid Purple"
@@ -1355,7 +1403,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-16-pro": {
     "brand": "Realme",
     "name": "Realme 16 Pro+",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/realme-16-Pro-Smartphone-Snapdragon/dp/B0GC6N68BC",
+    "flipkartUrl": "https://www.flipkart.com/realme-16-pro-5g/p/itmf8e5c193facd1",
+"colorNames": [
       "Master Grey",
       "Master Gold",
       "Camellia Pink"
@@ -1384,6 +1434,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-16t": {
     "brand": "Realme",
     "name": "Realme 16T",
+    
+    "amazonUrl": "https://www.amazon.in/dp/B0H255CF45",
+    "flipkartUrl": "https://www.flipkart.com/realme-16t-5g-aurora-green-256-gb/p/itm604f2af610fd0",
     "colorNames": [
       "Speed Green",
       "Racing Black"
@@ -1406,7 +1459,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-c71": {
     "brand": "Realme",
     "name": "Realme C71",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/realme-Smartphone-Comfort-Display-Obsidian/dp/B0GFVPT1X9",
+    "flipkartUrl": "https://www.flipkart.com/realme-c71-sea-blue-128-gb/p/itm920c5c8761871",
+"colorNames": [
       "Meadow Green",
       "Twilight Purple"
     ],
@@ -1428,7 +1483,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-c83": {
     "brand": "Realme",
     "name": "Realme C83",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/realme-Smartphone-Dimensity-Processor-Waterproof/dp/B0GQ78KNPT",
+    "flipkartUrl": "https://www.flipkart.com/realme-c83-5g-sprouting-green-64-gb/p/itm85479b4419036",
+"colorNames": [
       "Meadow Green",
       "Twilight Purple"
     ],
@@ -1466,7 +1523,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-p4": {
     "brand": "Realme",
     "name": "Realme P4",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/realme-P4-Smartphone-Engine-128-0/dp/B0FMDXKDDF",
+"colorNames": [
       "Nebula Purple",
       "Cosmic Black",
       "Starlight Silver"
@@ -1539,7 +1597,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-p4x": {
     "brand": "Realme",
     "name": "Realme P4x",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/realme-P4X-Smartphone-Dimensity-Waterproof/dp/B0G3X99MZS",
+"colorNames": [
       "Nebula Purple",
       "Cosmic Black"
     ],
@@ -1561,7 +1620,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "realme-pad-2-lite": {
     "brand": "Realme",
     "name": "Realme Pad 2 Lite",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/realme-10-9Inch-Eyecomfort-Mediatek-Connectivity/dp/B0DHQTQYNR",
+"colorNames": [
       "Green",
       "Grey"
     ],
@@ -1589,7 +1649,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "redmi-15a": {
     "brand": "Redmi",
     "name": "Redmi 15A",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/redmi-15a-awesome-blue-128-gb/p/itm9217bed9d5ed2",
+"colorNames": [
       "Light Blue",
       "Black",
       "Green"
@@ -1612,7 +1673,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "redmi-15c": {
     "brand": "Redmi",
     "name": "Redmi 15C",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/redmi-15c-5g-dusk-purple-128-gb/p/itma65eb003483e4",
+"colorNames": [
       "Stardust Purple",
       "Midnight Black",
       "Forest Green"
@@ -1635,7 +1697,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "redmi-a4": {
     "brand": "Redmi",
     "name": "Redmi A4",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Redmi-A4-5G-Sparkle-Charging/dp/B0FBR69B2R",
+    "flipkartUrl": "https://www.flipkart.com/redmi-a4-sparkle-purple-128-gb/p/itm195b57bdc2f83",
+"colorNames": [
       "Midnight Black",
       "Starlight Blue",
       "Sunset Orange"
@@ -1658,7 +1722,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "redmi-a5": {
     "brand": "Redmi",
     "name": "Redmi A5",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/redmi-a5-jaisalmer-gold-64-gb/p/itm2b4357effaa74",
+"colorNames": [
       "Midnight Black",
       "Lake Blue",
       "Olive Green"
@@ -1703,7 +1768,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-a06": {
     "brand": "Samsung",
     "name": "Samsung Galaxy A06",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-Galaxy-Storage-MediaTek-Battery/dp/B0DCJMMGNF",
+"colorNames": [
       "Black",
       "Light Blue",
       "Gold"
@@ -1726,7 +1792,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-f06": {
     "brand": "Samsung",
     "name": "Samsung Galaxy F06",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-Galaxy-Bahama-Blue-128GB/dp/B0DYKC512N",
+    "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-f06-5g-bahama-blue-128-gb/p/itm9acd4c5748761",
+"colorNames": [
       "Black",
       "Light Blue",
       "Gold"
@@ -1749,7 +1817,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-f07": {
     "brand": "Samsung",
     "name": "Samsung Galaxy F07",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-f07-green-64-gb/p/itm294cbb65839e6",
+"colorNames": [
       "Black",
       "Light Blue",
       "Gold"
@@ -1772,7 +1841,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-f36": {
     "brand": "Samsung",
     "name": "Samsung Galaxy F36",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-Galaxy-F36-Black-128GB/dp/B0FLZ517QL",
+"colorNames": [
       "Awesome Graphite",
       "Awesome Silver",
       "Awesome Violet"
@@ -1795,7 +1865,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-f70e": {
     "brand": "Samsung",
     "name": "Samsung Galaxy F70e",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-f70e-5g-spotlight-blue-128-gb/p/itm9b75b980e9dae",
+"colorNames": [
       "Awesome Graphite",
       "Awesome Silver"
     ],
@@ -1817,7 +1888,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-m06": {
     "brand": "Samsung",
     "name": "Samsung Galaxy M06",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-MediaTek-Dimensity-Charging-Upgrades/dp/B0DX6P3RX9",
+    "flipkartUrl": "https://www.flipkart.com/samsung-m06-5g-blazing-black-128-gb/p/itmcafa42dadc15c",
+"colorNames": [
       "Black",
       "Light Blue",
       "Gold"
@@ -1840,7 +1913,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-m36": {
     "brand": "Samsung",
     "name": "Samsung Galaxy M36",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-Storage-Enhanced-Unmatched-Nightography/dp/B0FDB9H277",
+    "flipkartUrl": "https://www.flipkart.com/samsung-m36-5g-light-green-128-gb/p/itm4cf1eae54334f",
+"colorNames": [
       "Awesome Graphite",
       "Awesome Silver",
       "Awesome Violet"
@@ -1863,7 +1938,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-m56": {
     "brand": "Samsung",
     "name": "Samsung Galaxy M56",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-Slimmest-Enhanced-Nightography-Processor/dp/B0F43WXC8K",
+    "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-m56-5g-black-128-gb/p/itm64935225a672e",
+"colorNames": [
       "Awesome Graphite",
       "Awesome Silver",
       "Awesome Violet"
@@ -1886,7 +1963,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-s25-fe": {
     "brand": "Samsung",
     "name": "Samsung Galaxy S25 FE",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-Smartphone-JetBlack-Storage-ProVisual/dp/B0FNMQW9HW",
+"colorNames": [
       "Icyblue",
       "Jetblack",
       "Navy",
@@ -1916,7 +1994,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-s25-ultra": {
     "brand": "Samsung",
     "name": "Samsung Galaxy S25 Ultra",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-Smartphone-Silverblue-Snapdragon-ProVisual/dp/B0DSBTKP5Q",
+    "flipkartUrl": "https://www.flipkart.com/samsung-galaxy-s25-ultra-5g-titanium-black-256-gb/p/itm09d676ceb930d",
+"colorNames": [
       "Titanium Silverblue",
       "Titanium Black",
       "Titanium Gray",
@@ -1946,7 +2026,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-s26-plus": {
     "brand": "Samsung",
     "name": "Samsung Galaxy S26+",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-Storage-Creative-Wireless-Charging/dp/B0GL8J486T",
+"colorNames": [
       "Black",
       "Cobalt Violet",
       "Sky Blue",
@@ -1972,7 +2053,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "samsung-tab-s10-lite": {
     "brand": "Samsung",
     "name": "Samsung Galaxy Tab S10 Lite",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Samsung-Galaxy-Display-Refresh-Storage/dp/B0FNWNZZ1B",
+"colorNames": [
       "Graphite",
       "Silver",
       "Pink Gold"
@@ -1995,7 +2077,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-t4": {
     "brand": "Vivo",
     "name": "Vivo T4",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/vivo-t4-5g-emerald-blaze-128-gb/p/itmc2634fd4daeb9",
+"colorNames": [
       "Emerald Blaze",
       "Phantom Grey"
     ],
@@ -2017,7 +2100,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-t4-lite": {
     "brand": "Vivo",
     "name": "Vivo T4 Lite",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/vivo-t4-lite-5g-2026-titanium-gold-128-gb/p/itm08f41580b36a4",
+"colorNames": [
       "Glacier Blue",
       "Starry Black"
     ],
@@ -2039,7 +2123,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-t4-pro": {
     "brand": "Vivo",
     "name": "Vivo T4 Pro",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/vivo-T4-Pro-5G-Blaze/dp/B0G4QQ3ZFV",
+    "flipkartUrl": "https://www.flipkart.com/vivo-t4-pro-5g-nitro-blue-128-gb/p/itm4da1824b696d9",
+"colorNames": [
       "Nitro Blue",
       "Blaze Gold"
     ],
@@ -2061,7 +2147,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-t4-ultra": {
     "brand": "Vivo",
     "name": "Vivo T4 Ultra",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/VIVO-T4-Ultra-5G-Meteor/dp/B0FFB1L75V",
+    "flipkartUrl": "https://www.flipkart.com/vivo-t4-ultra-5g-meteor-grey-512-gb/p/itm9cfd8118c9ce0",
+"colorNames": [
       "Phoenix Gold",
       "Meteor Grey"
     ],
@@ -2083,7 +2171,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-t4r": {
     "brand": "Vivo",
     "name": "Vivo T4R",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/VIVO-T4R-Twilight-Blue-256GB/dp/B0FPGR6SJ5",
+    "flipkartUrl": "https://www.flipkart.com/vivo-t4r-5g-twilight-blue-128-gb/p/itm3a5653667cb9c",
+"colorNames": [
       "Glacier Blue",
       "Starry Black"
     ],
@@ -2105,7 +2195,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-t4x": {
     "brand": "Vivo",
     "name": "Vivo T4x",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/Mobile-Phone-T4x-Marine-Blue_128G/dp/B0F194NC2H",
+    "flipkartUrl": "https://www.flipkart.com/vivo-t4x-5g-marine-blue-128-gb/p/itm017656bdd097b",
+"colorNames": [
       "Glacier Blue",
       "Starry Black"
     ],
@@ -2127,7 +2219,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-t5-pro": {
     "brand": "Vivo",
     "name": "Vivo T5 Pro",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/vivo-t5-pro-5g-glacier-blue-128-gb/p/itma21e2e09d4493",
+"colorNames": [
       "Glacier Blue",
       "Starry Black",
       "Champagne Gold"
@@ -2150,7 +2243,9 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-t5x": {
     "brand": "Vivo",
     "name": "Vivo T5x",
-    "colorNames": [
+    "amazonUrl": "https://www.amazon.in/vivo-5G-Dimensity-7400-Turbo-Processor/dp/B0GXRVCPST",
+    "flipkartUrl": "https://www.flipkart.com/vivo-t5x-5g-star-silver-128-gb/p/itm7da8aa253e72b",
+"colorNames": [
       "Glacier Blue",
       "Starry Black"
     ],
@@ -2172,7 +2267,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-v70": {
     "brand": "Vivo",
     "name": "Vivo V70",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/vivo-v70-passion-red-256-gb/p/itmecfa7a31699de",
+"colorNames": [
       "Starry Black",
       "Titanium Silver",
       "Ocean Blue"
@@ -2195,7 +2291,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-v70-elite": {
     "brand": "Vivo",
     "name": "Vivo V70 Elite",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/vivo-v70-elite-passion-red-2026-256-gb/p/itmf8e28e33a9cd0",
+"colorNames": [
       "Starry Black",
       "Titanium Silver",
       "Ocean Blue"
@@ -2224,7 +2321,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-v70-fe": {
     "brand": "Vivo",
     "name": "Vivo V70 FE",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/vivo-v70-fe-northern-lights-purple-256-gb/p/itmda852a903ef97",
+"colorNames": [
       "Jade Green",
       "Coral Red"
     ],
@@ -2240,7 +2338,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-y05": {
     "brand": "Vivo",
     "name": "Vivo Y05",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/vivo-y05-champagne-gold-64-gb/p/itm7b1e1a65e7c1f",
+"colorNames": [
       "Midnight Black",
       "Ocean Blue"
     ],
@@ -2262,7 +2361,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-y11": {
     "brand": "Vivo",
     "name": "Vivo Y11",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/vivo-y11-5g-midnight-blue-64-gb/p/itm722b8f27be0b8",
+"colorNames": [
       "Midnight Black",
       "Ocean Blue",
       "Sunset Orange"
@@ -2285,7 +2385,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-y31": {
     "brand": "Vivo",
     "name": "Vivo Y31",
-    "colorNames": [
+    "flipkartUrl": "https://www.flipkart.com/vivo-y31-racing-black-128-gb/p/itm4d669e9668d87",
+"colorNames": [
       "Starry Black",
       "Champagne Gold"
     ],
@@ -2307,6 +2408,8 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
   "vivo-y51-pro": {
     "brand": "Vivo",
     "name": "Vivo Y51 Pro",
+    
+    "flipkartUrl": "https://www.flipkart.com/vivo-y51-pro-5g-festive-red-128-gb/p/itmed4b902ad17d9",
     "colorNames": [
       "Starry Black",
       "Champagne Gold",
@@ -2364,6 +2467,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     "brand": "iQOO",
     "name": "iQOO 15R",
     "amazonUrl": "https://www.amazon.in/iQOO-Snapdragon%C2%AE-Processor-Slimmest-Smartphone/dp/B0GL83ZTP8",
+    "flipkartUrl": "https://www.flipkart.com/iqoo-15r-5g-dark-knight-256-gb/p/itm7bc8aee18f590",
     "colorNames": [
       "Raging Blue",
       "MoonKnight",
@@ -2436,6 +2540,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
     "brand": "iQOO",
     "name": "iQOO Z10R",
     "amazonUrl": "https://www.amazon.in/iQOO-Aquamarine-Quad-Curved-Dimensity-Processor/dp/B0FHB5V36G",
+    "flipkartUrl": "https://www.flipkart.com/iqoo-z10r-5g-8gb-256gb-moonstone-moonstone-256-gb/p/itm787d52a4e214e",
     "colorNames": [
       "Storm Black",
       "Cyber Blue"
@@ -2478,7 +2583,24 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
         "verified": true
       }
     ]
-  }
+  },
+  "nothing-phone-4a": {
+    "brand": "Nothing",
+    "name": "Nothing Phone 4a",
+    "flipkartUrl": "https://www.flipkart.com/nothing-phone-4a-white-128-gb/p/itm47712249513d4",
+    "colorNames": [
+      "White",
+      "Black"
+    ],
+    "variants": [
+      {
+        "ram": "8GB",
+        "storage": "128GB",
+        "price": 34999,
+        "verified": true
+      }
+    ]
+  },
 };
 
 export const DIRECT_URLS_META = {
