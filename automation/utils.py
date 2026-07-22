@@ -1,5 +1,68 @@
+import os
 import re
 from rapidfuzz import fuzz
+
+# ---------------------------------------------------------------------------
+# Tuning knobs
+# ---------------------------------------------------------------------------
+# Per-variant price-delta cap for a single sync run (20% max change per step).
+MAX_VARIANT_DELTA = 0.20
+# Minimum identity confidence required by the new sync.py (Flipkart-only).
+SYNC_MIN_IDENTITY_CONFIDENCE = 0.92
+# Legacy threshold kept for launch-checker and other callers.
+LEGACY_MIN_IDENTITY_CONFIDENCE = 0.75
+
+# ---------------------------------------------------------------------------
+# Groq AI helper (optional)
+# ---------------------------------------------------------------------------
+_groq_client = None
+
+
+def _get_groq_client():
+    global _groq_client
+    if _groq_client is not None:
+        return _groq_client
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        return None
+    try:
+        from groq import Groq
+        _groq_client = Groq(api_key=api_key)
+        return _groq_client
+    except Exception:
+        return None
+
+
+def groq_normalize(name: str, brand: str) -> dict:
+    """Use Groq to produce canonical title + slug. Falls back to identity."""
+    client = _get_groq_client()
+    if not client:
+        return {"title": name, "slug": name.lower().replace(" ", "-"), "description": ""}
+    try:
+        completion = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": "Output strictly valid JSON. No markdown."},
+                {
+                    "role": "user",
+                    "content": (
+                        f"Normalize this product name to a clean official title and URL slug.\n"
+                        f"Raw name: '{name}'\nBrand: {brand}\n"
+                        'Return JSON: {"title": "...", "slug": "..."}'
+                    ),
+                },
+            ],
+            model="llama-3.3-70b-versatile",
+            temperature=0.2,
+            response_format={"type": "json_object"},
+        )
+        data = json.loads(completion.choices[0].message.content)
+        return {
+            "title": data.get("title", name),
+            "slug": data.get("slug", name.lower().replace(" ", "-")),
+            "description": "",
+        }
+    except Exception:
+        return {"title": name, "slug": name.lower().replace(" ", "-"), "description": ""}
 
 
 def is_match(name1: str, name2: str, threshold: int = 90) -> bool:
@@ -87,6 +150,24 @@ def price_change_is_plausible(old, new):
         return False, f"price_drop_too_large({ratio:.2f}x)"
     if ratio > MAX_JUMP_RATIO:
         return False, f"price_jump_too_large({ratio:.2f}x)"
+    return True, ""
+
+
+def variant_price_change_is_plausible(old_price, new_price):
+    """Return (bool, reason). Per-variant delta guard for exact-matched variants.
+
+    Uses a tighter band (MAX_VARIANT_DELTA = 20%) than the product-level
+    guard, because a per-variant price shouldn't swing wildly within one sync.
+    """
+    if old_price is None or old_price == 0:
+        return True, ""
+    if new_price is None:
+        return False, "new_price_none"
+    ratio = new_price / old_price
+    if ratio < (1.0 - MAX_VARIANT_DELTA):
+        return False, f"variant_drop_too_large({ratio:.2f}x)"
+    if ratio > (1.0 + MAX_VARIANT_DELTA):
+        return False, f"variant_jump_too_large({ratio:.2f}x)"
     return True, ""
 
 

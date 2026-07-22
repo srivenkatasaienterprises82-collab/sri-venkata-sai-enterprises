@@ -16,13 +16,14 @@ dispatch (which supplies SANITY_TOKEN from secrets).
 import json
 import os
 import sys
+import time
 
 import requests
 
 PROJECT_ID = os.getenv("SANITY_PROJECT_ID", "homvjne9")
 DATASET = os.getenv("SANITY_DATASET", "production")
 TOKEN = os.getenv("SANITY_TOKEN")
-API_VERSION = "2023-05-03"
+API_VERSION = "v2023-05-03"
 
 if not TOKEN:
     print("ERROR: SANITY_TOKEN env var is required (write token).")
@@ -46,9 +47,19 @@ def _norm(value):
 def fetch_doc(slug):
     url = f"{BASE}/data/query/{DATASET}"
     q = f'*[_type=="product" && slug.current=="{slug}" && enabled!=false][0]{{_id, "variants": variants}}'
-    r = requests.get(url, headers=HEADERS, params={"query": q}, timeout=30)
-    r.raise_for_status()
-    return r.json().get("result")
+    max_retries = 5
+    for attempt in range(1, max_retries + 1):
+        try:
+            r = requests.get(url, headers=HEADERS, params={"query": q}, timeout=30)
+            r.raise_for_status()
+            return r.json().get("result")
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            if attempt < max_retries:
+                wait = min(2 ** attempt, 15)
+                print(f"    Retry {attempt}/{max_retries} after {wait}s: {e}")
+                time.sleep(wait)
+            else:
+                raise
 
 
 def patch_variants(slug, spec_variants):
@@ -125,10 +136,13 @@ def main():
         spec = json.load(f)
 
     ok = 0
-    for slug, variants in spec.items():
+    for idx, (slug, variants) in enumerate(spec.items()):
         print(f"Patching {slug} ...")
         if patch_variants(slug, variants):
             ok += 1
+        # Small delay between patches to avoid Sanity API rate limits
+        if idx < len(spec) - 1:
+            time.sleep(1)
     print(f"\nDone. Patched {ok}/{len(spec)} products.")
 
 

@@ -1,0 +1,57 @@
+name: Daily Automation Report
+
+on:
+  schedule:
+    - cron: "0 23 * * *"
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install deps
+        run: python -m pip install --upgrade pip requests
+      - name: Generate Report
+        env:
+          SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
+          SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
+          PYTHONPATH: automation
+        run: |
+          python -c "
+          import json, os, sys
+          sys.path.insert(0, 'automation')
+          from sanity_api import fetch_all_products
+          products = fetch_all_products()
+          total = len(products)
+          enabled = sum(1 for p in products if p.get('enabled') is not False)
+          with_fk = sum(1 for p in products if p.get('flipkartUrl'))
+          locked = sum(1 for p in products if p.get('priceLocked'))
+          print(f'Total products: {total}')
+          print(f'Enabled: {enabled}')
+          print(f'With Flipkart URL: {with_fk}')
+          print(f'Price locked: {locked}')
+          import os
+          up = 'updated_products.jsonl'
+          sk = 'skipped_products.jsonl'
+          up_count = sum(1 for _ in open(up)) if os.path.exists(up) else 0
+          sk_count = sum(1 for _ in open(sk)) if os.path.exists(sk) else 0
+          print(f'Updated (last run): {up_count}')
+          print(f'Skipped (last run): {sk_count}')
+          "
+      - name: Upload Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: daily-report
+          path: |
+            updated_products.jsonl
+            skipped_products.jsonl

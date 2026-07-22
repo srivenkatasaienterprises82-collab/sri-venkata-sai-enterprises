@@ -273,6 +273,41 @@ def _merge_variant_marketplace_prices(target: dict, scraped: dict | None,
             target[mk] = int(val)
 
 
+def update_variants_and_price(
+    product_id: str,
+    display_price: int,
+    flipped: bool,
+    flipkart_price: int | None,
+    matched_variants: list[dict],
+    fingerprint: str = "",
+) -> dict:
+    """Patch a product's root price and only the matched variants' price fields.
+
+    Never touches images, colors, description, specifications.
+    Never nudges. Never overwrites variants[] entirely.
+    Each variant in `matched_variants` should carry: ram, storage, price, flipkartPrice.
+    """
+    set_fields = {
+        "price": display_price,
+        "lastUpdated": datetime.now().isoformat(),
+        "lastPriceUpdatedAt": datetime.now().isoformat(),
+    }
+    if flipped and flipkart_price is not None:
+        set_fields["flipkartPrice"] = flipkart_price
+    variant_patches = []
+    for v in matched_variants:
+        nv = {
+            "ram": v.get("ram"),
+            "storage": v.get("storage"),
+            "price": v.get("price"),
+            "flipkartPrice": v.get("flipkartPrice"),
+        }
+        variant_patches.append(nv)
+    set_fields["variants"] = variant_patches
+    mutations = {"mutations": [{"patch": {"id": product_id, "set": set_fields}}]}
+    return _mutate(mutations)
+
+
 def update_price_and_variants(product_id: str, product_name: str,
                                amazon_price, flipkart_price, display_price,
                                scraped_variants: list,

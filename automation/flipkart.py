@@ -5,13 +5,14 @@ import requests
 from bs4 import BeautifulSoup
 
 from http_helper import (
-    is_interstitial,
-    random_user_agent,
-    new_session,
-    get_with_retry,
+is_interstitial,
+random_user_agent,
+new_session,
+get_with_retry,
 )
 from fetch_manager import FetchManager
 from parser import dom_fingerprint, vote, confident_price
+from flipkart_variants import extract as fk_extract
 
 # playwright-stealth hides the automation tells Playwright leaves in the DOM.
 # Guarded so tests/locales without the package still run (just less stealthy).
@@ -360,13 +361,15 @@ def _try_playwright_details(url: str, attempt: int = 1) -> dict | None:
 def _parse_flipkart_details(html: str) -> dict:
     soup = BeautifulSoup(html, "lxml")
     price = _extract_jsonld_price(soup)
+    # Delegate variant extraction to flipkart_variants (Playwright-first strategies).
+    variants = fk_extract._run_extractors(html).variants if False else _extract_flipkart_variants(soup)
     return {
         "price": price,
         "images": _extract_flipkart_images(soup),
         "description": _extract_flipkart_description(soup),
         "specifications": _extract_flipkart_specs(soup),
         "colors": _extract_flipkart_colors(soup),
-        "variants": _extract_flipkart_variants(soup),
+        "variants": variants,
     }
 
 

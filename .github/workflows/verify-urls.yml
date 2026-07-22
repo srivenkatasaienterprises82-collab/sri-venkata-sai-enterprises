@@ -1,0 +1,55 @@
+name: Flipkart URL Verification
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  verify-urls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev
+          python -m pip install --upgrade pip
+          pip install --upgrade "curl_cffi>=0.6.0"
+          pip install -r requirements.txt
+          python -m playwright install chromium --with-deps
+      - name: Verify All Flipkart URLs
+        env:
+          SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
+          SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          PYTHONPATH: automation
+          PYTHONUNBUFFERED: 1
+        run: |
+          python automation/urls.py --mode verify --output url-audit.csv 2>&1 | tee url-verify.log
+      - name: Upload URL Audit Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: url-audit-report
+          path: url-audit.csv
+      - name: Print Summary
+        if: always()
+        run: |
+          if [ -f url-audit.csv ]; then
+            echo "=== URL Audit Summary ==="
+            echo "Total rows: $(wc -l < url-audit.csv | tr -d ' ')"
+            echo "Verified: $(grep -c ',verified,' url-audit.csv || echo 0)"
+            echo "Proposed fixes: $(grep -cE ',url_replaced|,auto_found|,color_mismatch_fixed|,name_mismatch_fixed,' url-audit.csv || echo 0)"
+            echo "Unresolved: $(grep -cE ',bad_page|,no_url_found|,name_mismatch_unresolved|,color_mismatch_unresolved,' url-audit.csv || echo 0)"
+          else
+            echo "No url-audit.csv produced"
+          fi

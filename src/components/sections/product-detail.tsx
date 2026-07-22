@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Tag, Truck, ShieldCheck, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, Tag, Truck, ShieldCheck, MessageCircle, ShoppingCart, ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 
 import { Product, formatPrice, isPriceOnEnquiry } from "@/lib/data/products";
 import { siteConfig } from "@/lib/data/siteConfig";
@@ -101,8 +101,7 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
             : isFallbackPrice
               ? "Starting"
               : null;
-  const amazonUrl = matchingVariant?.amazonUrl ?? product.amazonUrl;
-  const flipkartUrl = matchingVariant?.flipkartUrl ?? product.flipkartUrl;
+
 
   const images = galleryImages ?? [product.image];
 
@@ -486,39 +485,6 @@ return (
                         </Button>
                       </div>
 
-                      {(amazonUrl || flipkartUrl) && (
-                        <div className="flex gap-3">
-                          {amazonUrl ? (
-                            <Button
-                              as="a"
-                              variant="primary"
-                              size="xl"
-                              href={amazonUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 rounded-2xl"
-                            >
-                              <ExternalLink className="h-5 w-5 mr-2" />
-                              Amazon
-                            </Button>
-                          ) : null}
-
-                          {flipkartUrl ? (
-                            <Button
-                              as="a"
-                              variant="primary"
-                              size="xl"
-                              href={flipkartUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 rounded-2xl"
-                            >
-                              <ExternalLink className="h-5 w-5 mr-2" />
-                              Flipkart
-                            </Button>
-                          ) : null}
-                        </div>
-                      )}
                     </>
                   )}
                 </div>

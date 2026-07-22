@@ -2,7 +2,7 @@ name: Price Sync Automation
 
 on:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "0 */12 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -12,8 +12,6 @@ concurrency:
 jobs:
   sync-prices:
     runs-on: ubuntu-latest
-    # Hard cap so a runaway Playwright session never holds a 6h lock.
-    # The real-world run completes in ~50 minutes; this leaves margin.
     timeout-minutes: 90
     steps:
       - name: Checkout code
@@ -22,56 +20,37 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: Install system deps for curl_cffi
+      - name: Install system deps
         run: |
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev
-      - name: Install dependencies
+      - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
-          # Guarantee curl_cffi is present and current — the impersonation
-          # transport is what lets us beat Flipkart/Amazon bot-walls. Without
-          # it the runner silently falls back to stdlib requests and every
-          # scrape returns a 403 interstitial (the root cause of run #52/#53).
           pip install --upgrade "curl_cffi>=0.6.0"
           pip install -r requirements.txt
       - name: Install Playwright browsers
         run: python -m playwright install chromium --with-deps
-      - name: Run Price Sync
+      - name: Run Flipkart Sync
         env:
           SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
           SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
           SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
-          # Force UTF-8 stdout so rupee-symbol logs never crash the run on a
-          # non-UTF-8 CI console (was the root cause of run #53's red status).
-          PYTHONIOENCODING: utf-8
-        # `--fail-with-body` makes curl surface HTTP errors instead of
-        # returning exit code 0 — the previous hard-coded -s hid webhook
-        # failures (which led to deploys not firing while the run went
-        # "green"). PYTHONUNBUFFERED=1 ensures the structured per-product
-        # STATUS=... rows are visible live in the GitHub Actions log.
-        run: PYTHONUNBUFFERED=1 python automation/launch_checker.py --mode sync
+          PYTHONPATH: automation
+          PYTHONUNBUFFERED: 1
+        run: |
+          python automation/sync.py --mode flipkart 2>&1 | tee sync.log
       - name: Upload run logs
         uses: actions/upload-artifact@v4
-        # Always upload the artifacts — even a partial/crashed run produces
-        # CSVs worth inspecting, and `invalid_products.csv` lists every URL we
-        # refused to trust (missing or name-mismatched). `continue-on-error`
-        # keeps the job from going red just because a CSV wasn't created yet.
         if: always()
         continue-on-error: true
         with:
           name: price-sync-logs
           path: |
-            price-changes.csv
-            invalid_products.csv
-      # NOTE: The Vercel Deploy Hook was removed. Storefront pages use
-      # `force-dynamic` + no-store Sanity fetches, so prices are fresh without
-      # a full site rebuild. Redeploys are now unnecessary for price updates.
+            sync.log
+            updated_products.jsonl
+            skipped_products.jsonl
       - name: Notify on Failure
         if: failure()
         run: |
-          echo "::error::Price sync failed. Check GitHub Actions logs and the uploaded artifacts."
-          # Optional: wire a Slack/Discord webhook here, e.g.
-          # curl -X POST -H 'Content-type: application/json' \
-          #   --data '{"text":"6h price-sync FAILED on '"${{ github.sha }}"'"}' \
-          #   "${{ secrets.SLACK_WEBHOOK_URL }}"
+          echo "::error::Price sync failed. Check GitHub Actions logs."
