@@ -66,15 +66,6 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
     (variant) => normKey(variant.ram) === normKey(activeRam) && normKey(variant.storage) === normKey(activeStorage),
   );
 
-  // ── Price source tracking ──
-  // True when the selected variant has NO prices of its own, so the
-  // display falls back to product-level price. The "Starting Price"
-  // label tells the user/editor the price didn't change because the
-  // variant data is missing its own price, not because of a code bug.
-  const isFallbackPrice = !matchingVariant?.flipkartPrice
-    && !matchingVariant?.amazonPrice
-    && !matchingVariant?.price;
-
   const displayPrice =
     matchingVariant?.flipkartPrice ??
     matchingVariant?.amazonPrice ??
@@ -88,19 +79,6 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
       : (product.flipkartPrice || product.amazonPrice)
         ? product.originalPrice
         : product.originalPrice;
-  const liveSource = matchingVariant?.flipkartPrice
-    ? "Flipkart"
-    : matchingVariant?.amazonPrice
-      ? "Amazon"
-      : matchingVariant?.price
-        ? "Store"
-        : product.flipkartPrice
-          ? "Flipkart"
-          : product.amazonPrice
-            ? "Amazon"
-            : isFallbackPrice
-              ? "Starting"
-              : null;
 
 
   const images = galleryImages ?? [product.image];
@@ -311,11 +289,9 @@ return (
                   <span className="text-3xl font-extrabold text-slate-900">Price on Enquiry</span>
                 ) : displayPrice ? (
                   <>
-                    {liveSource && (
-                      <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                        {liveSource} Price
-                      </p>
-                    )}
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      Best Price
+                    </p>
                     <div className="flex items-end gap-3">
                       <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{formatPrice(displayPrice)}</span>
                       {displayOriginalPrice && (
