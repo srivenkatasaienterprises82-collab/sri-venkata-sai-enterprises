@@ -60,12 +60,12 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
   });
 
   const c4 = getOffer(3, {
-    badge: "New Arrival",
-    title: "Vivo T5x 5G",
-    subtitle: "Experience the ultimate power of 5G connectivity.",
-    discountText: "₹27,000",
-    image: "/images/products/vivo-t5x/1.webp",
-    link: "/products/vivo-t5x",
+    badge: "5G Power",
+    title: "iQOO Z10 Lite",
+    subtitle: "Big battery, smooth 5G performance at an unbeatable price.",
+    discountText: "₹18,999",
+    image: "/images/products/iqoo-z10-lite/1.jpg",
+    link: "/products/iqoo-z10-lite",
     cta: "Shop Now",
   });
 

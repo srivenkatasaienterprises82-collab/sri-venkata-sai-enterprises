@@ -1,7 +1,7 @@
 import { ProductDetail } from "@/components/sections/product-detail";
 import { Footer } from "@/components/sections/footer";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { getProductBySlug, getStartingPrice } from "@/lib/data/products";
+import { getStartingPrice } from "@/lib/data/products";
 import { notFound } from "next/navigation";
 import { siteConfig } from "@/lib/data/siteConfig";
 import fs from "fs";
@@ -52,12 +52,6 @@ async function fetchProduct(param: string): Promise<{ product: Product; isSanity
     }
   } catch (err) {
     console.warn(`⚠️ Failed to fetch product slug ${param} from Sanity: ${err instanceof Error ? err.message : String(err)}`);
-  }
-
-  // Fallback to static data
-  const staticProduct = getProductBySlug(param);
-  if (staticProduct) {
-    return { product: staticProduct, isSanity: false };
   }
 
   return null;

@@ -121,10 +121,13 @@ async function migrateImages() {
     if (!files.length) continue;
 
     const ids: string[] = [];
-    for (const f of files) {
-      try { const aid = await uploadAsset(join(folder, f)); ids.push(aid); await sleep(250); }
-      catch (e: any) { console.error(` ✗ ${slug}/${f}: ${e.message.slice(0, 70)}`); errors++; }
-    }
+  for (const f of files) {
+    const fp = join(folder, f);
+    const st = existsSync(fp) ? require('fs').statSync(fp).size : 0;
+    if (st === 61) { console.log(`  ⚠ ${slug}/${f} is 61-byte placeholder, skip`); continue; }
+    try { const aid = await uploadAsset(fp); ids.push(aid); await sleep(250); }
+    catch (e: any) { const body = await e.text?.().catch(() => ""); console.error(` ✗ ${slug}/${f}: ${e.status} ${(body || e.message).slice(0, 200)}`); errors++; }
+  }
     if (!ids.length) continue;
     await mutate([{ patch: { id: doc._id, set: { coverImage: imgRef(ids[0]), images: ids.map(imgRef) } } }]);
     uploaded++; process.stdout.write(".");

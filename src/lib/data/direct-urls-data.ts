@@ -2240,30 +2240,7 @@ export const DIRECT_URLS_BY_SLUG: Record<string, DirectUrlProduct> = {
       }
     ]
   },
-  "vivo-t5x": {
-    "brand": "Vivo",
-    "name": "Vivo T5x",
-    "amazonUrl": "https://www.amazon.in/vivo-5G-Dimensity-7400-Turbo-Processor/dp/B0GXRVCPST",
-    "flipkartUrl": "https://www.flipkart.com/vivo-t5x-5g-star-silver-128-gb/p/itm7da8aa253e72b",
-"colorNames": [
-      "Glacier Blue",
-      "Starry Black"
-    ],
-    "variants": [
-      {
-        "ram": "6GB",
-        "storage": "128GB",
-        "price": 24999,
-        "verified": true
-      },
-      {
-        "ram": "8GB",
-        "storage": "256GB",
-        "price": 28999,
-        "verified": true
-      }
-    ]
-  },
+
   "vivo-v70": {
     "brand": "Vivo",
     "name": "Vivo V70",

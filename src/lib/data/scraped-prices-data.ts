@@ -250,32 +250,7 @@ export const SCRAPED_PRICES_BY_SLUG: Record<string, ScrapedPriceEntry> = {
       }
     ]
   },
-  "vivo-t5x": {
-    "colorNames": [
-      "Cyber Green",
-      "Star Silver"
-    ],
-    "variants": [
-      {
-        "ram": "6GB",
-        "storage": "128GB",
-        "price": 24999,
-        "originalPrice": 28999
-      },
-      {
-        "ram": "8GB",
-        "storage": "128GB",
-        "price": 27999,
-        "originalPrice": 30999
-      },
-      {
-        "ram": "8GB",
-        "storage": "256GB",
-        "price": 30999,
-        "originalPrice": 33999
-      }
-    ]
-  },
+
   "vivo-t5-pro": {
     "colorNames": [
       "Cosmic Black",

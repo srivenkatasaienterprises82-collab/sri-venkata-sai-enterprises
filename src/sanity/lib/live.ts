@@ -54,6 +54,8 @@ export async function sanityFetchNoCache<T>({
       // Content Lake by a few seconds after a `mutation`, which matters
       // right after the price-sync GitHub Action runs.
       useCdn: false,
+      // Never serve Studio drafts on the public site — only Published docs.
+      perspective: "published",
     });
     // Defensive unwrap in case a future client version returns the envelope.
     const data =
@@ -62,7 +64,17 @@ export async function sanityFetchNoCache<T>({
         : result;
     return { data: data as unknown as T, tags: [] };
   } catch (err) {
-    console.warn(`⚠️ Sanity fetch (no-cache) error for query ${query}: ${err instanceof Error ? err.message : String(err)}`);
+    const msg = err instanceof Error ? err.message : String(err);
+    // Log the full error so it shows up in Vercel Functions / server logs.
+    // This replaces the silent fallback that made Sanity appear "working"
+    // when it was really returning no data and the frontend was showing
+    // the static fallback instead.
+    if (process.env.NODE_ENV === "development") {
+      // In dev, surface the full error immediately
+      console.error(`❌ Sanity fetch error (query: ${query}):`, err);
+    } else {
+      console.warn(`⚠️ Sanity fetch error (query: ${query}): ${msg}`);
+    }
     return { data: null, tags: [] };
   }
 }

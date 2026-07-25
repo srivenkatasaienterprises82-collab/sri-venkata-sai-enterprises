@@ -1,3 +1,14 @@
+/** A Sanity image reference object (the shape stored by type: "image" fields). */
+export type SanityImageRef = {
+  _type: "image";
+  asset: {
+    _ref: string;
+    _type: "reference";
+  };
+  hotspot?: { x: number; y: number; width: number; height: number };
+  crop?: { top: number; bottom: number; left: number; right: number };
+};
+
 export type SanityProduct = {
   _id: string;
   name: string;
@@ -16,8 +27,11 @@ export type SanityProduct = {
   brandSlug: string;
   category?: { name: string; slug: { current: string } };
   categorySlug?: string;
-  coverImage?: string;
-  images?: string[];
+  /** Sanity image object (Studio stores images as {_type:"image", asset:{_ref:...}}).
+   *  Legacy string URLs may also appear before migration. resolveImage() handles both. */
+  coverImage?: SanityImageRef | string;
+  /** Array of Sanity image objects OR legacy URL strings. */
+  images?: (SanityImageRef | string)[];
   featured?: boolean;
   description?: string;
   colors: { name: string; hex: string }[];
@@ -31,7 +45,7 @@ export type SanityCategory = {
   _id: string;
   name: string;
   slug: { current: string };
-  image?: string;
+  image?: SanityImageRef | string;
   description?: string;
 };
 
@@ -39,7 +53,7 @@ export type SanityBrand = {
   _id: string;
   name: string;
   slug: { current: string };
-  logo?: string;
+  logo?: SanityImageRef | string;
   description?: string;
   featured?: boolean;
 };
@@ -51,7 +65,7 @@ export type SanityBanner = {
   badge?: string;
   cta?: string;
   backgroundColor?: string;
-  image?: string;
+  image?: SanityImageRef | string;
   link?: string;
 };
 
@@ -60,7 +74,7 @@ export type SanityTestimonial = {
   name: string;
   quote: string;
   rating: number;
-  avatar?: string;
+  avatar?: SanityImageRef | string;
 };
 
 export type SanityFaq = {
@@ -71,7 +85,7 @@ export type SanityFaq = {
 
 export type SanityGallery = {
   _id: string;
-  image: string;
+  image: SanityImageRef | string;
   caption?: string;
 };
 
@@ -81,7 +95,7 @@ export type SanityOffer = {
   badge?: string;
   subtitle?: string;
   discountText?: string;
-  image?: string;
+  image?: SanityImageRef | string;
   link?: string;
   cta?: string;
   expiryDate?: string;
@@ -100,7 +114,7 @@ export type SanitySiteSettings = {
   companyName: string;
   companyShortName?: string;
   tagline?: string;
-  logo?: string;
+  logo?: SanityImageRef | string;
   announcement?: string;
   phoneDisplay?: string;
   phoneTel?: string;
@@ -123,7 +137,7 @@ export type SanitySiteSettings = {
   seoTitleTemplate?: string;
   seoDescription?: string;
   seoKeywords?: string[];
-  openGraphImage?: string;
+  openGraphImage?: SanityImageRef | string;
 };
 
 export type SanityHomePage = {
