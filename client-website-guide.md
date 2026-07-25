@@ -38,6 +38,7 @@ visible to you — customers never see them.
 | **Add an FAQ** | Click **FAQs** → **Create** → fill Question + Answer → **Publish** |
 | **Add a customer review** | Click **Customer reviews** → **Create** → fill name, quote, rating → **Publish** |
 | **Add a special offer** | Click **Offers** → **Create** → fill title, badge, image, discount → **Publish** |
+| **Edit specs** | Open phone → **4. Colors & specs tab** → Add/change spec rows (Display, Camera, Battery…) → **Publish** |
 | **Edit About Us / Privacy page** | Click **Website Pages** → open the page → edit text → **Publish** |
 | **Add store photos** | Click **Store Photo Gallery** → add images + captions → **Publish** |
 
@@ -79,6 +80,27 @@ Same process — click the image area, upload from computer, Publish.
   (Example: 8GB + 128GB = ₹27,999)
 - The website uses these rows when a customer selects different options
 - **Ignore the "Advanced" tab** — those fields fill themselves automatically
+
+---
+
+## 📋 Specs (Key Specifications)
+
+Specs are the technical details customers see on the product page — Display,
+Processor, Camera, Battery, etc.
+
+### How to edit specs
+1. Open a product → go to the **4. Colors & specs** tab
+2. Scroll to **Key specifications**
+3. Click **Add item** to add a new row
+4. Fill:
+   - **Label** — the spec name (e.g., "Display", "Camera", "Battery")
+   - **Value** — the spec detail (e.g., '6.7" AMOLED, 120Hz', "50MP OIS")
+5. Drag rows to reorder them
+6. Click **Publish** (top right)
+
+> 💡 Common specs: Display, Processor, Camera, Selfie Camera, Battery, Charging,
+> OS. Add whatever matters for each phone — they'll show in the same order on
+> the website.
 
 ---
 
