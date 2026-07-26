@@ -19,6 +19,5 @@ export const client = createClient({
   apiVersion: "2026-06-23",
   useCdn: false,
   perspective: "published",
-  stega: false,
   token: process.env.SANITY_API_READ_TOKEN,
 });
