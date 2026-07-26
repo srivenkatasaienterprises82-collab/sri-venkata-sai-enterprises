@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { getSiteSettings } from "@/sanity/lib/settings";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Re-render on every request and re-fetch Sanity each time, so content
 // published in the Studio (products, logo, settings) appears without a redeploy.
@@ -78,6 +79,7 @@ export default async function RootLayout({
         <SkipLink />
         <SiteChrome settings={settings}>{children}</SiteChrome>
         {isDraftMode && process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && <SanityLive />}
+        <SpeedInsights />
       </body>
     </html>
   );
