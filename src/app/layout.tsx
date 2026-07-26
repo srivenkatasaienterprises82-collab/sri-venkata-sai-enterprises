@@ -6,6 +6,7 @@ import { getSiteSettings } from "@/sanity/lib/settings";
 export const dynamic = "force-dynamic";
 import { SiteChrome } from "@/components/layout/site-chrome";
 import { SanityLive } from "@/sanity/lib/live";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 function SkipLink() {
@@ -78,6 +79,7 @@ export default async function RootLayout({
         <SkipLink />
         <SiteChrome settings={settings}>{children}</SiteChrome>
         {isDraftMode && process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && <SanityLive />}
+        <Analytics />
       </body>
     </html>
   );
