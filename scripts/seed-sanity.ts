@@ -330,7 +330,7 @@ async function seedHomePage(): Promise<void> {
   const doc = {
     _id: "homePage",
     _type: "homePage",
-    heroTitle: `${siteConfig.storeName} — Ongole’s Best Mobile Deals`,
+    heroTitle: `${siteConfig.storeName} Wholesale & Retail`,
     heroSubtitle: `Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo, Motorola, OnePlus & more. Official warranty, EMI available, best prices guaranteed.`,
     heroSlides,
     primaryCtaText: "Browse Mobiles",
