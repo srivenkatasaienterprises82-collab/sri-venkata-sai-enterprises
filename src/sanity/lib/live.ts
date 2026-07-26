@@ -1,21 +1,9 @@
-import { createClient } from "next-sanity";
+import { client } from "@/sanity/client";
 
-export const client = createClient({
-  projectId: "homvjne9",
-  dataset: "production",
-  apiVersion: "2026-06-23",
-  useCdn: false,
-  perspective: "published",
-  token: process.env.SANITY_API_READ_TOKEN,
-});
-
-import { defineLive } from "next-sanity/live";
-
-export const { sanityFetch, SanityLive } = defineLive({
-  client,
-  serverToken: process.env.SANITY_API_READ_TOKEN,
-  browserToken: process.env.SANITY_API_READ_TOKEN,
-});
+export const sanityFetch = null;
+export function SanityLive() {
+  return null;
+}
 
 export async function sanityFetchNoCache<T>({
   query,

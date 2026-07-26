@@ -14,8 +14,8 @@ import { createClient } from "next-sanity";
  * (@sanity/image-url) does not need a token.
  */
 export const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "homvjne9",
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "production",
+  projectId: "homvjne9",
+  dataset: "production",
   apiVersion: "2026-06-23",
   useCdn: false,
   perspective: "published",
