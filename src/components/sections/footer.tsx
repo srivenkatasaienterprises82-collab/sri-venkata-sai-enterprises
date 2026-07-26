@@ -33,7 +33,7 @@ export function Footer({
 }) {
   const displayBrands = brands?.length ? brands.slice(0, 8) : getFeaturedBrands().slice(0, 8);
   const storeName = settings?.companyName || siteConfig.storeName;
-  const logoUrl = settings?.logo || "/logo.jpg";
+  const logoUrl = settings?.logo && typeof settings.logo === "string" ? settings.logo : "/logo.jpg";
   const phoneDisplay = settings?.phoneDisplay || siteConfig.phoneDisplay;
   const phoneTel = settings?.phoneTel || siteConfig.phoneTel;
   const whatsappUrl = settings?.whatsappNumber

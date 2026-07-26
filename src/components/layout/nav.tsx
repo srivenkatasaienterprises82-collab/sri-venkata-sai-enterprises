@@ -46,7 +46,7 @@ export function Nav({ settings }: { settings?: SanitySiteSettings }) {
   const { totalItems } = useCart();
 
   const storeName = settings?.companyName || siteConfig.storeName;
-  const logoUrl = settings?.logo || "/logo.jpg";
+  const logoUrl = settings?.logo && typeof settings.logo === "string" ? settings.logo : "/logo.jpg";
   const phoneTel = settings?.phoneTel || siteConfig.phoneTel;
   const whatsappUrl = settings?.whatsappNumber
     ? `https://wa.me/${settings.whatsappNumber}`

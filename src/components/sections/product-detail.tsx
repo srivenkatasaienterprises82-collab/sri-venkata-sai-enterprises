@@ -370,32 +370,7 @@ return (
                 </div>
               ) : null}
 
-              {/* Bank Offers */}
-              <div className="mb-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 className="mb-5 text-xs font-bold uppercase tracking-widest text-slate-500">
-                  Available Offers
-                </h3>
-                <div className="flex flex-col gap-5">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-                      <Tag className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">Selected Bank Offers</p>
-                      <p className="text-sm text-slate-600 mt-1">On selected banks get ₹2,000 instant discount.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-                      <ShieldCheck className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">SVS Exchange Bonus</p>
-                      <p className="text-sm text-slate-600 mt-1">Up to ₹6,000 extra value on exchanging your old smartphone.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
 
               {/* Spec Table */}
               <div className="mb-10">

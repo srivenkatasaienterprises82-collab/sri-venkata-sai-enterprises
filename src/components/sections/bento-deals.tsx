@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, RefreshCw, CreditCard } from "lucide-react";
 import type { SanityOffer } from "@/sanity/types";
+import { resolveImage } from "@/sanity/lib/image";
 
 export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
   // ── Falls back to hardcoded data if no offers are provided ──
@@ -26,7 +27,7 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
         badge: o.badge,
         subtitle: o.subtitle,
         discountText: o.discountText,
-        image: o.image,
+        image: resolveImage(o.image),
         link: o.link || "/",
         cta: o.cta || "Shop Now",
       };

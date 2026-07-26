@@ -38,14 +38,14 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: keywords,
     icons: {
       icon: "/favicon.ico",
-      apple: [{ url: settings.logo || "/logo.jpg" }],
+      apple: [{ url: String(settings.logo || "/logo.jpg") }],
     },
     openGraph: {
       type: "website",
       siteName: settings.companyName,
       title: settings.seoTitleTemplate || `${settings.companyName} | Premium Mobile Store in ${settings.city || "Ongole"}`,
       description: settings.seoDescription || `Sri Venkata Sai Enterprises is the leading mobile phone store in Ongole. Buy iPhone, Samsung, Vivo, Oppo, Realme, OnePlus, Redmi and accessories at the best prices.`,
-      images: [{ url: settings.openGraphImage || settings.logo || "/logo.jpg", width: 320, height: 320, alt: settings.companyName }],
+      images: [{ url: String(settings.openGraphImage || settings.logo || "/logo.jpg"), width: 320, height: 320, alt: settings.companyName }],
     },
   };
 }
