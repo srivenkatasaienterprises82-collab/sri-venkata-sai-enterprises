@@ -1,35 +1,22 @@
+import { createClient } from "next-sanity";
+
+export const client = createClient({
+  projectId: "homvjne9",
+  dataset: "production",
+  apiVersion: "2026-06-23",
+  useCdn: false,
+  perspective: "published",
+  token: process.env.SANITY_API_READ_TOKEN,
+});
+
 import { defineLive } from "next-sanity/live";
-import { client } from "@/sanity/client";
 
 export const { sanityFetch, SanityLive } = defineLive({
-  client: client,
+  client,
   serverToken: process.env.SANITY_API_READ_TOKEN,
   browserToken: process.env.SANITY_API_READ_TOKEN,
 });
 
-/**
- * Cache-bypassing Sanity fetch for **price-sensitive** server renders.
- *
- * Why this exists:
- * `defineLive().sanityFetch` wraps the underlying HTTP call with
- * `next: { revalidate: false, tags: [...] }`. That means the result is
- * cached indefinitely by the Next.js Data Cache and only invalidated via
- * `revalidateTag` callbacks fired by `<SanityLive />`. `<SanityLive />`
- * however is mounted only in draft mode (see src/app/layout.tsx), so in
- * normal production traffic the cached response is never evicted between
- * deploys. This produced a real bug: the product listing page rendered the
- * fresh post-sync price (it was forced to re-render and the cache happened
- * to have been evicted by a prior request) while the product detail page
- * kept returning the older cached document.
- *
- * To guarantee the storefront always shows the price that lives in Sanity,
- * we use the underlying `client.fetch` with `cache: 'no-store'` for every
- * server fetch whose result feeds a price display. Pages that use this
- * helper must (and do) opt out of static generation via
- * `export const dynamic = "force-dynamic"`.
- *
- * `sanityFetch`/`SanityLive` remain in place for draft-mode live preview.
- */
 export async function sanityFetchNoCache<T>({
   query,
   params,
@@ -39,23 +26,10 @@ export async function sanityFetchNoCache<T>({
 }): Promise<{ data: T | null; tags: string[] }> {
   try {
     const result = await client.fetch<T>(query, params ?? {}, {
-      // NOTE: do NOT pass `filterResponse: false` here. @sanity/client's
-      // `fetch` returns the *unwrapped* query result by default, and
-      // `filterResponse: false` instead returns the full response envelope
-      // (`{ result: [...], ms, query }`). Our callers (toProduct, etc.)
-      // expect the documents directly — passing the envelope made every
-      // product page render with `undefined` name/price.
-      // Bypass the Next.js Data Cache and the full request cache.
-      // This makes every render hit the Sanity Content Lake.
       next: { revalidate: 0 },
-      // Pull from the API, not the CDN edge. The Sanity CDN can lag the
-      // Content Lake by a few seconds after a `mutation`, which matters
-      // right after the price-sync GitHub Action runs.
       useCdn: false,
-      // Never serve Studio drafts on the public site — only Published docs.
       perspective: "published",
     });
-    // Defensive unwrap in case a future client version returns the envelope.
     const data =
       result && typeof result === "object" && "result" in (result as any)
         ? (result as any).result
@@ -63,15 +37,10 @@ export async function sanityFetchNoCache<T>({
     return { data: data as unknown as T, tags: [] };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    // Log the full error so it shows up in Vercel Functions / server logs.
-    // This replaces the silent fallback that made Sanity appear "working"
-    // when it was really returning no data and the frontend was showing
-    // the static fallback instead.
     if (process.env.NODE_ENV === "development") {
-      // In dev, surface the full error immediately
-      console.error(`❌ Sanity fetch error (query: ${query}):`, err);
+      console.error(`Sanity fetch error:`, err);
     } else {
-      console.warn(`⚠️ Sanity fetch error (query: ${query}): ${msg}`);
+      console.warn(`Sanity fetch error: ${msg}`);
     }
     return { data: null, tags: [] };
   }
@@ -84,9 +53,6 @@ export async function safeSanityFetch<T>({
   query: string;
   params?: Record<string, any>;
 }): Promise<{ data: T | null }> {
-  // Use the cache-bypassing helper for catalogue reads so price updates
-  // are visible without waiting for the Next.js fetch cache to expire.
   const { data } = await sanityFetchNoCache<T>({ query, params });
   return { data };
 }
-
