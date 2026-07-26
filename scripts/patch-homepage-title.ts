@@ -19,7 +19,7 @@ const client = createClient({
 });
 
 async function main() {
-  const newTitle = "Sri Venkata Sai Enterprises Wholesale & Retail";
+  const newTitle = "Sri Venkata Sai Enterprises Wholesale and Retail";
 
   console.log(`Creating/updating homePage with heroTitle → "${newTitle}"`);
 

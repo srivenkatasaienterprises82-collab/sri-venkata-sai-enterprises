@@ -330,7 +330,7 @@ async function seedHomePage(): Promise<void> {
   const doc = {
     _id: "homePage",
     _type: "homePage",
-    heroTitle: `${siteConfig.storeName} Wholesale & Retail`,
+    heroTitle: `${siteConfig.storeName} Wholesale and Retail`,
     heroSubtitle: `Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo, Motorola, OnePlus & more. Official warranty, EMI available, best prices guaranteed.`,
     heroSlides,
     primaryCtaText: "Browse Mobiles",

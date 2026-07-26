@@ -13,15 +13,8 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Button } from "@/components/ui/button";
 
-import { Playfair_Display } from "next/font/google";
 import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["700", "800", "900"],
-  display: "swap",
-});
 import { siteConfig } from "@/lib/data/siteConfig";
 
 /** Popular brands to show on home page */
@@ -68,7 +61,7 @@ export function HeroSection({
   const carouselProducts = featured.length > 0 ? featured : products.filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase())).slice(0, 16);
   const safeCarouselProducts = carouselProducts.filter((p) => p.slug);
 const displayTitle =
-  title ?? "Sri Venkata Sai Enterprises Wholesale & Retail";
+  title ?? "Sri Venkata Sai Enterprises Wholesale and Retail";
   const displaySubtitle = subtitle || "Shop genuine smartphones from Apple, Samsung, Vivo, iQOO, Oppo, Motorola, OnePlus & more.";
   const hasValidSlug = (product: Product) => product.slug && product.slug.trim().length > 0;
 
@@ -112,7 +105,7 @@ const displayTitle =
 initial={{ opacity: 0, scale: 0.95, y: 20 }}
 animate={{ opacity: 1, scale: 1, y: 0 }}
 transition={{ duration: 0.8, delay: 0.2, type: "spring", bounce: 0.4 }}
-className={`${playfair.className} mb-4 text-balance text-base sm:text-lg md:text-xl lg:text-2xl font-black leading-[1.1] tracking-tight text-gradient max-w-full px-4`}
+className="mb-6 text-balance text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-950 max-w-full px-4"
 >
 {displayTitle}
 </motion.h1>
@@ -125,7 +118,7 @@ className={`${playfair.className} mb-4 text-balance text-base sm:text-lg md:text
         >
           <div className="inline-flex max-w-full items-center gap-2 sm:gap-3 rounded-full border border-slate-200/80 bg-white/70 p-1.5 pr-4 sm:pr-6 shadow-sm backdrop-blur-md">
 <span className="shrink-0 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
-  Wholesale & Retail Store
+  Wholesale and Retail
 </span>
 <span className="truncate text-[11px] sm:text-sm font-medium text-slate-700">
 <span className="font-bold text-slate-900">Premium Mobile Store</span>
