@@ -1,14 +1,14 @@
 import { ProductDetail } from "@/components/sections/product-detail";
 import { Footer } from "@/components/sections/footer";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { getStartingPrice } from "@/lib/data/products";
+import { getProductBySlug, getStartingPrice } from "@/lib/data/products";
 import { notFound } from "next/navigation";
 import { siteConfig } from "@/lib/data/siteConfig";
 import fs from "fs";
 import path from "path";
 import type { Metadata } from "next";
 import { sanityFetchNoCache } from "@/sanity/lib/live";
-import { PRODUCT_BY_SLUG_QUERY } from "@/sanity/queries";
+import { PRODUCT_BY_SLUG_QUERY, PRODUCT_COUNT_QUERY } from "@/sanity/queries";
 import { toProduct } from "@/sanity/transform";
 import { resolveImage } from "@/sanity/lib/image";
 import { getSiteSettings } from "@/sanity/lib/settings";
@@ -50,8 +50,32 @@ async function fetchProduct(param: string): Promise<{ product: Product; isSanity
     if (sanityProduct) {
       return { product: toProduct(sanityProduct), isSanity: true };
     }
+
+    // No match. Fall back to the static catalog ONLY when Sanity holds no
+    // products at all (dataset emptied, outage, or a fresh project). Without
+    // this, an empty product dataset turns every product URL into a 404 even
+    // though /products and the homepage still render these products from
+    // static data. Gating on the total count keeps Sanity authoritative when
+    // it is healthy: a product the owner deletes in Studio stays 404 instead
+    // of being resurrected from static data.
+    const { data: total } = await sanityFetchNoCache<number>({
+      query: PRODUCT_COUNT_QUERY,
+    });
+    // `null` means the count query failed too (Sanity unreachable).
+    if (!total) {
+      const staticProduct = getProductBySlug(param);
+      if (staticProduct) {
+        return { product: staticProduct, isSanity: false };
+      }
+    }
   } catch (err) {
     console.warn(`⚠️ Failed to fetch product slug ${param} from Sanity: ${err instanceof Error ? err.message : String(err)}`);
+
+    // Sanity unreachable: serve the static catalog rather than 404.
+    const staticProduct = getProductBySlug(param);
+    if (staticProduct) {
+      return { product: staticProduct, isSanity: false };
+    }
   }
 
   return null;

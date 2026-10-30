@@ -73,6 +73,8 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[_type == "product" && (slug.
   colors, ramOptions, storageOptions, variants, specifications
 }`);
 
+export const PRODUCT_COUNT_QUERY = defineQuery(`count(*[_type == "product" && enabled != false])`);
+
 export const PRODUCTS_BY_BRAND_QUERY = defineQuery(`*[_type == "product" && brand->slug.current == $brandSlug && enabled != false] | order(order asc){
   _id, name, slug, type, stock, price, originalPrice, priceOnEnquiry,
   amazonUrl, flipkartUrl, amazonPrice, flipkartPrice, lastUpdated,
