@@ -11,7 +11,7 @@ const stats = [
   { icon: Star, value: siteConfig.rating, label: "Customer rating" },
   { icon: Users, value: siteConfig.happyCustomers, label: "Happy customers" },
   { icon: ShieldCheck, value: "100%", label: "Genuine products" },
-  { icon: Clock, value: "10-9", label: "Open every day" },
+  { icon: Clock, value: "9-10", label: "Open every day" },
 ];
 
 export function TrustStrip() {

@@ -154,8 +154,8 @@ export default async function Home() {
                 "Monday", "Tuesday", "Wednesday", "Thursday",
                 "Friday", "Saturday", "Sunday",
               ],
-              opens: "10:00",
-              closes: "21:00",
+              opens: "09:00",
+              closes: "22:00",
             },
             aggregateRating: {
               "@type": "AggregateRating",

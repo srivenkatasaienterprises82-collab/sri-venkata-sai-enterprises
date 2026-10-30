@@ -28,7 +28,8 @@ export const siteConfig = {
   },
 
   // Hours
-  hours: "Mon – Sun: 10:00 AM – 9:00 PM",
+  // Confirmed by the owner on 2026-10-30 (Google Business Profile says 9–10).
+  hours: "Mon – Sun: 9:00 AM – 10:00 PM",
 
   // Rating shown across the site (sourced from Justdial — keep in sync).
   rating: "4.8",

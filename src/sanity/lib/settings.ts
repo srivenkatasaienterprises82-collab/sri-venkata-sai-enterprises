@@ -10,8 +10,19 @@ export async function getSiteSettings(): Promise<SanitySiteSettings> {
     if (!settings || !settings.companyName) {
       throw new Error("No settings in Sanity");
     }
+
+    // The owner confirmed the store trades 9:00–22:00 (2026-10-30); the
+    // published document still carries the old 10:00–21:00 string and we have
+    // no write token to update it. Remap only that exact stale value so the
+    // footer/contact section are correct now; any value the owner publishes
+    // in Studio afterwards is used as-is.
+    const LEGACY_HOURS = "Mon – Sun: 10:00 AM – 9:00 PM";
+    const hours =
+      settings.hours?.trim() === LEGACY_HOURS ? siteConfig.hours : settings.hours || siteConfig.hours;
+
     return {
       ...settings,
+      hours,
       logo: resolveImage(settings.logo),
       openGraphImage: resolveImage(settings.openGraphImage),
     };
