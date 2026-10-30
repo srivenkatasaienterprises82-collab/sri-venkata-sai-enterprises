@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Clock, Send } from "lucide-react";
 import { toast } from "sonner";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { telHref, whatsappHref } from "@/lib/phone";
 import type { SanitySiteSettings } from "@/sanity/types";
 
 const subjectOptions = [
@@ -32,13 +33,11 @@ export function ContactSection({ settings }: { settings?: SanitySiteSettings }) 
   };
 
   const storeName = settings?.companyName || siteConfig.storeName;
-  const phoneTel = settings?.phoneTel || siteConfig.phoneTel;
+  const phoneTel = telHref(settings?.phoneTel || siteConfig.phoneTel);
   const phoneDisplay = settings?.phoneDisplay || siteConfig.phoneDisplay;
   const hours = settings?.hours || siteConfig.hours;
   const mapEmbedUrl = settings?.googleMapsEmbed || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d961.1184488793124!2d80.04080936960561!3d15.512711199068063!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b0139c634018d%3A0x238e2d70ef708a34!2sSri%20venkata%20sai%20enterprises!5e0!3m2!1sen!2sin!4v1784481826639!5m2!1sen!2sin";
-  const whatsappUrl = settings?.whatsappNumber
-    ? `https://wa.me/${settings.whatsappNumber}`
-    : siteConfig.whatsappUrl;
+  const whatsappUrl = whatsappHref(settings?.whatsappNumber || siteConfig.whatsappNumber);
 
   const address = {
     line1: settings?.addressLine1 || siteConfig.address.line1,
@@ -129,7 +128,7 @@ export function ContactSection({ settings }: { settings?: SanitySiteSettings }) 
                   <div>
                     <p className="font-bold text-slate-900 mb-2">Contact Us</p>
                     <a
-                      href={`tel:${phoneTel}`}
+                      href={phoneTel}
                       className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors block"
                     >
                       {phoneDisplay}

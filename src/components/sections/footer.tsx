@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { telHref, whatsappHref } from "@/lib/phone";
 import { getFeaturedBrands } from "@/lib/data/brands";
 import type { Brand } from "@/lib/data/brands";
 import type { SanitySiteSettings } from "@/sanity/types";
@@ -35,10 +36,8 @@ export function Footer({
   const storeName = settings?.companyName || siteConfig.storeName;
   const logoUrl = settings?.logo && typeof settings.logo === "string" ? settings.logo : "/logo.jpg";
   const phoneDisplay = settings?.phoneDisplay || siteConfig.phoneDisplay;
-  const phoneTel = settings?.phoneTel || siteConfig.phoneTel;
-  const whatsappUrl = settings?.whatsappNumber
-    ? `https://wa.me/${settings.whatsappNumber}`
-    : siteConfig.whatsappUrl;
+  const phoneTel = telHref(settings?.phoneTel || siteConfig.phoneTel);
+  const whatsappUrl = whatsappHref(settings?.whatsappNumber || siteConfig.whatsappNumber);
   const city = settings?.city || siteConfig.address.city;
   const hours = settings?.hours || siteConfig.hours;
   const copyright = settings?.copyrightText || `© ${new Date().getFullYear()} ${storeName}. All rights reserved.`;
@@ -88,7 +87,7 @@ export function Footer({
                 variant="secondary"
                 size="sm"
                 as="a"
-                href={`tel:${phoneTel}`}
+                href={phoneTel}
               >
                 <Phone className="mr-2 h-4 w-4" /> Call Now
               </Button>
@@ -151,7 +150,7 @@ export function Footer({
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-slate-400 shrink-0" />
-                <a href={`tel:${phoneTel}`} className="text-sm hover:text-blue-600 transition">
+                <a href={phoneTel} className="text-sm hover:text-blue-600 transition">
                   {phoneDisplay}
                 </a>
               </div>

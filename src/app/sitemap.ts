@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getAllProducts } from "@/lib/data/products";
 import { getAllBrands } from "@/lib/data/brands";
+import { siteUrl } from "@/lib/siteUrl";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://srivenkatasaienterprises.com";
+const baseUrl = siteUrl;
 
 // Static landing pages that should be indexed.
 const staticRoutes: MetadataRoute.Sitemap = [

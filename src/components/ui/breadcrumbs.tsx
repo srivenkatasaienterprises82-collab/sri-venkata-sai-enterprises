@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { ChevronRight } from "lucide-react";
+import { siteUrl } from "@/lib/siteUrl";
 
 export interface BreadcrumbItem {
   label: string;
@@ -56,8 +57,7 @@ export async function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
 
   const breadcrumbItems = items ?? buildBreadcrumbItems(pathname);
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://srivenkatasaienterprises.com";
+  const baseUrl = siteUrl;
 
   const jsonLd = {
     "@context": "https://schema.org",

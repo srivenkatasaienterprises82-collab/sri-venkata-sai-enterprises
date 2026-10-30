@@ -9,10 +9,12 @@ export const siteConfig = {
   tagline: "Ongole's #1 Mobile Store",
 
   // Contact
-  phoneDisplay: "+91 99486 18414",
-  phoneTel: "+919948618414",
-  whatsappNumber: "919948618414",
-  whatsappUrl: "https://wa.me/919948618414",
+  // Keep these in sync with siteSettings in Sanity (the live source for the
+  // nav, footer and contact section). Used as the offline fallback only.
+  phoneDisplay: "+91 7670859484",
+  phoneTel: "+917670859484",
+  whatsappNumber: "917670859484",
+  whatsappUrl: "https://wa.me/917670859484",
 
   // Address
   address: {

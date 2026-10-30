@@ -25,6 +25,8 @@ import { getAllTestimonials } from "@/lib/data/testimonials";
 import { getFeaturedBrands } from "@/lib/data/brands";
 import { getSiteSettings } from "@/sanity/lib/settings";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { siteUrl } from "@/lib/siteUrl";
+import { e164 } from "@/lib/phone";
 import type { SanityHomePage, SanityBrand, SanityProduct, SanityTestimonial, SanityFaq, SanityBanner, SanityGallery } from "@/sanity/types";
 import type { Metadata } from "next";
 
@@ -43,6 +45,9 @@ const ContactSection = dynamic(() => import("@/components/sections/contact-secti
 
 
 export const metadata: Metadata = {
+  title: "Mobile Shop in Ongole | Sri Venkata Sai Enterprises",
+  description:
+    "Buy genuine Apple, Samsung, Vivo, iQOO, Oppo, OnePlus and more at Sri Venkata Sai Enterprises, Ongole. Explore smartphones, EMI options, exchange offers and local store support.",
   alternates: { canonical: "/" },
 };
 
@@ -93,7 +98,9 @@ export default async function Home() {
 
   const bentoDeals = sanityHomePage?.bentoDeals?.length ? toOffers(sanityHomePage.bentoDeals) : undefined;
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://srivenkatasaienterprises.com";
+  const baseUrl = siteUrl;
+  const storeName = settings.companyName || siteConfig.storeName;
+  const storePhone = e164(settings.phoneTel || siteConfig.phoneTel);
 
   return (
     <>
@@ -124,16 +131,16 @@ export default async function Home() {
             "@context": "https://schema.org",
             "@type": ["ElectronicsStore", "LocalBusiness"],
             "@id": `${baseUrl}/#business`,
-            name: siteConfig.storeName,
+            name: storeName,
             image: `${baseUrl}/logo.jpg`,
             url: baseUrl,
-            telephone: siteConfig.phoneTel,
+            telephone: storePhone,
             address: {
               "@type": "PostalAddress",
-              streetAddress: `${siteConfig.address.line2}, ${siteConfig.address.line3}`,
-              addressLocality: siteConfig.address.city,
+              streetAddress: `${settings.addressLine2 || siteConfig.address.line2}, ${settings.addressLine3 || siteConfig.address.line3}`,
+              addressLocality: settings.city || siteConfig.address.city,
               addressRegion: "Andhra Pradesh",
-              postalCode: siteConfig.address.pincode,
+              postalCode: settings.pincode || siteConfig.address.pincode,
               addressCountry: "IN",
             },
             geo: {
@@ -169,7 +176,7 @@ export default async function Home() {
             "@context": "https://schema.org",
             "@type": "Organization",
             "@id": `${baseUrl}/#org`,
-            name: siteConfig.storeName,
+            name: storeName,
             url: baseUrl,
             logo: `${baseUrl}/logo.jpg`,
             sameAs: [
@@ -189,7 +196,7 @@ export default async function Home() {
             "@context": "https://schema.org",
             "@type": "WebSite",
             "@id": `${baseUrl}/#website`,
-            name: siteConfig.storeName,
+            name: storeName,
             url: baseUrl,
             potentialAction: {
               "@type": "SearchAction",
@@ -240,7 +247,7 @@ export default async function Home() {
         <BestSelling products={products} />
 
         <BentoDeals offers={bentoDeals} />
-        <TrustStrip settings={settings} />
+        <TrustStrip />
         <GallerySection items={gallery} />
         <Testimonials testimonials={testimonials} />
         <FAQ items={faqs} />

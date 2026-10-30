@@ -3,6 +3,7 @@ import { ContactSection } from "@/components/sections/contact-section";
 import { Footer } from "@/components/sections/footer";
 import { GradientText } from "@/components/ui/gradient-text";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { getSiteSettings } from "@/sanity/lib/settings";
 
 import type { Metadata } from "next";
 
@@ -13,7 +14,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  // Read contact details from Sanity so this page cannot drift from the
+  // nav/footer (it previously rendered the static fallback number instead).
+  const settings = await getSiteSettings();
+
   return (
     <>
       <main className="pt-20">
@@ -25,9 +30,9 @@ export default function ContactPage() {
             Visit our store, call us, or WhatsApp for instant help with your purchase.
           </p>
         </Section>
-        <ContactSection />
+        <ContactSection settings={settings} />
       </main>
-      <Footer />
+      <Footer settings={settings} />
     </>
   );
 }

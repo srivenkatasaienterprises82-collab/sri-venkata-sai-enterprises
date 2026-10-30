@@ -7,6 +7,7 @@ import { ArrowLeft, Tag, Truck, ShieldCheck, MessageCircle, ShoppingCart, Chevro
 
 import { Product, formatPrice, isPriceOnEnquiry } from "@/lib/data/products";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { siteUrl } from "@/lib/siteUrl";
 import { Button } from "@/components/ui/button";
 
 export function ProductDetail({ product, galleryImages }: { product: Product; galleryImages?: string[] }) {
@@ -82,6 +83,8 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
 
 
   const images = galleryImages ?? [product.image];
+  const absoluteUrl = (src: string) =>
+    src.startsWith("http") ? src : `${siteUrl}${src.startsWith("/") ? "" : "/"}${src}`;
 
   const schemaOffers = hasProductPrice
     ? [{
@@ -101,8 +104,8 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
         .filter((v) => v.price)
         .map((v) => ({
           "@type": "Offer",
-          sku: "${product.slug}-${v.ram}-${v.storage}",
-          name: "${product.name} ${v.ram} ${v.storage}",
+          sku: `${product.slug}-${v.ram}-${v.storage}`,
+          name: `${product.name} ${v.ram} ${v.storage}`,
           price: v.price!,
           priceCurrency: "INR",
           availability: product.stock === "inStock"
@@ -136,14 +139,12 @@ export function ProductDetail({ product, galleryImages }: { product: Product; ga
     description: product.description,
     brand: { "@type": "Brand", name: product.brand },
     sku: product.slug,
-    image: galleryImages ?? [product.image],
+    url: `${siteUrl}/products/${product.slug}`,
+    image: images.filter(Boolean).map(absoluteUrl),
     offers: schemaOffers,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: siteConfig.ratingValue,
-      reviewCount: siteConfig.reviewCount,
-      sameAs: siteConfig.ratingSourceUrl,
-    },
+    // No aggregateRating here: the store-wide Justdial rating is not a rating
+    // of this individual product, and attaching it to every Product is invalid
+    // structured data. The store rating lives on the LocalBusiness node.
   };
 
 return (

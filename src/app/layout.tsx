@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { getSiteSettings } from "@/sanity/lib/settings";
+import { siteUrl } from "@/lib/siteUrl";
 
 // Re-render on every request and re-fetch Sanity each time, so content
 // published in the Studio (products, logo, settings) appears without a redeploy.
@@ -29,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
   ];
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://srivenkatasaienterprises.com"),
+    metadataBase: new URL(siteUrl),
     title: {
       default: settings.seoTitleTemplate || `${settings.companyName} | Premium Mobile Store in ${settings.city || "Ongole"}`,
       template: titleTemplate,

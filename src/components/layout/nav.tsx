@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { ProductSearch } from "./product-search";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { telHref, whatsappHref } from "@/lib/phone";
 import type { SanitySiteSettings } from "@/sanity/types";
 
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -47,10 +48,8 @@ export function Nav({ settings }: { settings?: SanitySiteSettings }) {
 
   const storeName = settings?.companyName || siteConfig.storeName;
   const logoUrl = settings?.logo && typeof settings.logo === "string" ? settings.logo : "/logo.jpg";
-  const phoneTel = settings?.phoneTel || siteConfig.phoneTel;
-  const whatsappUrl = settings?.whatsappNumber
-    ? `https://wa.me/${settings.whatsappNumber}`
-    : siteConfig.whatsappUrl;
+  const phoneTel = telHref(settings?.phoneTel || siteConfig.phoneTel);
+  const whatsappUrl = whatsappHref(settings?.whatsappNumber || siteConfig.whatsappNumber);
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -125,7 +124,7 @@ export function Nav({ settings }: { settings?: SanitySiteSettings }) {
             <div className="w-[150px] lg:w-[180px] xl:w-[240px] mr-1 shrink-0">
               <ProductSearch />
             </div>
-            <Button variant="secondary" size="sm" as="a" href={`tel:${phoneTel}`} className="px-3 xl:px-4 shrink-0">
+            <Button variant="secondary" size="sm" as="a" href={phoneTel} className="px-3 xl:px-4 shrink-0">
               <Phone className="h-4 w-4 xl:mr-1.5" />
               <span className="hidden xl:inline">Call Now</span>
             </Button>
@@ -234,7 +233,7 @@ export function Nav({ settings }: { settings?: SanitySiteSettings }) {
                   variant="secondary"
                   size="sm"
                   as="a"
-                  href={`tel:${phoneTel}`}
+                  href={phoneTel}
                   className="flex-1 justify-center"
                 >
                   <Phone className="mr-1.5 h-3.5 w-3.5" />

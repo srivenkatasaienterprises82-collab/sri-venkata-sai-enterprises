@@ -2,12 +2,11 @@
 
 import { MessageCircle } from "lucide-react";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { whatsappHref } from "@/lib/phone";
 import type { SanitySiteSettings } from "@/sanity/types";
 
 export function WhatsAppFloat({ settings }: { settings?: SanitySiteSettings }) {
-  const whatsappUrl = settings?.whatsappNumber
-    ? `https://wa.me/${settings.whatsappNumber}`
-    : siteConfig.whatsappUrl;
+  const whatsappUrl = whatsappHref(settings?.whatsappNumber || siteConfig.whatsappNumber);
 
   return (
     <div className="fixed bottom-6 right-6 z-50 md:bottom-8 md:right-8 animate-fade-in">

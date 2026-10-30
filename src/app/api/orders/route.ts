@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { siteConfig } from "@/lib/data/siteConfig";
+import { whatsappNumber } from "@/lib/phone";
 
 const GOOGLE_APPS_SCRIPT_URL = process.env.GOOGLE_APPS_SCRIPT_URL;
 const GOOGLE_APPS_SCRIPT_SECRET = process.env.GOOGLE_APPS_SCRIPT_SECRET;
 const _rawOwnerWhatsApp = process.env.OWNER_WHATSAPP_NUMBER;
-const OWNER_WHATSAPP_NUMBER = _rawOwnerWhatsApp ?? siteConfig.whatsappNumber;
+// Sanitise to digits: the env var/Sanity value may be formatted as
+// "+91 7670859484", which would otherwise produce a broken wa.me link.
+const OWNER_WHATSAPP_NUMBER = whatsappNumber(_rawOwnerWhatsApp ?? siteConfig.whatsappNumber);
 
 // ── In-memory rate limiter (per-instance; effective for burst protection on warm instances) ──
 interface RateEntry {
