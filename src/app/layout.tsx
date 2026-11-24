@@ -1,6 +1,10 @@
 import { Metadata } from "next";
 import { getSiteSettings } from "@/sanity/lib/settings";
 import { siteUrl } from "@/lib/siteUrl";
+import { safeSanityFetch } from "@/sanity/lib/live";
+import { SEARCH_PRODUCTS_QUERY } from "@/sanity/queries";
+import { resolveImage } from "@/sanity/lib/image";
+import type { SearchProduct } from "@/components/layout/product-search";
 
 // Re-render on every request and re-fetch Sanity each time, so content
 // published in the Studio (products, logo, settings) appears without a redeploy.
@@ -53,12 +57,60 @@ export async function generateMetadata(): Promise<Metadata> {
 
 import { draftMode } from "next/headers";
 
+interface SearchRow {
+  _id: string;
+  name: string;
+  slug?: { current?: string };
+  tags?: string[];
+  price?: number | null;
+  flipkartPrice?: number | null;
+  amazonPrice?: number | null;
+  priceOnEnquiry?: boolean;
+  coverImage?: unknown;
+  brandName?: string | null;
+  variantPrices?: (number | null)[];
+  variantFlipkartPrices?: (number | null)[];
+  variantAmazonPrices?: (number | null)[];
+}
+
+/** Header search data: Sanity only, so it never lists products that no longer exist. */
+async function getSearchProducts(): Promise<SearchProduct[]> {
+  const { data } = await safeSanityFetch<SearchRow[]>({ query: SEARCH_PRODUCTS_QUERY });
+  return (data ?? []).map((row) => {
+    // Same preference as getStartingPrice(): live marketplace prices first,
+    // then the seed price. Search must agree with the PDP and checkout.
+    const positive = (prices: (number | null | undefined)[] | undefined) =>
+      (prices ?? []).filter((price): price is number => typeof price === "number" && price > 0);
+    const marketPrices = [
+      ...positive(row.variantFlipkartPrices),
+      ...positive(row.variantAmazonPrices),
+    ];
+    const price = marketPrices.length
+      ? Math.min(...marketPrices)
+      : positive([row.flipkartPrice, row.amazonPrice, row.price])[0];
+
+    return {
+      id: row._id,
+      name: row.name,
+      slug: row.slug?.current ?? row._id,
+      brand: row.brandName ?? "",
+      tags: row.tags ?? [],
+      image: resolveImage(row.coverImage) || "/logo.jpg",
+      price,
+      priceOnEnquiry: row.priceOnEnquiry,
+    };
+  });
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSiteSettings();
+  const [settings, searchProducts] = await Promise.all([
+    getSiteSettings(),
+    getSearchProducts(),
+  ]);
   const { isEnabled: isDraftMode } = await draftMode();
 
   return (
@@ -77,7 +129,7 @@ export default async function RootLayout({
       </head>
       <body suppressHydrationWarning className="min-h-screen max-w-full overflow-x-hidden bg-white text-slate-900 antialiased">
         <SkipLink />
-        <SiteChrome settings={settings}>{children}</SiteChrome>
+        <SiteChrome settings={settings} searchProducts={searchProducts}>{children}</SiteChrome>
         {isDraftMode && process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && <SanityLive />}
       </body>
     </html>

@@ -18,6 +18,9 @@ export function BestSelling({ products }: { products: Product[] }) {
     .filter((p) => POPULAR_BRANDS.includes(p.brand))
     .slice(0, 8);
 
+  // No products in Sanity yet: render nothing rather than a bare heading.
+  if (bestSellers.length === 0) return null;
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {

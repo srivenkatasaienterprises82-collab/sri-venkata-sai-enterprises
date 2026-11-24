@@ -8,9 +8,7 @@ import {
   normalizeRam,
   normalizeStorage,
 } from "./direct-urls-parse";
-import { mapColorName, buildMergedVariants } from "./direct-urls-overlay";
 import type { DirectUrlProduct, DirectUrlVariant } from "./direct-urls-parse";
-import type { ProductVariant } from "./products";
 
 const SAMPLE = `brand,product,ram,storage,colors,price_inr,flipkart_url,amazon_url,verified,url_source
 Apple,iPhone 17,8 GB,256 GB,Lavender | Sage | Mist Blue | White | Black,79900,https://www.flipkart.com/apple-iphone-17-black-256-gb/p/itm6eb39da622cdd,,True,flipkart
@@ -97,48 +95,5 @@ describe("findSearchUrls", () => {
     const bad = findSearchUrls([product]);
     assert.equal(bad.length, 1);
     assert.match(bad[0], /search/);
-  });
-});
-
-describe("mapColorName", () => {
-  it("maps composite color names to the palette", () => {
-    assert.equal(mapColorName("Cosmic Orange").name, "Orange");
-    assert.equal(mapColorName("Deep Blue").name, "Blue");
-    assert.equal(mapColorName("Lavender").hex, "#C4B5FD");
-    assert.equal(mapColorName("Obsidian").name, "Black");
-    assert.equal(mapColorName("Lemongrass").name, "Green");
-  });
-  it("is deterministic for unknown names", () => {
-    const a = mapColorName("Zebra Stripe");
-    const b = mapColorName("Zebra Stripe");
-    assert.equal(a.hex, b.hex);
-  });
-});
-
-describe("buildMergedVariants", () => {
-  const csv: DirectUrlProduct = {
-    brand: "X",
-    name: "X",
-    colorNames: [],
-    variants: [
-      { ram: "8 GB", storage: "256 GB", price: 6000, flipkartUrl: "https://flipkart.com/p/aa", verified: true },
-      { ram: "8 GB", storage: "512 GB", price: 99999, amazonUrl: "https://amazon.in/dp/B1", verified: true },
-    ],
-  };
-
-  it("preserves an existing price when the ram/storage combo matches", () => {
-    const existing: ProductVariant[] = [{ ram: "8GB", storage: "256GB", price: 79900 }];
-    const merged = buildMergedVariants(existing, csv);
-    const v = merged.find((m) => m.storage === "256 GB")!;
-    assert.equal(v.price, 79900); // kept curated price, ignored bogus 6000
-    assert.equal(v.flipkartUrl, "https://flipkart.com/p/aa");
-  });
-
-  it("fills a new combo price from CSV and carries per-variant urls", () => {
-    const existing: ProductVariant[] = [{ ram: "8GB", storage: "256GB", price: 79900 }];
-    const merged = buildMergedVariants(existing, csv);
-    const v = merged.find((m) => m.storage === "512 GB")!;
-    assert.equal(v.price, 99999);
-    assert.equal(v.amazonUrl, "https://amazon.in/dp/B1");
   });
 });

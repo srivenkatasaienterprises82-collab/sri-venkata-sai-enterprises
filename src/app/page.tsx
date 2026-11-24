@@ -20,7 +20,6 @@ import {
   GALLERY_QUERY,
 } from "@/sanity/queries";
 import { toProducts, toBrands, toTestimonials, toFaqs, toBanners, toGalleries, toOffers } from "@/sanity/transform";
-import { getAllProducts } from "@/lib/data/products";
 import { getAllTestimonials } from "@/lib/data/testimonials";
 import { getFeaturedBrands } from "@/lib/data/brands";
 import { getSiteSettings } from "@/sanity/lib/settings";
@@ -72,8 +71,9 @@ export default async function Home() {
     getSiteSettings(),
   ]);
 
-  // Transform Sanity arrays with fallbacks
-  const allProducts = sanityProducts?.length ? toProducts(sanityProducts) : getAllProducts();
+  // Transform Sanity arrays. No static fallback: the owner manages the
+  // catalogue in Sanity Studio, so an empty dataset must render an empty site.
+  const allProducts = sanityProducts?.length ? toProducts(sanityProducts) : [];
   // Filter to only popular brands for home page
   const products = allProducts.filter((p) => POPULAR_BRAND_SLUGS.includes(p.brandSlug.toLowerCase()));
   const allBrands = sanityBrands?.length ? toBrands(sanityBrands) : getFeaturedBrands();

@@ -429,7 +429,7 @@ return (
                           variant="primary"
                           size="xl"
                           as={Link}
-                          href={`/checkout?product=${product.slug}&ram=${encodeURIComponent(activeRam)}&storage=${encodeURIComponent(activeStorage)}&color=${encodeURIComponent(activeColor?.name ?? "")}`}
+                          href={`/checkout?product=${product.slug}&variant=${encodeURIComponent(`${activeRam}-${activeStorage}`)}&ram=${encodeURIComponent(activeRam)}&storage=${encodeURIComponent(activeStorage)}&color=${encodeURIComponent(activeColor?.name ?? "")}`}
                           className="flex-1 rounded-2xl"
                         >
                           <ShoppingCart className="h-5 w-5 mr-2" />

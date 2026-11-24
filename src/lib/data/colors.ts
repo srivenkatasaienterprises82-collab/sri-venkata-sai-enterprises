@@ -1,4 +1,4 @@
-// Shared colour palette. Kept in its own module so direct-urls-overlay can use
+// Shared colour palette. Kept in its own module so catalogue tooling can use
 // it without creating a value-level circular import with products.ts.
 export const C = {
   black: { name: "Black", hex: "#1A1A1A" },

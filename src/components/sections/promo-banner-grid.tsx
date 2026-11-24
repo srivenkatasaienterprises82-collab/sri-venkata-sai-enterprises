@@ -10,41 +10,16 @@ export interface PromoBanner {
   href: string;
 }
 
-const staticBanners: PromoBanner[] = [
-  {
-    id: 1,
-    src: "/images/promo-banner/promo-1.png",
-    alt: "iQOO 15 R smartphone - available at Sri Venkata Sai Enterprises",
-    href: "/products/iqoo-15r",
-  },
-  {
-    id: 2,
-    src: "/images/promo-banner/promo-2.png",
-    alt: "Motorola Edge 70 Pro - 200MP camera flagship phone",
-    href: "/products/moto-edge-70-pro",
-  },
-  {
-    id: 3,
-    src: "/images/promo-banner/promo-3.png",
-    alt: "iPhone 17 Series - iPhone 17, Pro, Pro Max and Air",
-    href: "/category/apple",
-  },
-  {
-    id: 4,
-    src: "/images/promo-banner/promo-4.jpg",
-    alt: "iQOO Neo 10 Pro",
-    href: "/products/iqoo-neo-10-pro",
-  },
-];
-
 export function PromoBannerGrid({ banners }: { banners?: PromoBanner[] }) {
-  const displayBanners = banners && banners.length > 0 ? banners : staticBanners;
+  // Banners are managed in Sanity Studio (Banners collection). With none
+  // published there is nothing to show — no hardcoded product promos.
+  if (!banners?.length) return null;
 
   return (
     <section className="bg-white px-4 py-16 sm:px-6 lg:px-8 animate-fade-in">
       <div className="mx-auto max-w-7xl">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-6">
-          {displayBanners.map((card) => (
+          {banners.map((card) => (
             <div key={card.id}>
               <Link
                 href={card.href}

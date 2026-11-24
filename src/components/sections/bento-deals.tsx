@@ -7,7 +7,11 @@ import type { SanityOffer } from "@/sanity/types";
 import { resolveImage } from "@/sanity/lib/image";
 
 export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
-  // ── Falls back to hardcoded data if no offers are provided ──
+  // Offers are managed in Sanity Studio (Offers collection). With none
+  // published there is nothing to show — no hardcoded product deals.
+  if (!offers?.length) return null;
+
+  // ── Falls back to generic store messaging per empty slot ──
   const getOffer = (
     index: number,
     fallback: {
@@ -36,13 +40,11 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
   };
 
   const c1 = getOffer(0, {
-    badge: "Flagship Deal",
-    title: "iQOO Z11x 5G",
-    subtitle: "Get 0% EMI for up to 12 months with leading bank credit cards.",
-    discountText: "₹27,000",
-    image: "/images/products/iqoo-z11x/1.png",
-    link: "/products/iqoo-z11x",
-    cta: "Shop Now",
+    badge: "New Arrivals",
+    title: "Latest 5G Phones",
+    subtitle: "New launches land in store every week — ask us what just arrived.",
+    link: "/products",
+    cta: "Browse Catalog",
   });
 
   const c2 = getOffer(1, {
@@ -61,19 +63,17 @@ export function BentoDeals({ offers }: { offers?: SanityOffer[] }) {
   });
 
   const c4 = getOffer(3, {
-    badge: "5G Power",
-    title: "iQOO Z10 Lite",
-    subtitle: "Big battery, smooth 5G performance at an unbeatable price.",
-    discountText: "₹18,999",
-    image: "/images/products/iqoo-z10-lite/1.jpg",
-    link: "/products/iqoo-z10-lite",
-    cta: "Shop Now",
+    badge: "Ask the Store",
+    title: "Best Price on Any 5G Phone",
+    subtitle: "Tell us the model you want — we'll quote today's best price.",
+    link: "/contact",
+    cta: "Contact Us",
   });
 
   return (
     <section className="bg-slate-50 px-8 pb-12 pt-6">
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-4 md:grid-cols-3">
-        {/* 1. FLAGSHIP DEAL — iQOO Z11x 5G (Spans 2 columns) */}
+        {/* 1. Featured offer (Spans 2 columns) */}
         <Link href={c1.link} className="md:col-span-2">
           <div className="group relative flex h-[280px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md">
             <div className="z-10 flex flex-col items-start">

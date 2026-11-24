@@ -1,6 +1,5 @@
 import { GradientText } from "@/components/ui/gradient-text";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { getAllProducts } from "@/lib/data/products";
 import { getAllBrands } from "@/lib/data/brands";
 import { Footer } from "@/components/sections/footer";
 import { BrandFilter } from "@/components/sections/brand-filter";
@@ -39,7 +38,7 @@ export default async function ProductsPage({
     getSiteSettings(),
   ]);
 
-  const allProducts = sanityProducts?.length ? toProducts(sanityProducts) : getAllProducts();
+  const allProducts = sanityProducts?.length ? toProducts(sanityProducts) : [];
   const brands = sanityBrands?.length ? toBrands(sanityBrands) : getAllBrands();
 
   const filteredProducts = activeBrand

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { ProductSearch } from "./product-search";
+import type { SearchProduct } from "./product-search";
 import { siteConfig } from "@/lib/data/siteConfig";
 import { telHref, whatsappHref } from "@/lib/phone";
 import type { SanitySiteSettings } from "@/sanity/types";
@@ -39,7 +40,13 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function Nav({ settings }: { settings?: SanitySiteSettings }) {
+export function Nav({
+  settings,
+  searchProducts = [],
+}: {
+  settings?: SanitySiteSettings;
+  searchProducts?: SearchProduct[];
+}) {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -122,7 +129,7 @@ export function Nav({ settings }: { settings?: SanitySiteSettings }) {
           {/* Desktop actions */}
           <div className="hidden items-center gap-3 lg:flex min-w-0 flex-none justify-end xl:gap-5">
             <div className="w-[150px] lg:w-[180px] xl:w-[240px] mr-1 shrink-0">
-              <ProductSearch />
+              <ProductSearch products={searchProducts} />
             </div>
             <Button variant="secondary" size="sm" as="a" href={phoneTel} className="px-3 xl:px-4 shrink-0">
               <Phone className="h-4 w-4 xl:mr-1.5" />
@@ -204,7 +211,7 @@ export function Nav({ settings }: { settings?: SanitySiteSettings }) {
             className="animate-fade-in overflow-hidden border-t border-slate-200 bg-white/95 backdrop-blur-md lg:hidden shadow-lg"
           >
             <div className="p-4">
-              <ProductSearch onSelect={() => setSearchOpen(false)} />
+              <ProductSearch products={searchProducts} onSelect={() => setSearchOpen(false)} />
             </div>
           </div>
         )}

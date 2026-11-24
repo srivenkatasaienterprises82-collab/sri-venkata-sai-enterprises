@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
-import { getAllProducts } from "@/lib/data/products";
 import { getAllBrands } from "@/lib/data/brands";
 import { siteUrl } from "@/lib/siteUrl";
+import { safeSanityFetch } from "@/sanity/lib/live";
+import { PRODUCT_SLUGS_QUERY } from "@/sanity/queries";
 
 const baseUrl = siteUrl;
 
@@ -17,7 +18,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: "/best-mobile-store-in-ongole", changeFrequency: "monthly", priority: 0.8 },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const brandRoutes: MetadataRoute.Sitemap = getAllBrands().map((brand) => ({
@@ -27,12 +28,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  const productRoutes: MetadataRoute.Sitemap = getAllProducts().map((product) => ({
-    url: `/products/${product.slug}`,
-    lastModified: now,
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  // Product URLs come from Sanity only: listing a deleted or never-published
+  // product would point Google at a 404.
+  const { data: productSlugs } = await safeSanityFetch<{ slug: string }[]>({
+    query: PRODUCT_SLUGS_QUERY,
+  });
+  const productRoutes: MetadataRoute.Sitemap = (productSlugs ?? [])
+    .filter((entry) => entry?.slug)
+    .map((entry) => ({
+      url: `/products/${entry.slug}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    }));
 
   return [...staticRoutes, ...brandRoutes, ...productRoutes].map((route) => ({
     ...route,

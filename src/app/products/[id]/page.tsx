@@ -1,84 +1,40 @@
 import { ProductDetail } from "@/components/sections/product-detail";
 import { Footer } from "@/components/sections/footer";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { getProductBySlug, getStartingPrice } from "@/lib/data/products";
+import { getStartingPrice } from "@/lib/data/products";
 import { notFound } from "next/navigation";
 import { siteConfig } from "@/lib/data/siteConfig";
-import fs from "fs";
-import path from "path";
 import type { Metadata } from "next";
 import { sanityFetchNoCache } from "@/sanity/lib/live";
-import { PRODUCT_BY_SLUG_QUERY, PRODUCT_COUNT_QUERY } from "@/sanity/queries";
+import { PRODUCT_BY_SLUG_QUERY } from "@/sanity/queries";
 import { toProduct } from "@/sanity/transform";
 import { resolveImage } from "@/sanity/lib/image";
 import { getSiteSettings } from "@/sanity/lib/settings";
-import type { Product } from "@/lib/data/products";
 import type { SanityProduct } from "@/sanity/types";
 
 // The product detail page is price-sensitive. Force a fresh render for
 // every request so updated Sanity documents are reflected immediately
-// after the price-sync GitHub Action runs, with no stale Data Cache.
+// after the owner publishes (or the price-sync action runs), with no cache.
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
-async function getGalleryImages(imageFolder: string, fallbackImage: string): Promise<string[]> {
-  if (!imageFolder) return [fallbackImage];
-  const dir = path.join(process.cwd(), "public", "images", "products", imageFolder);
+/**
+ * Products exist only in Sanity. A slug that Sanity does not know is a 404 —
+ * there is no static catalogue to fall back to any more.
+ */
+async function fetchProduct(param: string): Promise<SanityProduct | null> {
   try {
-    const files = await fs.promises.readdir(dir);
-    const images = files
-      .filter(f => /\.(webp|jpg|jpeg|png|avif)$/i.test(f))
-      .sort((a, b) => {
-        const numA = parseInt(a.match(/(\d+)/)?.[1] || "0", 10);
-        const numB = parseInt(b.match(/(\d+)/)?.[1] || "0", 10);
-        return numA - numB;
-      })
-      .map(f => `/images/products/${imageFolder}/${f}`);
-    return images.length > 0 ? images : [fallbackImage];
-  } catch {
-    return [fallbackImage];
-  }
-}
-
-async function fetchProduct(param: string): Promise<{ product: Product; isSanity: boolean } | null> {
-  try {
-    const { data: sanityProduct } = await sanityFetchNoCache({
+    const { data } = (await sanityFetchNoCache({
       query: PRODUCT_BY_SLUG_QUERY,
       params: { slug: param, id: param },
-    }) as { data: SanityProduct | null };
-
-    if (sanityProduct) {
-      return { product: toProduct(sanityProduct), isSanity: true };
-    }
-
-    // No match. Fall back to the static catalog ONLY when Sanity holds no
-    // products at all (dataset emptied, outage, or a fresh project). Without
-    // this, an empty product dataset turns every product URL into a 404 even
-    // though /products and the homepage still render these products from
-    // static data. Gating on the total count keeps Sanity authoritative when
-    // it is healthy: a product the owner deletes in Studio stays 404 instead
-    // of being resurrected from static data.
-    const { data: total } = await sanityFetchNoCache<number>({
-      query: PRODUCT_COUNT_QUERY,
-    });
-    // `null` means the count query failed too (Sanity unreachable).
-    if (!total) {
-      const staticProduct = getProductBySlug(param);
-      if (staticProduct) {
-        return { product: staticProduct, isSanity: false };
-      }
-    }
+    })) as { data: SanityProduct | null };
+    return data;
   } catch (err) {
-    console.warn(`⚠️ Failed to fetch product slug ${param} from Sanity: ${err instanceof Error ? err.message : String(err)}`);
-
-    // Sanity unreachable: serve the static catalog rather than 404.
-    const staticProduct = getProductBySlug(param);
-    if (staticProduct) {
-      return { product: staticProduct, isSanity: false };
-    }
+    console.warn(
+      `⚠️ Failed to fetch product slug ${param} from Sanity: ${err instanceof Error ? err.message : String(err)}`
+    );
+    return null;
   }
-
-  return null;
 }
 
 export async function generateMetadata({
@@ -86,16 +42,16 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const resolvedParams = await params;
-  const data = await fetchProduct(resolvedParams.id);
+  const { id } = await params;
+  const sanityProduct = await fetchProduct(id);
 
-  if (!data) {
+  if (!sanityProduct) {
     return {
       title: "Product Not Found",
     };
   }
 
-  const { product } = data;
+  const product = toProduct(sanityProduct);
   const price = getStartingPrice(product);
   const priceText = price ? ` from ₹${price.toLocaleString("en-IN")}` : "";
 
@@ -112,36 +68,19 @@ export async function generateMetadata({
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  const data = await fetchProduct(resolvedParams.id);
-  
-  if (!data) {
+  const { id } = await params;
+  const sanityProduct = await fetchProduct(id);
+
+  if (!sanityProduct) {
     notFound();
   }
 
-  const { product, isSanity } = data;
+  const product = toProduct(sanityProduct);
   const settings = await getSiteSettings();
 
-  // Resolve gallery images
-  let galleryImages: string[] = [product.image];
-  if (isSanity) {
-    // If it's a Sanity product, it has CDN gallery images in it.
-    // Let's refetch Sanity images directly (PRODUCT_BY_SLUG_QUERY returns images in s.images)
-    try {
-      const { data: rawSanityProduct } = await sanityFetchNoCache({
-        query: PRODUCT_BY_SLUG_QUERY,
-        params: { slug: resolvedParams.id, id: resolvedParams.id },
-      }) as { data: SanityProduct | null };
-  if (rawSanityProduct?.images?.length) {
-    galleryImages = rawSanityProduct.images.map(resolveImage).filter(Boolean);
-  }
-    } catch {
-      // Keep single cover image
-    }
-  } else {
-    // Fallback to reading public local directories
-    galleryImages = await getGalleryImages(product.imageFolder, product.image);
-  }
+  const galleryImages = sanityProduct.images?.length
+    ? sanityProduct.images.map(resolveImage).filter(Boolean)
+    : [product.image];
 
   return (
     <>

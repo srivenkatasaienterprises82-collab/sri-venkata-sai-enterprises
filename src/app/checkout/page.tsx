@@ -1,8 +1,11 @@
 import { OrderForm } from "@/components/sections/order-form";
 import { Footer } from "@/components/sections/footer";
 import { notFound } from "next/navigation";
-import { getAllProducts } from "@/lib/data/products";
 import type { Metadata } from "next";
+import { sanityFetchNoCache } from "@/sanity/lib/live";
+import { PRODUCT_BY_SLUG_QUERY } from "@/sanity/queries";
+import { toProduct } from "@/sanity/transform";
+import type { SanityProduct } from "@/sanity/types";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -22,18 +25,22 @@ export default async function CheckoutPage({
   const ram = typeof params.ram === "string" ? params.ram : undefined;
   const storage = typeof params.storage === "string" ? params.storage : undefined;
 
-  const productId = rawProduct && getAllProducts().some((item) => item.slug === rawProduct)
-    ? rawProduct
-    : undefined;
+  // Products live only in Sanity: an unknown slug is a 404.
+  const { data: sanityProduct } = (await sanityFetchNoCache({
+    query: PRODUCT_BY_SLUG_QUERY,
+    params: { slug: rawProduct, id: rawProduct },
+  })) as { data: SanityProduct | null };
 
-  if (!productId) {
+  if (!sanityProduct) {
     notFound();
   }
+
+  const product = toProduct(sanityProduct);
 
   return (
     <>
       <main>
-        <OrderForm productId={productId} variant={variant} color={color} ram={ram} storage={storage} />
+        <OrderForm product={product} variant={variant} color={color} ram={ram} storage={storage} />
       </main>
       <Footer />
     </>

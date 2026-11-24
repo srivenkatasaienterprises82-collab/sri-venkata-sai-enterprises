@@ -8,7 +8,7 @@
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, basename, extname } from "node:path";
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "homvjne9";
@@ -123,7 +123,7 @@ async function migrateImages() {
     const ids: string[] = [];
   for (const f of files) {
     const fp = join(folder, f);
-    const st = existsSync(fp) ? require('fs').statSync(fp).size : 0;
+    const st = existsSync(fp) ? statSync(fp).size : 0;
     if (st === 61) { console.log(`  ⚠ ${slug}/${f} is 61-byte placeholder, skip`); continue; }
     try { const aid = await uploadAsset(fp); ids.push(aid); await sleep(250); }
     catch (e: any) { const body = await e.text?.().catch(() => ""); console.error(` ✗ ${slug}/${f}: ${e.status} ${(body || e.message).slice(0, 200)}`); errors++; }

@@ -5,13 +5,16 @@ import { Toaster } from "sonner";
 import { Nav } from "@/components/layout/nav";
 import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { CartProvider } from "@/context/CartContext";
+import type { SearchProduct } from "@/components/layout/product-search";
 import type { SanitySiteSettings } from "@/sanity/types";
 
 export function SiteChrome({
   settings,
+  searchProducts,
   children,
 }: {
   settings: SanitySiteSettings;
+  searchProducts: SearchProduct[];
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -23,7 +26,7 @@ export function SiteChrome({
 
   return (
     <CartProvider>
-      <Nav settings={settings} />
+      <Nav settings={settings} searchProducts={searchProducts} />
       <main id="main">{children}</main>
       <WhatsAppFloat settings={settings} />
       <Toaster position="top-right" theme="dark" />

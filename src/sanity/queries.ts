@@ -75,6 +75,18 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[_type == "product" && (slug.
 
 export const PRODUCT_COUNT_QUERY = defineQuery(`count(*[_type == "product" && enabled != false])`);
 
+export const PRODUCT_SLUGS_QUERY = defineQuery(`*[_type == "product" && enabled != false && defined(slug.current)]{"slug": slug.current}`);
+
+// Lean projection for the header search box: enough to filter and render a
+// result row, without shipping full specs to every page.
+export const SEARCH_PRODUCTS_QUERY = defineQuery(`*[_type == "product" && enabled != false] | order(order asc){
+  _id, name, slug, tags, price, flipkartPrice, amazonPrice, priceOnEnquiry, coverImage,
+  "brandName": brand->name,
+  "variantPrices": variants[].price,
+  "variantFlipkartPrices": variants[].flipkartPrice,
+  "variantAmazonPrices": variants[].amazonPrice
+}`);
+
 export const PRODUCTS_BY_BRAND_QUERY = defineQuery(`*[_type == "product" && brand->slug.current == $brandSlug && enabled != false] | order(order asc){
   _id, name, slug, type, stock, price, originalPrice, priceOnEnquiry,
   amazonUrl, flipkartUrl, amazonPrice, flipkartPrice, lastUpdated,

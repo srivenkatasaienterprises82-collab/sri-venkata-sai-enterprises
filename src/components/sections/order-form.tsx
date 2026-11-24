@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ShieldCheck } from "lucide-react";
-import { getProductBySlug, formatPrice, isPriceOnEnquiry } from "@/lib/data/products";
+import { formatPrice, isPriceOnEnquiry } from "@/lib/data/products";
+import type { Product } from "@/lib/data/products";
 import { siteConfig } from "@/lib/data/siteConfig";
 
 // WhatsApp icon SVG component
@@ -18,20 +19,28 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export function OrderForm({ productId, variant, color, ram, storage }: { productId: string; variant?: string; color?: string; ram?: string; storage?: string }) {
-  const product = getProductBySlug(productId);
-  
-  // Default values if product isn't found
-  const productName = product?.name || "Premium Smartphone";
-  const productImage = product?.image || "/images/products/iqoo-z11x/1.png";
-  const productColor = product?.colors?.[0]?.name || "Default Color";
-  
+export function OrderForm({
+  product,
+  variant,
+  color,
+  ram,
+  storage,
+}: {
+  product: Product;
+  variant?: string;
+  color?: string;
+  ram?: string;
+  storage?: string;
+}) {
+  const productName = product.name;
+  const productImage = product.image || "/logo.jpg";
+
   // Find specific variant or use first one
-  const selectedVariant = product?.variants.find(v => `${v.ram}-${v.storage}` === variant) 
-    || product?.variants?.[0];
-    
-  const price = selectedVariant?.flipkartPrice ?? product?.flipkartPrice ?? selectedVariant?.price;
-  const priceDisplay = isPriceOnEnquiry(product!) || !price ? "Price on Enquiry" : formatPrice(price);
+  const selectedVariant = product.variants.find(v => `${v.ram}-${v.storage}` === variant)
+    || product.variants?.[0];
+
+  const price = selectedVariant?.flipkartPrice ?? product.flipkartPrice ?? selectedVariant?.price;
+  const priceDisplay = isPriceOnEnquiry(product) || !price ? "Price on Enquiry" : formatPrice(price);
   const storageStr = selectedVariant ? `${selectedVariant.ram} / ${selectedVariant.storage}` : "128GB";
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,7 +56,7 @@ export function OrderForm({ productId, variant, color, ram, storage }: { product
     const orderData = {
       ...data,
       productName,
-      productSlug: productId,
+      productSlug: product.slug,
       selectedColor: color ?? "",
       selectedRam: ram ?? "",
       selectedStorage: storage ?? variant ?? "",
@@ -181,7 +190,7 @@ export function OrderForm({ productId, variant, color, ram, storage }: { product
                 <div className="flex flex-col justify-center">
                   <h3 className="text-lg font-bold text-slate-900 leading-tight mb-1">{productName}</h3>
                   <p className="text-sm font-medium text-slate-500 mb-0.5">{storageStr}</p>
-                  <p className="text-sm font-medium text-slate-500">{productColor}</p>
+                  <p className="text-sm font-medium text-slate-500">{color || product.colors?.[0]?.name || ""}</p>
                 </div>
               </div>
               

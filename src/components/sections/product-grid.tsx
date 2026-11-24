@@ -41,6 +41,9 @@ export function ProductGrid({ products }: { products: Product[] }) {
     setMounted(true);
   }, []);
 
+  // No products in Sanity yet: render nothing rather than an empty carousel.
+  if (filteredProducts.length === 0) return null;
+
   return (
     <Section className="bg-white" container="sm" id="products">
       <div className="w-full">

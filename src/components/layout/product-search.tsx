@@ -5,13 +5,26 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
-import { products, getStartingPrice, isPriceOnEnquiry, formatPrice } from "@/lib/data/products";
+import { formatPrice } from "@/lib/data/products";
+
+/** Minimal product shape for the header search results. */
+export interface SearchProduct {
+  id: string;
+  name: string;
+  slug: string;
+  brand: string;
+  tags: string[];
+  image: string;
+  price?: number;
+  priceOnEnquiry?: boolean;
+}
 
 interface ProductSearchProps {
+  products: SearchProduct[];
   onSelect?: () => void;
 }
 
-export function ProductSearch({ onSelect }: ProductSearchProps) {
+export function ProductSearch({ products, onSelect }: ProductSearchProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -34,7 +47,7 @@ export function ProductSearch({ onSelect }: ProductSearchProps) {
           p.tags.some((t) => t.toLowerCase().includes(lowerQuery))
       )
       .slice(0, 6);
-  }, [query]);
+  }, [query, products]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -74,10 +87,9 @@ export function ProductSearch({ onSelect }: ProductSearchProps) {
     }
   }
 
-  function priceLabel(product: (typeof products)[number]) {
-    if (isPriceOnEnquiry(product)) return "Price on Enquiry";
-    const price = getStartingPrice(product);
-    return price !== undefined ? formatPrice(price) : "Price on Enquiry";
+  function priceLabel(product: SearchProduct) {
+    if (product.priceOnEnquiry || typeof product.price !== "number") return "Price on Enquiry";
+    return formatPrice(product.price);
   }
 
   const activeOptionId =
